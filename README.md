@@ -1,2 +1,2 @@
 # My personal website
-maujim.github.io
+https://maujim.github.io
