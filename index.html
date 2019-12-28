@@ -21,35 +21,86 @@
             border: 0.5px solid black;
         }
     </style>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous" />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/style-navbar.css" />
+    <link rel="stylesheet" href="/css/main.css" />
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="#">Mukund Mauji</a>
-    </nav>
+    <header>
+        <!-- navbar -->
+        <nav class="navbar navbar-expand-lg">
+            <a></a>
+            <!-- This empty <a> tag lets the navbar toggler stay on the right. Not sure why but it works -->
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                onclick="toggleSideNav()">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse">
+                <div class="top-nav-temp-spacer" style="height: 65px;"></div>
+                <!-- Keeping below elements as templates for now -->
+                <!-- <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/index.html">Home <span>
+                                <hr class="underline" /> </span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/pages/about-us.html">About us <span>
+                                <hr class="underline" /> </span>
+                        </a>
+                    </li>
+                </ul> -->
+            </div>
+        </nav>
 
+        <!-- side nav -->
+        <nav class="side-nav" id="sideNav">
+            <div class="side-nav-body">
+                <!-- Keeping below elements as templates for now -->
+                <!-- <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/pages/about-us.html">About us</a>
+                    </li>
+                </ul> -->
+                <!-- <hr class="side-nav-underline" /> -->
+                <!-- find a nice shade of grey for this hr (maybe)-->
+            </div>
+        </nav>
+    </header>
 
-    <div class="container">
-        <h1>
-            Mukund Mauji
-        </h1>
-        <p>
-            I'm currently in the process of building the site. Check back soon for an updated version! In the meantime,
-            feel
-            free to connect with me.
-        </p>
-        <div>
-            <a target="_blank" href="https://github.com/maujim">GitHub</a> | <a target="_blank"
-                href="https://linkedin.com/in/mukund-mauji/">LinkedIn</a> | <a target="_blank"
-                href="mailto:mauji.mukund@yahoo.ca">Email</a>
+    <main>
+        <!-- overlay -->
+        <div class="container-fluid" id="overlay"></div>
+        <!-- content -->
+        <div class="container">
+            <h1>
+                Mukund Mauji
+            </h1>
+            <p>
+                I'm currently in the process of building the site. Check back soon for an updated version! In the
+                meantime,
+                feel
+                free to connect with me.
+            </p>
+            <div>
+                <a target="_blank" href="https://github.com/maujim">GitHub</a> | <a target="_blank"
+                    href="https://linkedin.com/in/mukund-mauji/">LinkedIn</a> | <a target="_blank"
+                    href="mailto:mauji.mukund@yahoo.ca">Email</a>
+            </div>
+            <hr>
+            <div>
+                Download my resume <a target="_blank" href="resume/resume.pdf">here</a>.
+            </div>
         </div>
-        <hr>
-        <div>
-            Download my resume <a target="_blank" href="resume/resume.pdf">here</a>.
-        </div>
-    </div>
+    </main>
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
         integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
@@ -60,6 +111,7 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
         integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
         crossorigin="anonymous"></script>
+    <script src="/js/myscript.js"></script>
 </body>
 
 </html>

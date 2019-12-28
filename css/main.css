@@ -1,0 +1,32 @@
+body {
+  /* background-color: #222222; */
+  /* overflow: scroll; */
+}
+
+@media (max-width: 575.98px) {
+  body main div.container .heading-scale-big{
+  /* scales the headings down on xs screens */
+    display: none;
+  }
+}
+
+@media (min-width: 576px) {
+  body main div.container .heading-scale-small{
+  /* scales the headings up on sm and larger screens */
+    display: none;
+  }
+}
+
+main > .container-fluid + .container {
+  /* background-color: rgba(0, 0, 0, 0.2); */
+  margin-top: 16px;
+  margin-bottom: 16px;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  min-height: calc(100vh - 113px);
+  border-radius: 0.25rem;
+}
+
+.container {
+  /* color: white; */
+}

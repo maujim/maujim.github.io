@@ -1,0 +1,191 @@
+.navbar,
+.navbar-collapse {
+  /* backgound color of navbar */
+  background-color: #222222;
+}
+
+.navbar.navbar-expand-lg {
+  /* border-bottom: 1px #cb142f solid; */
+}
+
+.navbar.navbar-expand-lg.side-nav-active {
+  border-bottom: 1px #222222 solid;
+}
+
+.navbar-nav .nav-link,
+.dropdown-item {
+  /* custom CSS for all navbar and dropdown elements */
+  color: white;
+}
+
+.navbar-nav .nav-link:hover,
+.navbar-nav .nav-link:focus,
+.navbar-nav .active>.nav-link,
+.navbar-nav .nav-link.active {
+  /* custom CSS for active navbar, navbar:hover and :focus elements */
+  color: #cb142f;
+}
+
+hr.underline {
+  /* base CSS for underline for nav elements */
+  background-color: #cb142f;
+  border: none;
+  margin: 8px -8px -8px -8px;
+  padding: 0.5px 0 0.5px 0;
+  width: 0%;
+  -webkit-transition: all 0.6s ease-in-out;
+  -o-transition: all 0.6s ease-in-out;
+  transition: all 0.6s ease-in-out;
+}
+
+.navbar-nav .nav-link:hover hr.underline,
+.navbar-nav .nav-link:focus hr.underline {
+  /* displays the underline for navbar:hover elements */
+  padding: 0.5px 8px 0.5px 8px;
+  width: 100%;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+  /* custom CSS for dropdown:hover and :focus elements */
+  color: white;
+  text-decoration: none;
+  background-color: #cb142f;
+}
+
+.dropdown-item.active,
+.dropdown-item:active {
+  /* custom CSS for active dropdown elements */
+  color: #cb142f;
+  text-decoration: none;
+  background-color: transparent;
+}
+
+.navbar-toggler {
+  /* base CSS for navbar toggler */
+  /* had to be added because navbar-dark class wasn't used for navbar
+     copied directly from bootstrap */
+  color: white;
+  border-color: white;
+  float: right;
+}
+
+.navbar-toggler.side-nav-active {
+  /* hides the navbar toggler when the side nav is active */
+  color: transparent;
+  border-color: transparent;
+}
+
+.navbar-toggler-icon {
+  /* base CSS for navbar toggler icon */
+  /* had to be added because navbar-dark class wasn't used for navbar
+     copied directly from bootstrap */
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='white' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+}
+
+.navbar-toggler-icon.side-nav-active {
+  /* changes the navbar toggler icon when the side nav is active */
+  background-image: url('/images/close-round-white.png');
+}
+
+#contact-btn {
+  /* base CSS for contact-us button */
+  color: #cb142f;
+  background-color: transparent;
+  background-image: none;
+  border-color: #cb142f;
+}
+
+#contact-btn:hover {
+  color: white;
+  background-color: #cb142f;
+  border-color: #cb142f;
+}
+
+/* --------------------------------------------------------------
+                            SIDENAV
+-------------------------------------------------------------- */
+
+.side-nav {
+  /* base CSS for the side nav */
+  position: fixed;
+  top: 0;
+  left: -250px;
+  height: 100vh;
+  width: 250px;
+  z-index: 999;
+  background-color: #222222;
+  /* border-right: #cb142f 1px solid; */
+  color: #fff;
+  -webkit-transition: all 0.3s;
+  -o-transition: all 0.3s;
+  transition: all 0.3s;
+  overflow: hidden;
+}
+
+.side-nav::-webkit-scrollbar,
+.side-nav div::-webkit-scrollbar {
+  /* hides the scroll bar in the side nav */
+  display: none;
+}
+
+.side-nav.side-nav-active {
+  /* the .side-nav-active class makes the side nav visible on screen */
+  left: 0px;
+}
+
+.side-nav-spacer {
+  /* base CSS for the side nav header */
+  height: 80px;
+}
+
+.side-nav-body {
+  /* base CSS for the side nav body */
+  padding-top: 8px;
+  height: calc(100vh - 80px);
+  overflow-y: scroll;
+}
+
+#side-nav-logo {
+  /* adjusts the positioning of the logo in the side nav */
+  margin: 13px 0px 13px 16px;
+}
+
+.side-nav-body .navbar-nav .nav-link {
+  /* adjusts the positioning of the links in the side nav */
+  padding: 8px 19.5px;
+}
+
+.side-nav-body .contact-btn {
+  /* adjusts the positioning of the contact us button in the side nav */
+  padding: 8px 19.5px;
+}
+
+.side-nav-body  hr.side-nav-underline {
+  /* base CSS for underline for nav elements */
+  background-color: white;
+  border: none;
+  padding: 0.5px 0;
+  margin: 8px 19.5px;
+}
+
+#overlay {
+  /* base CSS for overlay */
+  display: none;
+  /* position: fixed; */ 
+  /* Property is unspecified, might cause problems in the future. Currently, when the sidenav appears, page content is hidden */
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 998;
+  opacity: 0;
+  -webkit-transition: all 0.3s ease-in-out;
+  -o-transition: all 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
+}
+
+#overlay.side-nav-active {
+  /* the .side-nav-active class makes the overlay visible on screen */
+  display: block;
+  opacity: 1;
+}
