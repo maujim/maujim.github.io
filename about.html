@@ -2,149 +2,62 @@
 <html lang="en">
 
 <!-- https://m.theentireworld.com/ -->
+<!-- https://coder-coder.com/build-flexbox-website-layout/ -->
+<!-- https://www.quackit.com/css/flexbox/tutorial/create_a_responsive_flexbox_layout.cfm -->
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>mukund mauji</title>
+    <title>testing</title>
 
-    <style>
-        .bottom {
-            position: fixed;
-            bottom: 12px;
-            left: 12px;
-            width: calc(100% - 24px);
-            z-index: 200;
-            font-size: 16px;
-            font-family: HelveticaNeue-Light, Helvetica, Arial, sans-serif;
-            font: inherit;
-            transition: opacity 0.12s ease-out;
-            transition-delay: 0.18s;
-            -webkit-backdrop-filter: blur(3px);
-            backdrop-filter: blur(3px);
-            background: hsla(0, 0%, 100%, 0.22);
-        }
-
-        .bottom_footer {
-            border-top: 1px solid #000;
-            overflow: hidden;
-            contain: content;
-        }
-
-        .bottom_footer .footer-text {
-            padding: 10px 12px;
-        }
-
-        .frame {
-            position: fixed;
-            top: 12px;
-            left: 12px;
-            bottom: 12px;
-            right: 12px;
-            z-index: 300;
-            pointer-events: none;
-            border: 1px solid #000000;
-        }
-
-        .top {
-            position: fixed;
-            top: 12px;
-            left: 12px;
-            width: calc(100% - 24px);
-            z-index: 300;
-            font-size: 16px;
-            font-family: HelveticaNeue-Light, Helvetica, Arial, sans-serif;
-            font: inherit;
-            transition: opacity 0.12s ease-out;
-            transition-delay: 0.18s;
-            -webkit-backdrop-filter: blur(3px);
-            backdrop-filter: blur(3px);
-            background: hsla(0, 0%, 100%, 0.22);
-        }
-
-        .top_header {
-            display: -webkit-flex;
-            display: flex;
-            -webkit-justify-content: space-between;
-            justify-content: space-between;
-            -webkit-align-items: center;
-            align-items: center;
-            height: 50px;
-            padding: 10px 12px;
-            border-bottom: 1px solid #000;
-        }
-
-        .top_sections {
-            display: -webkit-flex;
-            display: flex;
-            -webkit-align-items: center;
-            align-items: center;
-            border-bottom: 1px solid #000;
-        }
-
-        .top_sections>a {
-            -webkit-flex: 1 1;
-            flex: 1 1;
-        }
-
-        .top_sections>a:first-of-type {
-            border-right: 1px solid;
-        }
-
-        .top_sections>a:last-of-type {
-            border-left: 1px solid;
-        }
-
-        .top_sections .cb__li {
-            text-align: center;
-            padding: 2px;
-        }
-
-        .page {
-            position: fixed;
-            top: 12px;
-            left: 12px;
-            bottom: 12px;
-            right: 12px;
-            overflow: scroll;
-            -webkit-transform: rotate(0);
-            transform: rotate(0);
-            -webkit-overflow-scrolling: touch;
-        }
-
-        #page--home {
-            position: absolute;
-            top: 0px;
-            bottom: 0px;
-        }
-
-        .page-body {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        /* should be hidden in mobile */
-        .hamburger-menu {
-            /* width: 15px;
-            height: 12px; */
-            position: relative;
-            display: block;
-            cursor: pointer;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js"></script>
 </head>
 
 <body>
+    <div class="frame"></div>
+
     <div class="top" id="top">
-        <div class="top_header">
+        <div class="header flex-container">
+            <a href="/about.html" class="header__title">
+                Home
+            </a>
+
+            <!-- should be hidden in mobile -->
+            <div class="header__hamburger">
+                hamburger
+            </div>
+        </div>
+        <div class="menu flex-container">
+            <a href="/about.html" class="menu__item">
+                About
+            </a>
+            <a href="/blog" class="menu__item">
+                Blog
+            </a>
+            <a href="/contact.html" class="menu__item">
+                Contact
+            </a>
+        </div>
+    </div>
+    <div class="bottom" id="bottom">
+        <div class="bottom_footer">
+            <div class="footer-text">
+                footer text
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- 
+    <div class="top" id="top">
+        <div class="header">
             <a href="/about.html">
                 <h1>Mukund Mauji</h1>
             </a>
 
-            <!-- should be hidden in mobile -->
+            should be hidden in mobile
             <div class="hamburger-menu">
                 hamburger
             </div>
@@ -173,32 +86,15 @@
         <div class="page-body">
             page
         </div>
-    </div>
+    </div> 
+-->
 
-    <div class="frame"></div>
 
 
-    <script>
-        window.onload = function set_size_of_main_area() {
-            var top = document.getElementById("top");
-            var position_info = element.getBoundingClientRect();
-            var top_height = position_info.height;
-            // var top_width = position_info.width;
 
-            var bottom = document.getElementById("bottom");
-            var position_info = element.getBoundingClientRect();
-            var bottom_height = position_info.height;
-            // var bottom_width = position_info.width;
-
-            var content = document.getElementById("page--home").style;
-
-            content.top = top_height + 12 + 'px';
-            content.bottom = bottom_height + 12 + 'px';
-            // https://stackoverflow.com/questions/20162333/javascript-change-css-top-property
-            // https://www.geeksforgeeks.org/how-to-run-a-function-when-the-page-is-loaded-in-javascript/
-        }
-    </script>
-
+    <!-- <script>
+        window.onload = set_size_of_main_area()
+    </script> -->
 </body>
 
 </html>
