@@ -1,76 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<!-- https://m.theentireworld.com/ -->
-
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>mukund mauji</title>
-
-    <link rel="stylesheet" href="style/main.css">
+    <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1" 
+    charset="UTF-8">
+    <title>Mukund Mauji</title>
+    <link rel="stylesheet" href="style/style.css">
+    <link rel="stylesheet" href="style/scheme.css">
+    <link rel='stylesheet' href='https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@600&display=swap'>
 </head>
 
 <body>
-    <div class="top" id="top">
-        <div class="top_header">
-            <a href="/about.html">
-                <h1>Mukund Mauji</h1>
-            </a>
+    <div class="body-container">
+    <!-- <div class="body-container debug-show"> -->
+        <h1 style="margin-top: 2.5rem">
+            <b>Mukund Mauji</b>
+        </h1>
 
-            <!-- should be hidden in mobile -->
-            <div class="hamburger-menu">
-                hamburger
-            </div>
+        <div class="tabs-container-flex">
+            <!-- <div>Blog</div> -->
+            <div><a href="https://github.com/maujim">GitHub</a></div>
+            <div><a href="https://www.linkedin.com/in/mukund-mauji/">LinkedIn</a></div>
+            <div><a href="mailto:mauji.mukund@yahoo.ca">Email</a></div>
         </div>
-        <div class="top_sections">
-            <a href="/about.html">
-                <h3 class="cb__li">About</h3>
-            </a>
-            <a href="/blog">
-                <h3 class="cb__li">Blog</h3>
-            </a>
-            <a href="/contact.html">
-                <h3 class="cb__li">Contact</h3>
-            </a>
-        </div>
-    </div>
-    <div class="page" id="page--home">
-        <div class="page-body">
-            page
+
+        <div class="body-content">
+            <p>
+            Currently, I'm a software developer at <a href="https://www.mosaicmfg.com/">Mosaic Manufacturing</a>, working on 3D printing software.
+            </p>
+
+            <p>
+            Previously, I completed my B.A.Sc. from Queen's University, where I studied <a href="https://www.queensu.ca/mathstat/mthe">Mathematics and Engineering</a>, specializing in the <a href="https://www.queensu.ca/mathstat/undergraduate/prospective-undergraduate/mthe/options">Systems and Robotics</a> option.
+            </p>
         </div>
     </div>
-    <div class="bottom" id="bottom">
-        <div class="bottom_footer">
-            <div class="footer-text">
-                footer text
-            </div>
-        </div>
-    </div>
-
-    <div class="frame"></div>
-
-    <script>
-        window.onload = function set_size_of_main_area() {
-            var top = document.getElementById("top");
-            var position_info = element.getBoundingClientRect();
-            var top_height = position_info.height;
-            // var top_width = position_info.width;
-
-            var bottom = document.getElementById("bottom");
-            var position_info = element.getBoundingClientRect();
-            var bottom_height = position_info.height;
-            // var bottom_width = position_info.width;
-
-            var content = document.getElementById("page--home").style;
-
-            content.top = top_height + 12 + 'px';
-            content.bottom = bottom_height + 12 + 'px';
-            // https://stackoverflow.com/questions/20162333/javascript-change-css-top-property
-            // https://www.geeksforgeeks.org/how-to-run-a-function-when-the-page-is-loaded-in-javascript/
-        }
-    </script>
-
 </body>
-
 </html>

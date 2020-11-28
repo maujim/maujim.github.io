@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1" 
+    charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="style/w3.css">
+    <link rel="stylesheet" href="style/style.css">
+</head>
+
+<body>
+    <div class="body-container debug-show">
+        <h1>Mukund Mauji</h1>
+
+        <div class="tabs-container-flex">
+            <div>About</div>
+            <div>Blog</div>
+            <div>3</div>  
+            <div>4</div>
+        </div>
+
+        <div class="debug-spacer-small"></div>
+        
+        <!-- use the posts format from typical contents here -->
+
+        <!-- 
+        if doing the above method, would not need the blow-row-flex class 
+        could just have every entry be a child of blog-container-flex with nowrap enabled to the number of entries in each row changes as the screen width changes
+
+        however, the website implements a horizontal scrolling section on mobile which I don't like. I would prefer the user to scroll vertically, which also doesn't require any additional work on my part
+
+        I think the format I'm aiming for is similar to what castel.dev/notes implements
+
+        However, the format of the actual blog entries of typical contents is quite nice 
+        The blog posts layout on jaycarlson.net is also quite nice, but that requires having a few posts, and also some nice colorful images to go make the entries pop
+
+        That could be something that is done in the future
+        -->
+        <div class="blog-container-flex debug-show">  
+            <div class="blog-row-flex debug-show">
+                <div class="blog-entry debug-show"> 
+                    <img src="files/random.png">
+                    <div class="blog-entry-title"> ABC </div>
+                </div>
+
+                <div class="blog-entry debug-show"> 
+                    <img src="files/random.png">
+                    <div class="blog-entry-title"> ABC2 </div>
+                </div>
+            </div>
+
+            <div class="blog-row-flex debug-show">
+                <div class="blog-entry debug-show"> 
+                    <img src="files/random.png">
+                    <div class="blog-entry-title"> ABC </div>
+                </div>
+
+                <div class="blog-entry debug-show"> 
+                    <img src="files/random.png">
+                    <div class="blog-entry-title"> ABC2 </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="debug-spacer-small"></div>
+
+        <div class="debug-spacer-large">spacer</div>
+        <p>Some text some text some text some text..</p>
+    </div>
+</body>
+</html>
+
