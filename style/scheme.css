@@ -1,0 +1,37 @@
+html {
+    font-family: 'Source Code Pro', monospace !important;
+
+    /* gruvbox light */
+    background-color: #f2e5bc;
+    color: #3c3836 !important;
+
+    /* gruvbox dark */
+    background-color: #1d2021;
+    color: #ebdbb2 !important;
+
+    /* alt dark */
+    background-color: #181a1b;
+    color: #e8e6e3 !important;
+}
+
+a:link, a:visited, a:link:active, a:link:visited {
+    /* gruvbox light */
+    /* color: #282828; */
+
+    /* gruvbox dark */
+    color: #ebdbb2;
+}
+
+/* a:link { */
+/*     /1* same for both light and theme *1/ */
+/*     color: #458588; */
+/* } */
+/* a:visited { */
+/*     /1* same for both light and theme *1/ */
+/*     color: #b16286; */
+/* } */
+/* a:link:active, a:visited:active { */
+/*     /1* same for both light and theme *1/ */
+/*     color: #cc241d; */
+/* } */
+

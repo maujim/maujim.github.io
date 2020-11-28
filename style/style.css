@@ -1,0 +1,30 @@
+.body-container {
+    /* TODO: make this class responsive at multiple layers, like the bootstrap container */
+    margin: 1rem auto;
+    max-width: 1140px;
+    line-height: 1.6;
+    padding: 0 10px;
+}
+
+.body-content {}
+
+.tabs-container-flex {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    align-items: center;
+}
+
+.tabs-container-flex > div {
+    /* background-color: #f1f1f1; */
+    min-width: 260px;
+    margin: 10px;
+    text-align: center;
+}
+
+.debug-spacer-small { min-height: 50px; }
+.debug-spacer-large { min-height: 150px; }
+.debug-show {
+    border-style: solid;
+    border-width: 1px;
+}
