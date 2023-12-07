@@ -1,36 +1,18 @@
-a {
-    color: #004677;
+body {
+    font-family: Georgia, serif !important;
+    font-size: 18px;
+
+    background: #fefae0 !important;
 }
 
-nav a,
-footer div a {
-    margin: 0px 5px;
+header, main, footer {
+    background: inherit;
+}
+
+header {
+    border-bottom: 3px solid #5F3713;
 }
 
 footer {
-    margin-top: 3em;
-    text-align: center;
-}
-
-hr {
-    margin-top: 1rem;
-    margin-bottom: 1rem;
-    border: 0;
-    border-top: 1px solid rgba(0, 0, 0, 0.1);
-}
-
-body {
-    background-color: white;
-    margin: auto;
-    max-width: 600px;
-    padding: 18px;
-    position: relative;
-
-    font-family: Georgia, serif;
-    font-size: 18px;
-    text-align: left;
-}
-
-.big-name {
-    margin-top: 1em;
+    background: #AF997A;
 }
