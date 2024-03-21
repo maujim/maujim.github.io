@@ -9,12 +9,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="stylesheet" type="text/css" href="/css/global.css">
+    <link rel="stylesheet" type="text/css" href="/css/fonts.css">
 </head>
 
 <body>
-    <header>
-        <h1 class="big-name">Mukund Mauji</h1>
-    </header>
+    <div class="background-image" id="background-image"></div>
+    <div class="content-container" id="dynamic-placement">
+        <div class="scrolling-text">
+            <header>
+                <h1 class="big-name" id="big-name">Mukund Mauji</h1>
+            </header>
+        </div>
+    </div>
 
     <p>
         I am currently participating in the Computational Neuroscience course at <a target="_blank" href="https://academy.neuromatch.io/courses">Neuromatch Academy</a>.
@@ -42,7 +48,29 @@
         </div>
     </footer>
 
-    <script type="text/javascript" src="/javascript/global.js"></script>
 </body>
+
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
+        const targetHeight = document.getElementById("big-name").clientHeight;
+        const paddingTopValue = `calc(66vh - ${targetHeight / 2}px)`;
+
+        const targetElement = document.getElementById("dynamic-placement");
+
+        // targetElement.style.paddingTop = paddingTopValue;
+        // console.log(`setting value of ${targetElement} to ${paddingTopValue}`)
+    });
+
+    window.addEventListener('scroll', () => {
+        const fadingSpeed = 0.8;
+        const opacityLowerBound = 0.15;
+
+        const bgImage = document.getElementById("background-image");
+        const scrollPosition = window.scrollY;
+        const opacity = 1 - (scrollPosition / (bgImage.clientHeight * fadingSpeed));
+
+        bgImage.style.opacity = opacity > opacityLowerBound ? opacity : opacityLowerBound;
+    });
+</script>
 
 </html>

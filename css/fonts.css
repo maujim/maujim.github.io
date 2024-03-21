@@ -1,0 +1,35 @@
+@font-face {
+    font-family: "Butler";
+    src: url("/assets/fonts/Butler-Free-Regular.otf");
+}
+
+@font-face {
+    font-family: "ButlerBold";
+    src: url("/assets/fonts/Butler-Free-Bold.otf");
+}
+
+@font-face {
+    font-family: "ButlerSemiBold";
+    src: url("/assets/fonts/Butler-Free-SemiBold.otf");
+}
+
+@font-face {
+    font-family: "ButlerMedium";
+    src: url("/assets/fonts/Butler-Free-Medium.otf");
+}
+
+@font-face {
+    font-family: "ButlerExtraBold";
+    src: url("/assets/fonts/Butler-Free-ExtraBold.otf");
+}
+
+@font-face {
+    font-family: "ButlerBlack";
+    src: url("/assets/fonts/Butler-Free-Black.otf");
+}
+
+@font-face {
+    font-family: "ButlerLight";
+    src: url("/assets/fonts/Butler-Free-Light.otf");
+}
+
