@@ -1,5 +1,5 @@
 format-html:
-	pnpm dlx prettier index.html --write
+	pnpm install && pnpm prettier index.html --write
 
 run-dev: redbean.com
 	cp redbean.com dev.com
