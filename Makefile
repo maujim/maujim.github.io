@@ -1,3 +1,6 @@
+format-html:
+	pnpm install && pnpm prettier index.html --write
+
 run-dev: redbean.com
 	cp redbean.com dev.com
 	zip dev.com ./index.html
