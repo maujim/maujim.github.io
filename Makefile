@@ -1,5 +1,5 @@
 format-html:
-	pnpm install && pnpm prettier index.html --write
+	pnpm install && pnpm prettier src/ --write
 
 run-dev: redbean.com
 	cp redbean.com dev.com
@@ -11,4 +11,3 @@ run-dev: redbean.com
 
 redbean.com:
 	curl -f https://redbean.dev/redbean-2.2.com -o redbean.com
-
