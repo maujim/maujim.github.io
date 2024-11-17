@@ -1,36 +1,36 @@
 a {
-    color: #004677;
+  color: #004677;
 }
 
 nav a,
 footer div a {
-    margin: 0px 5px;
+  margin: 0px 5px;
 }
 
 footer {
-    margin-top: 3em;
-    text-align: center;
+  margin-top: 3em;
+  text-align: center;
 }
 
 hr {
-    margin-top: 1rem;
-    margin-bottom: 1rem;
-    border: 0;
-    border-top: 1px solid rgba(0, 0, 0, 0.1);
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  border: 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 body {
-    background-color: white;
-    margin: auto;
-    max-width: 600px;
-    padding: 18px;
-    position: relative;
+  background-color: white;
+  margin: auto;
+  max-width: 600px;
+  padding: 18px;
+  position: relative;
 
-    font-family: Georgia, serif;
-    font-size: 18px;
-    text-align: left;
+  font-family: Georgia, serif;
+  font-size: 18px;
+  text-align: left;
 }
 
 .big-name {
-    margin-top: 1em;
+  margin-top: 1em;
 }
