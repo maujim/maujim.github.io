@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Clinical Trials Viewer</title>
+
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"
+    ></script>
+
+    <!-- Alpine JS -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+      [x-cloak] {
+        display: none !important;
+      }
+    </style>
+  </head>
+
+  <body x-data="clinicalTrials()" x-init="init()">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">GANSID</a>
+      </div>
+    </nav>
+
+    <div class="container-fluid">
+      <div class="row">
+        <!-- Left Panel (Filters) -->
+        <div class="col-md-3">
+          <div class="card mb-3">
+            <div class="card-header">
+              <strong>Filters</strong>
+            </div>
+
+            <div class="card-body">
+              <!-- Age Range Filter -->
+              <div class="mb-3">
+                <label class="form-label">How old are you:</label>
+                <div class="d-flex align-items-center">
+                  <input
+                    type="number"
+                    class="form-control me-2"
+                    min="0"
+                    step="1"
+                    x-model.number="filters.age"
+                    placeholder="All ages"
+                    @input="filters.age === '' ? filters.age = null : null"
+                  />
+                </div>
+              </div>
+
+              <!-- TODO: hook these up in filteredTrials() -->
+
+              <!-- Start Date Filter -->
+              <!-- <div class="mb-3"> -->
+              <!--   <label for="startDate" class="form-label">Start Date</label> -->
+              <!--   <input type="date" class="form-control" id="startDate" x-model="filters.startDate" /> -->
+              <!-- </div> -->
+
+              <!-- <!-1- Completion Date Filter -1-> -->
+              <!-- <div class="mb-3"> -->
+              <!--   <label for="endDate" class="form-label">Completion Date</label> -->
+              <!--   <input type="date" class="form-control" id="endDate" x-model="filters.endDate" /> -->
+              <!-- </div> -->
+
+              <!-- Status Filter -->
+              <div class="mb-3">
+                <label for="status" class="form-label">Status</label>
+                <select class="form-select" id="status" x-model="filters.status">
+                  <option selected value="all">All</option>
+                  <option value="RECRUITING">Recruiting</option>
+                  <option value="ENROLLING_BY_INVITATION">By Invitation</option>
+                  <option value="ACTIVE_NOT_RECRUITING">Active, Not Recruiting</option>
+                </select>
+              </div>
+
+              <button type="button" class="btn btn-outline-secondary" @click="resetFilters()">Reset</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="col-12 col-md-9">
+          <!-- TODO: hook this up to actually do stuff -->
+          <!-- Sorting Options (Top Bar) -->
+          <div class="mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <strong>Sort By:</strong>
+                <select class="form-select d-inline-block" x-model="sortBy" style="width: auto">
+                  <option selected value="default">default</option>
+                  <option value="title">Title</option>
+                  <option value="start-date-asc">Start Date (ascending)</option>
+                  <option value="start-date-desc">Start Date (descending)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="py-3">
+            <!-- Loading Indicator (only shown if no trials yet) -->
+            <template x-if="loading && trials.length === 0">
+              <div class="text-center my-3">
+                <div class="spinner-border" role="status">
+                  <span class="sr-only">Loading...</span>
+                </div>
+                <p>Loading trials...</p>
+              </div>
+            </template>
+
+            <!-- No Trials Message -->
+            <template x-if="!loading && trials.length === 0">
+              <div class="alert alert-warning" role="alert">No trials found.</div>
+            </template>
+
+            <!-- Trials Cards -->
+            <template x-for="(trial, index) in filteredTrials()" :key="index">
+              <div class="card mb-3 overflow-hidden">
+                <div class="card-body" x-show.important="!showContactIndex.has(index)">
+                  <h5 class="card-title">
+                    <strong x-text="trial.protocolSection.identificationModule.briefTitle"></strong>
+                  </h5>
+
+                  <div class="d-flex flex-wrap">
+                    <span
+                      :class="{
+      'bg-success': trial.protocolSection.statusModule.overallStatus === 'RECRUITING',
+      'bg-primary': trial.protocolSection.statusModule.overallStatus === 'ENROLLING_BY_INVITATION',
+      'bg-warning': trial.protocolSection.statusModule.overallStatus === 'ACTIVE_NOT_RECRUITING'
+    }"
+                      class="badge me-2 text-white"
+                      x-text="trial.protocolSection.statusModule.overallStatus"
+                    ></span>
+                  </div>
+                </div>
+
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item">
+                    <strong>Start date:</strong> <span x-text="startDate(trial)"></span>
+                    <br />
+                    <strong>Completion date:</strong> <span x-text="completionDate(trial)"></span>
+                  </li>
+                  <li class="list-group-item"><strong>Age:</strong> <span x-text="ageRange(trial)"></span></li>
+
+                  <li class="list-group-item">
+                    <strong>Eligible sexes:</strong>
+                    <span x-text="trial.protocolSection.eligibilityModule.sex"></span>
+                  </li>
+
+                  <li class="list-group-item">
+                    <strong>Accepts healthy volunteers:</strong>
+                    <span x-text="trial.protocolSection.eligibilityModule.healthyVolunteers ? 'Yes' : 'No'"></span>
+                  </li>
+                </ul>
+
+                <!-- Footer Buttons -->
+                <a
+                  :href="`https://clinicaltrials.gov/study/${trial.protocolSection.identificationModule.nctId}`"
+                  target="_blank"
+                  class="btn text-center card-footer"
+                >
+                  View Trial Details
+                  <i data-lucide="external-link"></i>
+                </a>
+              </div>
+            </template>
+
+            <!-- Load More Button / End of Data Message -->
+            <div class="text-center my-3">
+              <template x-if="nextPageToken">
+                <button class="btn btn-primary" @click="loadMore()" :disabled="loading">
+                  <span
+                    x-show="loading"
+                    class="spinner-border spinner-border-sm mr-2"
+                    role="status"
+                    aria-hidden="true"
+                  ></span>
+                  <span x-text="loading ? 'Loading...' : 'Load More'"></span>
+                </button>
+              </template>
+              <template x-if="!nextPageToken && trials.length > 0">
+                <p>No more trials available.</p>
+              </template>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alpine JS Component -->
+    <script>
+      const baseUrl = 'https://clinicaltrials.gov/api/v2/studies';
+      function clinicalTrials() {
+        const defaultFilters = () => {
+          return { age: null, startDate: null, endDate: null, status: 'all' };
+        };
+
+        return {
+          trials: [],
+          loading: false,
+          nextPageToken: null,
+          sortBy: 'default',
+          showContactIndex: new Set(),
+          filters: defaultFilters(),
+          resetFilters() {
+            this.filters = defaultFilters();
+          },
+
+          startDate(trial) {
+            const startDate = trial.protocolSection.statusModule.startDateStruct;
+            if (!startDate) {
+              return 'Date not available';
+            }
+            return `${startDate.date} ${startDate.type === 'ESTIMATED' ? '(estimated)' : ''}`;
+          },
+          completionDate(trial) {
+            const completionDate = trial.protocolSection.statusModule.completionDateStruct;
+            if (!completionDate) {
+              return 'Date not available';
+            }
+            return `${completionDate.date} ${completionDate.type === 'ESTIMATED' ? '(estimated)' : ''}`;
+          },
+          ageRange(trial) {
+            const eligibilityModule = trial.protocolSection.eligibilityModule;
+            if (!eligibilityModule.minimumAge && !eligibilityModule.maximumAge) {
+              return 'Age not specified';
+            }
+            if (!eligibilityModule.minimumAge) {
+              return `Up to ${eligibilityModule.maximumAge}`;
+            }
+            if (!eligibilityModule.maximumAge) {
+              return `${eligibilityModule.minimumAge} or older`;
+            }
+            return `${eligibilityModule.minimumAge} to ${eligibilityModule.maximumAge}`;
+          },
+
+          filteredTrials() {
+            this.$nextTick(() => lucide.createIcons());
+            let callbacks = [];
+
+            // If age filter is set, add it to the filters
+            if (this.filters.age !== defaultFilters().age) {
+              callbacks.push(trial => {
+                const eligibility = trial.protocolSection.eligibilityModule;
+                const trialMinAge = parseInt(eligibility.minimumAge) || 0;
+                const trialMaxAge = parseInt(eligibility.maximumAge) || 200;
+
+                return this.filters.age >= trialMinAge && this.filters.age <= trialMaxAge;
+              });
+            }
+
+            // If status filter is set, add it to the filters
+            if (this.filters.status !== defaultFilters().status) {
+              callbacks.push(trial => trial.protocolSection.statusModule.overallStatus === this.filters.status);
+            }
+
+            const subset =
+              callbacks.length === 0 ? [...this.trials] : this.trials.filter(trial => callbacks.every(cb => cb(trial)));
+
+            return this.sortTrials(subset);
+          },
+
+          sortTrials(unsorted) {
+            if (this.sortBy === 'default') {
+              return unsorted;
+            }
+
+            const getSortFunction = () => {
+              switch (this.sortBy) {
+                case 'title':
+                  return (a, b) =>
+                    a.protocolSection.identificationModule.briefTitle.localeCompare(
+                      b.protocolSection.identificationModule.briefTitle,
+                    );
+
+                case 'start-date-asc':
+                  return (a, b) => {
+                    const dateA = new Date(a.protocolSection.statusModule.startDateStruct.date);
+                    const dateB = new Date(b.protocolSection.statusModule.startDateStruct.date);
+
+                    const res = dateA - dateB;
+
+                    console.log(dateA, dateB, res);
+                    return res;
+                  };
+
+                case 'start-date-desc':
+                  return (a, b) => {
+                    const dateA = new Date(a.protocolSection.statusModule.startDateStruct.date);
+                    const dateB = new Date(b.protocolSection.statusModule.startDateStruct.date);
+
+                    const res = dateB - dateA;
+
+                    console.log(dateA, dateB, res);
+                    return res;
+                  };
+              }
+            };
+            return unsorted.sort(getSortFunction());
+          },
+
+          async fetchTrials(token = null) {
+            this.loading = true;
+
+            let url = new URL(baseUrl);
+            url.searchParams.set('format', 'json');
+            url.searchParams.set(
+              'query.cond',
+              'thalassemia OR (sickle cell) OR Aplastic Anemia OR Diamond-Blackfan Anemia OR Hemophilia OR Hematologic Diseases OR Myeloid Chimerism',
+            );
+            url.searchParams.set('filter.overallStatus', 'RECRUITING|ENROLLING_BY_INVITATION|ACTIVE_NOT_RECRUITING');
+            url.searchParams.set('fields', [
+              // 'IdentificationModule',
+              'NCTId',
+              'BriefTitle',
+              'StatusModule',
+              'SponsorCollaboratorsModule',
+              'ConditionsModule',
+              // 'EligibilityModule',
+              'HealthyVolunteers',
+              'Sex',
+              'MinimumAge',
+              'MaximumAge',
+              'ContactsLocationsModule',
+            ]);
+            url.searchParams.set('pageSize', '10');
+
+            if (token) {
+              url.searchParams.set('pageToken', token);
+            }
+
+            try {
+              const response = await fetch(url);
+              if (!response.ok) {
+                throw new Error('Network response was not ok: ' + response.status);
+              }
+
+              const data = await response.json();
+              if (data.studies) {
+                // Append new trials to the existing list
+                this.trials = this.trials.concat(data.studies);
+              }
+
+              // Save the next page token if available
+              this.nextPageToken = data.nextPageToken || null;
+
+              this.$nextTick(() => lucide.createIcons());
+            } catch (error) {
+              console.error('Error fetching trials:', error);
+            } finally {
+              this.loading = false;
+            }
+          },
+          loadMore() {
+            if (this.nextPageToken) {
+              this.fetchTrials(this.nextPageToken);
+            }
+          },
+          init() {
+            if (this.loading) return; // Prevents re-triggering
+            this.fetchTrials();
+          },
+        };
+      }
+    </script>
+  </body>
+</html>
