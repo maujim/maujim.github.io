@@ -1,0 +1,15 @@
+
+/* Ensure the container takes up the full viewport */
+.container {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+/* Each half-screen occupies 50% of the container */
+.half-screen {
+  flex: 1;
+  overflow: hidden; /* Prevent scrollbars if content overflows */
+}
