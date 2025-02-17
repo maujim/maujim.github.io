@@ -1,6 +1,9 @@
 import React, { useState, useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { AsciiRenderer } from '@react-three/drei';
+import { EffectComposer } from '@react-three/postprocessing';
+
+import { ASCIIEffect } from './ascii-effect.jsx';
 
 import './App.css';
 
@@ -12,11 +15,12 @@ function Box(props) {
   const [clicked, click] = useState(false);
   // Subscribe this component to the render-loop, rotate the mesh every frame
   useFrame((state, delta) => {
-    ref.current.rotation.x += delta;
-    ref.current.rotation.y += delta;
+    const delay = 0.75;
+    ref.current.rotation.x += delay * delta;
+    ref.current.rotation.y += delay * delta;
   });
 
-  const scale = 1;
+  const scale = 0.11;
 
   return (
     <mesh
@@ -27,16 +31,29 @@ function Box(props) {
       onPointerOver={event => hover(true)}
       onPointerOut={event => hover(false)}
     >
-      <torusKnotGeometry />
+      <torusKnotGeometry args={[10, 3, 64, 8]} />
       <meshStandardMaterial color={hovered ? 'hotpink' : 'orange'} />
     </mesh>
   );
 }
 
 function App() {
+  const asciiEffect = React.useMemo(
+    () =>
+      new ASCIIEffect({
+        characters: ` mukund`,
+        fontSize: 54,
+        cellSize: 22,
+        color: '#ffffff',
+        invert: false,
+      }),
+    [],
+  );
   return (
     <Canvas>
-      <AsciiRenderer />
+      <EffectComposer>
+        <primitive object={asciiEffect} />
+      </EffectComposer>
 
       <color attach="background" args={['black']} />
 
