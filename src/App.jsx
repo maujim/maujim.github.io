@@ -22,16 +22,16 @@ function Box(props) {
     ref.current.rotation.y += delay * delta;
   });
 
-  const { radius, tube, tubularSegments, radialSegments, p, q } = useControls({
-    radius: 1,
+  const { scale, radius, tube, tubularSegments, radialSegments, p, q } = useControls({
+    radius: 2,
     tube: 0.4,
     tubularSegments: 64,
     radialSegments: 8,
     p: 2,
     q: 3,
+    scale: 0.5,
   });
 
-  const scale = 0.88;
   // const torusArgs = [10, 3, 64, 8];
   const torusArgs = [radius, tube, tubularSegments, radialSegments, p, q];
 
@@ -51,16 +51,17 @@ function Box(props) {
 }
 
 function App() {
+  const {chars} = useControls({ chars : ` =mukund`});
   const asciiEffect = React.useMemo(
     () =>
       new ASCIIEffect({
-        characters: ` =mukund`,
+        characters: chars,
         fontSize: 54,
         cellSize: 22,
         color: '#ffffff',
         invert: false,
       }),
-    [],
+    [chars],
   );
   return (
     <Canvas>
