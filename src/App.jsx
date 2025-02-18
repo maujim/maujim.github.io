@@ -1,9 +1,11 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { AsciiRenderer } from '@react-three/drei';
 import { EffectComposer } from '@react-three/postprocessing';
 
 import { ASCIIEffect } from './ascii-effect.jsx';
+
+import { useControls } from 'leva';
 
 import './App.css';
 
@@ -15,12 +17,23 @@ function Box(props) {
   const [clicked, click] = useState(false);
   // Subscribe this component to the render-loop, rotate the mesh every frame
   useFrame((state, delta) => {
-    const delay = 0.75;
+    const delay = 0.66;
     ref.current.rotation.x += delay * delta;
     ref.current.rotation.y += delay * delta;
   });
 
-  const scale = 0.11;
+  const { radius, tube, tubularSegments, radialSegments, p, q } = useControls({
+    radius: 1,
+    tube: 0.4,
+    tubularSegments: 64,
+    radialSegments: 8,
+    p: 2,
+    q: 3,
+  });
+
+  const scale = 0.88;
+  // const torusArgs = [10, 3, 64, 8];
+  const torusArgs = [radius, tube, tubularSegments, radialSegments, p, q];
 
   return (
     <mesh
@@ -31,7 +44,7 @@ function Box(props) {
       onPointerOver={event => hover(true)}
       onPointerOut={event => hover(false)}
     >
-      <torusKnotGeometry args={[10, 3, 64, 8]} />
+      <torusKnotGeometry args={torusArgs} />
       <meshStandardMaterial color={hovered ? 'hotpink' : 'orange'} />
     </mesh>
   );
@@ -41,7 +54,7 @@ function App() {
   const asciiEffect = React.useMemo(
     () =>
       new ASCIIEffect({
-        characters: ` mukund`,
+        characters: ` =mukund`,
         fontSize: 54,
         cellSize: 22,
         color: '#ffffff',

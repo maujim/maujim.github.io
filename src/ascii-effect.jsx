@@ -30,15 +30,31 @@ void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor)
         greyscaled = 1.0 - greyscaled;
     }
 
+    // Scale greyscale value to the range of the available character set
     float characterIndex = floor((uCharactersCount - 1.0) * greyscaled);
+
+    // If there are fewer characters, we want to avoid the space character being overly dominant.
+    // This adjustment ensures that fewer characters (e.g., 6) still fill the entire space.
+    float scaleFactor = max(1.0, float(uCharactersCount) / 20.0);
+    characterIndex = floor(characterIndex * scaleFactor);
+
+    // Map the character index to the correct character in the set
     vec2 characterPosition = vec2(mod(characterIndex, SIZE.x), floor(characterIndex / SIZE.y));
     vec2 offset = vec2(characterPosition.x, -characterPosition.y) / SIZE;
     vec2 charUV = mod(uv * (cell / SIZE), 1.0 / SIZE) - vec2(0., 1.0 / SIZE) + offset;
     vec4 asciiCharacter = texture2D(uCharacters, charUV);
 
-    asciiCharacter.rgb = uColor * asciiCharacter.r;
+    asciiCharacter.rgb = pixelized.rgb * asciiCharacter.r;
     asciiCharacter.a = pixelized.a;
-    outputColor = asciiCharacter;
+
+    float boundarySize = 0.0922;
+    float transitionStart = 0.5 - (boundarySize / 4.0);
+    float transitionEnd = 0.5 + (boundarySize / 2.0);
+
+    // smooth transition between regular and ascii
+    float blendFactor = smoothstep(transitionStart, transitionEnd, uv.x); // Adjust 0.45 - 0.55 for a smoother or sharper transition
+    vec4 originalColor = texture2D(inputBuffer, uv);
+    outputColor = mix(originalColor, asciiCharacter, blendFactor);
 }
 `;
 
