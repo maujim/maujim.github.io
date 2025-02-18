@@ -328,6 +328,9 @@
             if (this.filters.country !== defaultFilters().country) {
               callbacks.push(trial => {
                 const locations = trial.protocolSection.contactsLocationsModule.locations;
+                if (!locations) {
+                  return false;
+                }
                 const unique_countries = Array.from(new Set(locations.map(x => x.country.toLowerCase())));
 
                 return unique_countries.some(country => country.includes(this.filters.country.toLowerCase()));
@@ -397,11 +400,12 @@
             }
           },
 
-          async fetchTrials(token = null) {
+          async fetchTrials(token = null, filter_api_call = false) {
             this.loading = true;
 
             const params = {
               format: 'json',
+              countTotal: true,
               'query.cond':
                 'thalassemia OR (sickle cell) OR Aplastic Anemia OR Diamond-Blackfan Anemia OR Hemophilia OR Hematologic Diseases OR Myeloid Chimerism',
               'filter.overallStatus': 'RECRUITING|ENROLLING_BY_INVITATION|ACTIVE_NOT_RECRUITING',
@@ -424,6 +428,10 @@
 
             if (token) {
               params.pageToken = token;
+            }
+
+            if (filter_api_call && this.filters.country !== defaultFilters().country) {
+              params['query.locn'] = `AREA[LocationCountry](${this.filters.country})`;
             }
 
             const url = newUrl(baseUrl, '/studies/', params);
@@ -451,11 +459,10 @@
             }
           },
           loadMore() {
-            if (!this.nextPageToken) {
-              return;
-            }
+            if (!this.nextPageToken) return;
             this.fetchTrials(this.nextPageToken);
           },
+
           init() {
             this.fetchAllCountries();
             if (this.loading) return; // Prevents re-triggering
