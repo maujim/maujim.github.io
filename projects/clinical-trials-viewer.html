@@ -27,27 +27,142 @@
       [x-cloak] {
         display: none !important;
       }
+
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+      }
+
+      .app-container {
+        height: calc(100vh - 56px); /* Subtract navbar height */
+        display: flex;
+        flex-direction: column;
+      }
+
+      .content-area {
+        flex: 1;
+        overflow: hidden;
+        display: flex;
+        position: relative;
+      }
+
+      .top-nav {
+        border-bottom: 1px solid #dee2e6;
+      }
+
+      .trials-container {
+        flex: 1;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        border-left: 1px solid #dee2e6;
+      }
+
+      .trials-list {
+        flex: 1;
+        overflow-y: auto;
+        padding: 1rem;
+      }
+
+      .filters-panel {
+        width: 300px;
+        overflow-y: auto;
+        transition: transform 0.3s ease;
+        background: white;
+      }
+
+      .filters-backdrop {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1029;
+      }
+
+      @media (max-width: 768px) {
+        .filters-panel {
+          position: fixed;
+          top: 56px; /* Set to navbar height */
+          left: 0;
+          bottom: 0;
+          width: 100%;
+          height: calc(100vh - 56px); /* Subtract navbar height */
+          z-index: 1030;
+          transform: translateX(-100%);
+          box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .filters-panel.show {
+          transform: translateX(0);
+        }
+
+        .filters-backdrop.show {
+          display: block;
+          top: 56px; /* Adjust backdrop to start below navbar */
+          height: calc(100vh - 56px); /* Adjust backdrop height */
+        }
+      }
+
+      .pagination-container {
+        padding: 0.5rem;
+        background: white;
+        border-top: 1px solid #dee2e6;
+      }
+
+      @media (max-width: 576px) {
+        .pagination-container {
+          padding: 0.25rem;
+        }
+
+        .page-link {
+          padding: 0.375rem 0.75rem;
+        }
+      }
     </style>
   </head>
 
   <body x-data="clinicalTrials()" x-init="init()">
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="top-nav navbar navbar-expand-lg navbar-light bg-light">
       <div class="container-fluid">
         <a class="navbar-brand" href="#">GANSID</a>
+        <button
+          class="btn btn-outline-secondary d-md-none"
+          @click="showSidebar = !showSidebar"
+          x-text="showSidebar ? 'Hide Sidebar' : 'Show Sidebar'"
+        ></button>
       </div>
     </nav>
 
-    <div class="container-fluid">
-      <div class="row">
-        <!-- Left Panel (Filters) -->
-        <div class="col-md-3">
-          <div class="card mb-3">
-            <div class="card-header">
-              <strong>Filters</strong>
+    <div class="app-container">
+      <div class="content-area">
+        <!-- Backdrop for mobile filters -->
+        <div class="filters-backdrop" :class="{ 'show': showSidebar }" @click="showSidebar = false"></div>
+
+        <!-- Filters Panel -->
+        <div class="filters-panel" :class="{ 'show': showSidebar }">
+          <div class="card border-0">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <strong>Filters & Sorting</strong>
             </div>
 
             <div class="card-body">
+              <!-- Sort By -->
+              <div class="mb-3">
+                <label class="form-label">Sort By</label>
+                <select class="form-select" x-model="sortBy">
+                  <option selected value="default">Default</option>
+                  <option value="title">Title</option>
+                  <option value="start-date-asc">Start Date (ascending)</option>
+                  <option value="start-date-desc">Start Date (descending)</option>
+                </select>
+              </div>
+
               <!-- Condition Filter -->
               <div class="mb-3">
                 <label class="form-label">Condition</label>
@@ -80,9 +195,9 @@
                 <label for="status" class="form-label">Status</label>
                 <select class="form-select" id="status" x-model="filters.status" @change="handleFilterChange">
                   <option selected value="all">All</option>
-                  <option value="RECRUITING">Recruiting</option>
-                  <option value="ENROLLING_BY_INVITATION">By Invitation</option>
-                  <option value="ACTIVE_NOT_RECRUITING">Active, Not Recruiting</option>
+                  <template x-for="status in possible_statuses" :key="status">
+                    <option :value="status" x-text="status_to_label(status)"></option>
+                  </template>
                 </select>
               </div>
 
@@ -107,8 +222,7 @@
               <div class="mb-3">
                 <label for="sex" class="form-label">Sex</label>
                 <select class="form-select" id="sex" x-model="filters.sex" @change="handleFilterChange">
-                  <option selected value="all">All</option>
-                  <option value="ALL">All Sexes</option>
+                  <option selected value="ALL">All</option>
                   <option value="FEMALE">Female</option>
                   <option value="MALE">Male</option>
                 </select>
@@ -117,152 +231,142 @@
               <!-- Healthy Volunteers Filter -->
               <div class="mb-3">
                 <label for="healthyVolunteers" class="form-label">Healthy Volunteers</label>
-                <select class="form-select" id="healthyVolunteers" x-model="filters.healthyVolunteers" @change="handleFilterChange">
+                <select
+                  class="form-select"
+                  id="healthyVolunteers"
+                  x-model="filters.healthyVolunteers"
+                  @change="handleFilterChange"
+                >
                   <option selected value="all">All</option>
                   <option value="true">Yes</option>
                   <option value="false">No</option>
                 </select>
               </div>
 
-              <!-- TODO: hook these up in filteredTrials() -->
-
-              <!-- Start Date Filter -->
-              <!-- <div class="mb-3"> -->
-              <!--   <label for="startDate" class="form-label">Start Date</label> -->
-              <!--   <input type="date" class="form-control" id="startDate" x-model="filters.startDate" /> -->
-              <!-- </div> -->
-
-              <!-- <!-1- Completion Date Filter -1-> -->
-              <!-- <div class="mb-3"> -->
-              <!--   <label for="endDate" class="form-label">Completion Date</label> -->
-              <!--   <input type="date" class="form-control" id="endDate" x-model="filters.endDate" /> -->
-              <!-- </div> -->
-
-              <button type="button" class="btn btn-outline-secondary" @click="resetFilters()">Reset</button>
+              <button type="button" class="btn btn-outline-secondary w-100" @click="resetFilters()">Reset All</button>
             </div>
           </div>
         </div>
 
-        <!-- Main Content Area -->
-        <div class="col-12 col-md-9">
-          <!-- Sorting Options stay outside the scrollable area -->
-          <div class="mb-4">
-            <div class="d-flex justify-content-between align-items-center">
-              <div>
-                <strong>Sort By:</strong>
-                <select class="form-select d-inline-block" x-model="sortBy" style="width: auto">
-                  <option selected value="default">default</option>
-                  <option value="title">Title</option>
-                  <option value="start-date-asc">Start Date (ascending)</option>
-                  <option value="start-date-desc">Start Date (descending)</option>
-                </select>
+        <!-- Trials Container -->
+        <div class="trials-container">
+          <!-- Trials List -->
+          <div class="trials-list">
+            <!-- Loading Indicator -->
+            <template x-if="loading && trials.length === 0">
+              <div class="text-center my-3">
+                <div class="spinner-border" role="status"></div>
+                <p>Loading trials...</p>
               </div>
-            </div>
-          </div>
+            </template>
 
-          <!-- Fixed height container for trials -->
-          <div class="d-flex flex-column" style="height: calc(100vh - 200px)">
-            <!-- Scrollable area for trials -->
-            <div class="flex-grow-1 overflow-auto mb-3">
-              <!-- Loading Indicator -->
-              <template x-if="loading && trials.length === 0">
-                <div class="text-center my-3">
-                  <div class="spinner-border" role="status">
-                    <span class="sr-only">Loading...</span>
+            <!-- No Trials Message -->
+            <template x-if="!loading && trials.length === 0">
+              <div class="alert alert-warning" role="alert">No trials found.</div>
+            </template>
+
+            <!-- Trials Cards -->
+            <template x-for="(trial, index) in filteredTrials()" :key="index">
+              <div class="card mb-3 overflow-hidden">
+                <div class="card-body" x-show.important="!showContactIndex.has(index)">
+                  <h5 class="card-title">
+                    <strong x-text="trial.protocolSection.identificationModule.briefTitle"></strong>
+                  </h5>
+
+                  <div class="d-flex flex-wrap">
+                    <span
+                      :class="{
+                        'bg-success': trial.protocolSection.statusModule.overallStatus === 'RECRUITING',
+                        'bg-primary': trial.protocolSection.statusModule.overallStatus === 'ENROLLING_BY_INVITATION',
+                        'bg-warning': trial.protocolSection.statusModule.overallStatus === 'ACTIVE_NOT_RECRUITING'
+                      }"
+                      class="badge me-2 text-white"
+                      x-text="trial.protocolSection.statusModule.overallStatus"
+                    ></span>
                   </div>
-                  <p>Loading trials...</p>
                 </div>
-              </template>
 
-              <!-- No Trials Message -->
-              <template x-if="!loading && trials.length === 0">
-                <div class="alert alert-warning" role="alert">No trials found.</div>
-              </template>
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item">
+                    <strong>Start date:</strong> <span x-text="startDate(trial)"></span>
+                    <br />
+                    <strong>Completion date:</strong> <span x-text="completionDate(trial)"></span>
+                  </li>
+                  <li class="list-group-item"><strong>Age:</strong> <span x-text="ageRange(trial)"></span></li>
 
-              <!-- Trials Cards -->
-              <template x-for="(trial, index) in filteredTrials()" :key="index">
-                <div class="card mb-3 overflow-hidden">
-                  <div class="card-body" x-show.important="!showContactIndex.has(index)">
-                    <h5 class="card-title">
-                      <strong x-text="trial.protocolSection.identificationModule.briefTitle"></strong>
-                    </h5>
-
-                    <div class="d-flex flex-wrap">
-                      <span
-                        :class="{
-              'bg-success': trial.protocolSection.statusModule.overallStatus === 'RECRUITING',
-              'bg-primary': trial.protocolSection.statusModule.overallStatus === 'ENROLLING_BY_INVITATION',
-              'bg-warning': trial.protocolSection.statusModule.overallStatus === 'ACTIVE_NOT_RECRUITING'
-            }"
-                        class="badge me-2 text-white"
-                        x-text="trial.protocolSection.statusModule.overallStatus"
-                      ></span>
-                    </div>
-                  </div>
-
-                  <ul class="list-group list-group-flush">
-                    <li class="list-group-item">
-                      <strong>Start date:</strong> <span x-text="startDate(trial)"></span>
-                      <br />
-                      <strong>Completion date:</strong> <span x-text="completionDate(trial)"></span>
-                    </li>
-                    <li class="list-group-item"><strong>Age:</strong> <span x-text="ageRange(trial)"></span></li>
-
-                    <li class="list-group-item">
-                      <strong>Eligible sexes:</strong>
-                      <span x-text="trial.protocolSection.eligibilityModule.sex"></span>
-                    </li>
-
-                    <li class="list-group-item">
-                      <strong>Accepts healthy volunteers:</strong>
-                      <span x-text="trial.protocolSection.eligibilityModule.healthyVolunteers ? 'Yes' : 'No'"></span>
-                    </li>
-
-                    <li class="list-group-item">
-                      <strong>Locations:</strong>
-                      <span x-text="locationString(trial)"></span>
-                    </li>
-                  </ul>
-
-                  <!-- Footer Buttons -->
-                  <a
-                    :href="`https://clinicaltrials.gov/study/${trial.protocolSection.identificationModule.nctId}`"
-                    target="_blank"
-                    class="btn text-center card-footer"
-                  >
-                    View Trial Details
-                    <i data-lucide="external-link"></i>
-                  </a>
-                </div>
-              </template>
-            </div>
-
-            <!-- Pagination controls stay at bottom -->
-            <div class="mt-auto">
-              <nav aria-label="Trial pagination">
-                <ul class="pagination justify-content-center">
-                  <li class="page-item" :class="{ 'disabled': currentPage === 1 }">
-                    <button class="page-link" @click="previousPage()" :disabled="currentPage === 1">Previous</button>
+                  <li class="list-group-item">
+                    <strong>Eligible sexes:</strong>
+                    <span x-text="trial.protocolSection.eligibilityModule.sex"></span>
                   </li>
 
-                  <li class="page-item disabled">
-                    <span class="page-link">
-                      Page <span x-text="currentPage"></span> of <span x-text="totalPages()"></span> (<span
-                        x-text="totalCount"
-                      ></span>
-                      total results)
-                    </span>
+                  <li class="list-group-item">
+                    <strong>Accepts healthy volunteers:</strong>
+                    <span x-text="trial.protocolSection.eligibilityModule.healthyVolunteers ? 'Yes' : 'No'"></span>
                   </li>
 
-                  <li class="page-item" :class="{ 'disabled': currentPage >= totalPages() }">
-                    <button class="page-link" @click="nextPage()" :disabled="currentPage >= totalPages() || loading">
-                      <span x-show="loading" class="spinner-border spinner-border-sm me-1" role="status"></span>
-                      Next
-                    </button>
+                  <li class="list-group-item">
+                    <strong>Locations:</strong>
+                    <span x-text="locationString(trial)"></span>
                   </li>
                 </ul>
-              </nav>
-            </div>
+
+                <!-- Footer Buttons -->
+                <a
+                  :href="`https://clinicaltrials.gov/study/${trial.protocolSection.identificationModule.nctId}`"
+                  target="_blank"
+                  class="btn text-center card-footer"
+                >
+                  View Trial Details
+                  <i data-lucide="external-link"></i>
+                </a>
+              </div>
+            </template>
+          </div>
+
+          <!-- Pagination -->
+          <div class="pagination-container">
+            <nav aria-label="Trial pagination">
+              <ul class="pagination justify-content-center mb-0">
+                <li class="page-item" :class="{ 'disabled': currentPage === 1 || totalCount === 0 }">
+                  <button
+                    class="page-link d-flex align-items-center h-100"
+                    @click="previousPage()"
+                    :disabled="currentPage === 1 || totalCount === 0"
+                  >
+                    <i
+                      data-lucide="chevron-left"
+                      class="d-none d-sm-inline-block"
+                      style="width: 16px; height: 16px"
+                    ></i>
+                    <span>Prev</span>
+                  </button>
+                </li>
+
+                <li class="page-item disabled">
+                  <span class="page-link pagination-info">
+                    <span class="d-none d-sm-inline">Page </span>
+                    <span x-text="currentPage"></span> of
+                    <span x-text="totalPages()"></span>
+                    <span class="d-none d-sm-inline"> (<span x-text="totalCount"></span> results) </span>
+                  </span>
+                </li>
+
+                <li class="page-item" :class="{ 'disabled': currentPage >= totalPages() || totalCount === 0 }">
+                  <button
+                    class="page-link d-flex align-items-center h-100"
+                    @click="nextPage()"
+                    :disabled="currentPage >= totalPages() || totalCount === 0"
+                  >
+                    <span>Next</span>
+                    <i
+                      data-lucide="chevron-right"
+                      class="d-none d-sm-inline-block"
+                      style="width: 16px; height: 16px"
+                    ></i>
+                  </button>
+                </li>
+              </ul>
+            </nav>
           </div>
         </div>
       </div>
@@ -310,7 +414,7 @@
             country: 'all',
             condition: 'all',
             sex: 'all',
-            healthyVolunteers: 'all'
+            healthyVolunteers: 'all',
           };
         };
 
@@ -322,21 +426,39 @@
           loading: false,
           nextPageToken: null,
           sortBy: 'default',
+          showSidebar: false, // Start with filters hidden
           showContactIndex: new Set(),
           filters: defaultFilters(),
           possible_countries: [],
           possible_conditions: [
-            'thalassemia',
-            'sickle cell',
+            'Thalassemia',
+            'Sickle Cell',
             'Aplastic Anemia',
             'Diamond-Blackfan Anemia',
             'Hemophilia',
             'Hematologic Diseases',
             'Myeloid Chimerism',
           ],
+          possible_statuses: ['RECRUITING', 'ENROLLING_BY_INVITATION', 'ACTIVE_NOT_RECRUITING'],
+
+          status_to_label(status) {
+            return status
+              .replace(/_/g, ' ')
+              .toLowerCase()
+              .replace(/\b\w/g, c => c.toUpperCase());
+          },
+
+          toggleFilters() {
+            if (this.showSidebar) {
+              this.showSidebar = false;
+            } else {
+              this.showSidebar = true;
+            }
+          },
 
           totalPages() {
-            return Math.ceil(this.totalCount / this.pageSize);
+            // Return 1 if there are no results to avoid showing "page 1 of 0"
+            return Math.max(1, Math.ceil(this.totalCount / this.pageSize));
           },
 
           paginatedTrials() {
@@ -490,10 +612,7 @@
                 'StatusModule',
                 'SponsorCollaboratorsModule',
                 'ConditionsModule',
-                'HealthyVolunteers',
-                'Sex',
-                'MinimumAge',
-                'MaximumAge',
+                'EligibilityModule',
                 'ContactsLocationsModule',
               ],
             };
@@ -503,40 +622,42 @@
               baseParams.countTotal = true;
             }
 
+            const eligibilityData = [
+              // Sex filter
+              `AREA[Sex](${this.filters.sex})`,
+
+              // Age filter
+              ...(this.filters.age !== null
+                ? [
+                    `AREA[MinimumAge]RANGE[MIN, ${this.filters.age} years]`,
+                    `AREA[MaximumAge]RANGE[${this.filters.age} years, MAX]`,
+                  ]
+                : []),
+
+              // Healthy Volunteers filter
+              ...(this.filters.healthyVolunteers !== 'all'
+                ? [`AREA[HealthyVolunteers]${this.filters.healthyVolunteers}`]
+                : []),
+            ];
+
             // Filter-specific parameters
             const filterParams = {
               // Condition filter
               'query.cond':
                 this.filters.condition === 'all'
-                  ? 'thalassemia OR (sickle cell) OR Aplastic Anemia OR Diamond-Blackfan Anemia OR Hemophilia OR Hematologic Diseases OR Myeloid Chimerism'
+                  ? this.possible_conditions.map(cond => `"${cond}"`).join(' OR ')
                   : this.filters.condition,
 
               // Status filter
               'filter.overallStatus':
-                this.filters.status === 'all'
-                  ? 'RECRUITING|ENROLLING_BY_INVITATION|ACTIVE_NOT_RECRUITING'
-                  : this.filters.status,
+                this.filters.status === 'all' ? this.possible_statuses.join('|') : this.filters.status,
 
               // Country filter
               ...(this.filters.country !== 'all' && {
                 'query.locn': `AREA[LocationCountry](${this.filters.country})`,
               }),
 
-              // Age filter
-              ...(this.filters.age !== null && {
-                'filter.minimumAge': `LTEQ${this.filters.age}`,
-                'filter.maximumAge': `GTEQ${this.filters.age}`,
-              }),
-
-              // Sex filter
-              ...(this.filters.sex !== 'all' && {
-                'filter.sex': this.filters.sex
-              }),
-
-              // Healthy Volunteers filter
-              ...(this.filters.healthyVolunteers !== 'all' && {
-                'filter.healthyVolunteers': this.filters.healthyVolunteers
-              }),
+              'filter.advanced': eligibilityData.join(' AND '),
 
               // Pagination token
               ...(token && { pageToken: token }),
@@ -559,10 +680,13 @@
               const data = await response.json();
               if (data.studies) {
                 this.trials = token ? [...this.trials, ...data.studies] : data.studies;
+              } else {
+                // If no studies found, set trials to empty array
+                this.trials = [];
               }
-              // Only update totalCount on initial load
-              if (!token && data.totalCount) {
-                this.totalCount = data.totalCount;
+              // Update totalCount on initial load or when no results
+              if (!token || !data.studies) {
+                this.totalCount = data.totalCount || 0;
               }
               this.nextPageToken = data.nextPageToken || null;
               this.$nextTick(() => lucide.createIcons());
@@ -578,6 +702,18 @@
           },
 
           init() {
+            // Show filters by default only on desktop
+            this.showSidebar = window.innerWidth >= 768;
+
+            // Handle resize events
+            window.addEventListener('resize', () => {
+              if (window.innerWidth >= 768) {
+                this.showSidebar = true;
+              } else {
+                this.showSidebar = false;
+              }
+            });
+
             this.fetchAllCountries();
             if (this.loading) return; // Prevents re-triggering
             this.fetchTrials();
