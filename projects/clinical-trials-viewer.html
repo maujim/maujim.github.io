@@ -141,9 +141,6 @@
 
     <div class="app-container">
       <div class="content-area">
-        <!-- Backdrop for mobile filters -->
-        <div class="filters-backdrop" :class="{ 'show': showSidebar }" @click="showSidebar = false"></div>
-
         <!-- Filters Panel -->
         <div class="filters-panel" :class="{ 'show': showSidebar }">
           <div class="card border-0">
@@ -221,11 +218,23 @@
               <!-- Sex Filter -->
               <div class="mb-3">
                 <label for="sex" class="form-label">Sex</label>
-                <select class="form-select" id="sex" x-model="filters.sex" @change="handleFilterChange">
-                  <option selected value="ALL">All</option>
-                  <option value="FEMALE">Female</option>
-                  <option value="MALE">Male</option>
-                </select>
+                <div class="d-flex align-items-center gap-2">
+                  <select class="form-select" id="sex" x-model="filters.sex" @change="handleFilterChange">
+                    <option selected value="ALL">All</option>
+                    <option value="FEMALE">Female</option>
+                    <option value="MALE">Male</option>
+                  </select>
+                  <div class="form-check" x-show="filters.sex !== 'ALL'">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="sexOnly"
+                      x-model="filters.sexOnly"
+                      @change="handleFilterChange"
+                    />
+                    <label class="form-check-label" for="sexOnly">only</label>
+                  </div>
+                </div>
               </div>
 
               <!-- Healthy Volunteers Filter -->
@@ -413,7 +422,8 @@
             status: 'all',
             country: 'all',
             condition: 'all',
-            sex: 'all',
+            sex: 'ALL',
+            sexOnly: false,
             healthyVolunteers: 'all',
           };
         };
@@ -622,23 +632,27 @@
               baseParams.countTotal = true;
             }
 
-            const eligibilityData = [
-              // Sex filter
-              `AREA[Sex](${this.filters.sex})`,
+            const eligibilityData = [];
 
-              // Age filter
-              ...(this.filters.age !== null
-                ? [
-                    `AREA[MinimumAge]RANGE[MIN, ${this.filters.age} years]`,
-                    `AREA[MaximumAge]RANGE[${this.filters.age} years, MAX]`,
-                  ]
-                : []),
+            // Sex filter
+            if (this.filters.sex !== 'ALL' && !this.filters.sexOnly) {
+              eligibilityData.push(`AREA[Sex](${this.filters.sex} OR ALL)`);
+            } else {
+              eligibilityData.push(`AREA[Sex](${this.filters.sex})`);
+            }
 
-              // Healthy Volunteers filter
-              ...(this.filters.healthyVolunteers !== 'all'
-                ? [`AREA[HealthyVolunteers]${this.filters.healthyVolunteers}`]
-                : []),
-            ];
+            // Age filter
+            if (this.filters.age !== null) {
+              eligibilityData.concat([
+                `AREA[MinimumAge]RANGE[MIN, ${this.filters.age} years]`,
+                `AREA[MaximumAge]RANGE[${this.filters.age} years, MAX]`,
+              ]);
+            }
+
+            // Healthy Volunteers filter
+            if (this.filters.healthyVolunteers !== 'all') {
+              eligibilityData.push(`AREA[HealthyVolunteers]${this.filters.healthyVolunteers}`);
+            }
 
             // Filter-specific parameters
             const filterParams = {
