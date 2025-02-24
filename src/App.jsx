@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useMemo, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { AsciiRenderer } from '@react-three/drei';
 import { EffectComposer } from '@react-three/postprocessing';
@@ -22,14 +22,14 @@ function Box(props) {
     ref.current.rotation.y += delay * delta;
   });
 
-  const { scale, radius, tube, tubularSegments, radialSegments, p, q } = useControls({
+  const { scale, radius, tube, tubularSegments, radialSegments, p, q } = useControls('TorusKnotGeometry', {
     radius: 2,
-    tube: 0.4,
-    tubularSegments: 64,
+    tube: 0.5,
+    tubularSegments: 96,
     radialSegments: 8,
     p: 2,
     q: 3,
-    scale: 0.5,
+    scale: 0.75,
   });
 
   // const torusArgs = [10, 3, 64, 8];
@@ -39,7 +39,7 @@ function Box(props) {
     <mesh
       {...props}
       ref={ref}
-      scale={clicked ? 1.5 * scale : scale}
+      scale={scale}
       onClick={event => click(!clicked)}
       onPointerOver={event => hover(true)}
       onPointerOut={event => hover(false)}
@@ -51,7 +51,7 @@ function Box(props) {
 }
 
 function App() {
-  const {chars} = useControls({ chars : ` =mukund`});
+  const { chars } = useControls('ASCII Shader', { chars: ` .,=mukund` });
   const asciiEffect = React.useMemo(
     () =>
       new ASCIIEffect({

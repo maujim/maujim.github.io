@@ -47,9 +47,9 @@ void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor)
     asciiCharacter.rgb = pixelized.rgb * asciiCharacter.r;
     asciiCharacter.a = pixelized.a;
 
-    float boundarySize = 0.0922;
-    float transitionStart = 0.5 - (boundarySize / 4.0);
-    float transitionEnd = 0.5 + (boundarySize / 2.0);
+    float boundarySize = 0.1;
+    float transitionStart = 0.5 - (boundarySize / 16.0);
+    float transitionEnd = 0.5 + (boundarySize / 8.0);
 
     // smooth transition between regular and ascii
     float blendFactor = smoothstep(transitionStart, transitionEnd, uv.x); // Adjust 0.45 - 0.55 for a smoother or sharper transition
@@ -69,8 +69,8 @@ void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor)
 export class ASCIIEffect extends Effect {
   constructor({
     characters = ` .:,'-^=*+?!|0#X%WM@`,
-    fontSize = 54,
-    cellSize = 16,
+    fontSize = 34,
+    cellSize = 12,
     color = '#ffffff',
     invert = false,
   }) {
