@@ -1,111 +1,101 @@
 <!doctype html>
-<html lang="en">
+<html>
   <head>
+    <title>Mukund Mauji</title>
+
     <meta charset="UTF-8" />
+    <meta name="author" content="Mukund Mauji" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <link rel="icon" type="image/png" href="favicon.png" />
-    <title>Clothing Label Mockup</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" />
+
+    <!-- <link rel="stylesheet" href="./css/global.css" /> -->
+
     <style>
-      :root {
-        --niceblue1: #4c5e9c;
-        --niceblue2: #45568c;
-        --niceblue3: #405082;
-        --niceblue: var(--niceblue3);
-      }
-      body,
-      html {
-        display: flex;
-        flex-direction: column;
-
-        color: #222222;
-        color: var(--niceblue);
-        margin: 0;
-
-        background-color: floralwhite;
-        /* background-color: #fffaf1; */
-        /* background-color: #f0f0f0; */
-      }
-
-      .label {
-        display: flex;
-        flex-direction: column;
-        height: 100vh;
-        padding: 1rem;
-        box-sizing: border-box; /* ensures padding is included inside the 100vh */
-      }
-
-      .label-header {
-        display: flex;
-        justify-content: center;
-        padding: 2vh 0;
-      }
-
-      .text-center {
-        font-family: Palatino, 'Times New Roman', serif;
-        font-style: italic;
-        font-size: 4vh;
-        font-size: clamp(1.5rem, 4vh, 4rem);
+      footer {
+        margin-top: 1em;
         text-align: center;
-      }
-      .dots {
-        flex-grow: 1;
-        display: flex;
-        justify-content: center;
-        padding: 4vh;
-        flex-direction: row;
+        font-size: 85%;
       }
 
-      .dots:hover .dot {
-        opacity: 0;
+      h1 {
+        font: Times New Roman;
+        font-family: serif;
       }
-      
-      .dots p {
-          display: none;
-      }
-
-      .dots:hover p {
-          display: block;
-      }
-
-      @media (orientation: portrait) {
-        .dots {
-          flex-direction: column;
-        }
-      }
-
-      .dot {
-        flex-grow: 1;
-        margin: -0.05rem;
-        background-color: var(--niceblue);
-        border-radius: 50%; /* This makes it an ellipse */
-
-        opacity: 1;
-
-        /* https://easings.net/#easeInOutQuart */
-        transition: opacity 0.6s cubic-bezier(0.76, 0, 0.24, 1);
-
-        /* https://easings.net/#easeInOutQuint */
-        transition: opacity 0.6s cubic-bezier(0.83, 0, 0.17, 1);
     </style>
   </head>
-  <body>
-    <div class="label">
-      <div class="label-header">
-        <div class="text-center">mukund | मुकुंद</div>
-      </div>
 
-      <div class="dots">
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
+  <body class="container">
+    <header>
+      <nav>
+        <ul></ul>
+        <ul>
+          <li>
+            <h1>mukund | मुकुंद</h1>
+          </li>
+        </ul>
+        <ul></ul>
+      </nav>
+    </header>
 
-          <p> hello world </p>
+    <main>
+        <p>
+    I'm currently a freelance software engineer. 
+    <br>
+    I'm comfortable across the entire stack; backend optimization is the most fun though.
+    </p>
+
+      <!-- <p>Projects:</p> -->
+      <!-- <ul> -->
+      <!--   <li>playing around with react-three-fiber,</li> -->
+
+      <!--   <ul> -->
+      <!--     <li>post-processing and gpu rendering, <a target="_blank" href="/projects/torus.html">try it here</a></li> -->
+      <!--     <!-1- <li>visualizer for pdb files, <a target="_blank" href="/projects/pdb-visualizer.html">try it here</a></li> -1-> -->
+      <!--   </ul> -->
+
+      <!--   <li> -->
+      <!--     Predicting mouse behaviour from neural data -->
+      <!--     <a -->
+      <!--       target="_blank" -->
+      <!--       href="https://github.com/maujim/maujim.github.io/blob/master/assets/nma_2024_group_explore.ipynb" -->
+      <!--       >see the notebook here</a -->
+      <!--     > -->
+      <!--   </li> -->
+      <!--   <ul> -->
+      <!--     <li> -->
+      <!--       for neuromatch's -->
+      <!--       <a target="_blank" href="https://neuromatch.io/computational-neuroscience-course/"> -->
+      <!--         Computational Neuroscience course -->
+      <!--       </a> -->
+      <!--       (2024-01) -->
+      <!--     </li> -->
+      <!--   </ul> -->
+      <!-- </ul> -->
+
+      <p>Previously:</p>
+      <ul>
+        <li>software engineer at <a target="_blank" href="https://www.search.brave.com">Brave Search</a></li>
+        <li>firmware engineer at <a target="_blank" href="https://mosaicmfg.com">Mosaic Manufacturing</a></li>
+        <li>
+          B.A.Sc in <a target="_blank" href="https://www.queensu.ca/mathstat/mthe">Mathematics and Engineering</a> at
+          Queen’s University
+        </li>
+      </ul>
+    </main>
+
+    <footer>
+      <hr />
+      <p>
+        page source: <a target="_blank" href=" https://github.com/maujim/maujim.github.io/ ">maujim/maujim.github.io</a>
+      </p>
+      <p>Get in touch via email: <a target="_blank" href="mailto:mauji.mukund@yahoo.ca">mauji.mukund@yahoo.ca</a></p>
+      <div>Other places you can find me:</div>
+      <div>
+        <a target="_blank" href="https://github.com/maujim">GitHub</a> |
+        <a target="_blank" href="https://linkedin.com/in/mukund-mauji/">LinkedIn</a>
       </div>
-    </div>
+    </footer>
   </body>
 </html>
