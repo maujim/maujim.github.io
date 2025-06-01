@@ -46,12 +46,42 @@
         text-align: center;
       }
 
-      .dots {
+      .dots-outside {
         flex-grow: 1;
         display: flex;
-        justify-content: center;
+        flex-direction: column;
+        position: relative;
         margin: 4vh;
+      }
+
+      .dots {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        justify-content: center;
         flex-direction: row;
+      }
+
+      .dots-circles {
+        z-index: 5;
+        opacity: 1;
+      }
+
+      .dots-text {
+        z-index: 1;
+        pointer-events: none;
+
+        opacity: 0;
+        font-family: Palatino, 'Times New Roman', serif;
+        font-style: italic;
+        font-size: clamp(1rem, 3vh, 2rem);
+        margin: 0;
+        padding: 1rem;
+      }
+
+      .dots.transition {
+        /* https://easings.net/#easeInOutQuint */
+        transition: opacity 0.6s cubic-bezier(0.83, 0, 0.17, 1);
       }
 
       @media (orientation: portrait) {
@@ -65,14 +95,14 @@
         margin: -0.05rem;
         background-color: var(--niceblue);
         border-radius: 50%; /* This makes it an ellipse */
-        opacity: 1;
-
-        /* https://easings.net/#easeInOutQuint */
-        transition: opacity 0.6s cubic-bezier(0.83, 0, 0.17, 1);
       }
 
-      .dots:hover .dot {
+      .dots-outside:hover .dots-circles {
         opacity: 0;
+      }
+
+      .dots-outside:hover .dots-text {
+        opacity: 1;
       }
     </style>
   </head>
@@ -82,15 +112,23 @@
         <div class="text-center">mukund | मुकुंद</div>
       </div>
 
-      <div class="dots">
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
+      <div class="dots-outside">
+        <!-- the two divs here are styled to be directly above/below each other -->
+        <!-- on hover, we hide the circles and show the text -->
+        <!-- they use the same transition timings -->
+        <div class="dots dots-circles transition">
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+        </div>
+        <div class="dots dots-text transition">
+          <p>hello world</p>
+        </div>
       </div>
     </div>
   </body>
