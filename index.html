@@ -65,6 +65,7 @@
       .dots-circles {
         z-index: 5;
         opacity: 1;
+        visibility: visible;
       }
 
       .dots-text {
@@ -72,6 +73,8 @@
         pointer-events: none;
 
         opacity: 0;
+        visibility: hidden;
+
         font-family: Palatino, 'Times New Roman', serif;
         font-style: italic;
         font-size: clamp(1rem, 3vh, 2rem);
@@ -81,7 +84,7 @@
 
       .dots.transition {
         /* https://easings.net/#easeInOutQuint */
-        transition: opacity 0.6s cubic-bezier(0.83, 0, 0.17, 1);
+        transition: all 0.6s cubic-bezier(0.83, 0, 0.17, 1);
       }
 
       @media (orientation: portrait) {
@@ -99,10 +102,12 @@
 
       .dots-outside:hover .dots-circles {
         opacity: 0;
+        visibility: hidden;
       }
 
       .dots-outside:hover .dots-text {
         opacity: 1;
+        visibility: visible;
       }
     </style>
   </head>
