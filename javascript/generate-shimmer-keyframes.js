@@ -8,7 +8,7 @@
 
 // all durations are in seconds
 const loop_duration = 60;
-const dot_animation_duration = 3;
+const dot_animation_duration = 2.2;
 
 const base_brightness = 1;
 const max_brightness = 1.6;
