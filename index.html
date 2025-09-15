@@ -122,18 +122,26 @@
 
 
 
-      .dots-outside:hover .dots-circles {
+      .dots-outside.clicked .dots-circles {
         opacity: 0;
         visibility: hidden;
       }
 
-      .dots-outside:hover .dots-text {
+      .dots-outside.clicked .dots-text {
         opacity: 1;
         visibility: visible;
       }
     </style>
   </head>
   <body>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const dotsOutside = document.querySelector('.dots-outside');
+        dotsOutside.addEventListener('click', function() {
+          this.classList.toggle('clicked');
+        });
+      });
+    </script>
     <div class="label">
       <div class="label-header">
         <div class="text-center">mukund | मुकुंद</div>
