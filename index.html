@@ -129,24 +129,25 @@
         bottom: 0;
         border-radius: 50%;
         background: 
+          /* Curved vertical lines - left side */
+          radial-gradient(ellipse 200% 100% at 10% 50%, 
+            transparent 48%, rgba(255, 255, 255, 0.4) 49%, rgba(255, 255, 255, 0.4) 51%, transparent 52%),
+          radial-gradient(ellipse 200% 100% at 30% 50%, 
+            transparent 48%, rgba(255, 255, 255, 0.4) 49%, rgba(255, 255, 255, 0.4) 51%, transparent 52%),
+          radial-gradient(ellipse 200% 100% at 50% 50%, 
+            transparent 48%, rgba(255, 255, 255, 0.4) 49%, rgba(255, 255, 255, 0.4) 51%, transparent 52%),
+          radial-gradient(ellipse 200% 100% at 70% 50%, 
+            transparent 48%, rgba(255, 255, 255, 0.4) 49%, rgba(255, 255, 255, 0.4) 51%, transparent 52%),
+          radial-gradient(ellipse 200% 100% at 90% 50%, 
+            transparent 48%, rgba(255, 255, 255, 0.4) 49%, rgba(255, 255, 255, 0.4) 51%, transparent 52%),
+          /* Horizontal concentric ellipses */
           radial-gradient(ellipse at center, 
-            transparent 5%, rgba(255, 255, 255, 0.3) 6%, transparent 7%,
-            transparent 15%, rgba(255, 255, 255, 0.3) 16%, transparent 17%,
-            transparent 25%, rgba(255, 255, 255, 0.3) 26%, transparent 27%,
-            transparent 35%, rgba(255, 255, 255, 0.3) 36%, transparent 37%,
-            transparent 45%, rgba(255, 255, 255, 0.3) 46%, transparent 47%,
-            transparent 55%, rgba(255, 255, 255, 0.3) 56%, transparent 57%,
-            transparent 65%, rgba(255, 255, 255, 0.3) 66%, transparent 67%,
-            transparent 75%, rgba(255, 255, 255, 0.3) 76%, transparent 77%,
-            transparent 85%, rgba(255, 255, 255, 0.3) 86%, transparent 87%,
-            transparent 95%, rgba(255, 255, 255, 0.3) 96%, transparent 100%
-          ),
-          repeating-linear-gradient(
-            0deg,
-            transparent,
-            transparent 8px,
-            rgba(255, 255, 255, 0.25) 8px,
-            rgba(255, 255, 255, 0.25) 9px
+            transparent 15%, rgba(255, 255, 255, 0.4) 16%, transparent 17%,
+            transparent 30%, rgba(255, 255, 255, 0.4) 31%, transparent 32%,
+            transparent 45%, rgba(255, 255, 255, 0.4) 46%, transparent 47%,
+            transparent 60%, rgba(255, 255, 255, 0.4) 61%, transparent 62%,
+            transparent 75%, rgba(255, 255, 255, 0.4) 76%, transparent 77%,
+            transparent 90%, rgba(255, 255, 255, 0.4) 91%, transparent 92%
           );
         z-index: 1;
       }
