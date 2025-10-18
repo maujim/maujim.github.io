@@ -134,16 +134,16 @@
         visibility: visible;
       }
 
-      /* Auto-return after 3 seconds of no interaction */
+      /* Auto-return after 30 seconds of no interaction */
       .dots-outside.clicked {
-        animation: autoReturn 3s linear forwards;
+        animation: autoReturn 30s linear forwards;
       }
 
       .dots-outside.clicked:active,
       .dots-outside.clicked:hover {
         animation-play-state: paused;
-        animation-delay: 3s;
-        animation-duration: 3s;
+        animation-delay: 30s;
+        animation-duration: 30s;
       }
 
       @keyframes autoReturn {
@@ -377,147 +377,24 @@
       </svg>
     </div>
 
-    <!-- Debug Panel -->
-    <div class="debug-panel" id="debugPanel">
-      <div class="debug-title">
-        <span>Design Parameters</span>
-        <button class="hide-btn" id="hideBtn" title="Hide panel">×</button>
-      </div>
-
-
-      <div class="debug-item">
-        <span class="debug-label">Auto Return</span>
-        <span class="debug-value" id="debug-return">3</span>
-      </div>
-
-      <div class="debug-item">
-        <span class="debug-label">Animation Loop</span>
-        <span class="debug-value">60</span>
-      </div>
-
-      <div class="debug-item">
-        <span class="debug-label">Primary Blue</span>
-        <span class="debug-value">#405082</span>
-      </div>
-
-      <div class="debug-item">
-        <span class="debug-label">Background</span>
-        <span class="debug-value">floralwhite</span>
-      </div>
-
-      <div class="debug-item">
-        <span class="debug-label">Ellipse Transition</span>
-        <span class="debug-value" id="debug-transition">ON</span>
-      </div>
-    </div>
-
+    
     <script>
       // Simple click handler - CSS does all the work
       const dotsOutside = document.querySelector('.dots-outside');
       const dotsCircles = document.querySelector('.dots-circles');
-      const debugTransition = document.getElementById('debug-transition');
       let returnTimer;
       let lotusTransitionEnabled = true;
 
-      // Debug panel toggle and ellipse transition toggle
-      const hideBtn = document.getElementById('hideBtn');
-      const debugPanel = document.getElementById('debugPanel');
-
-      hideBtn.addEventListener('click', function () {
-        if (debugPanel.style.display === 'none') {
-          debugPanel.style.display = '';
-          hideBtn.textContent = '×';
-        } else {
-          debugPanel.style.display = 'none';
-          hideBtn.textContent = '☰';
-        }
-      });
-
-      // Ellipse transition toggle
-      debugTransition.addEventListener('click', function () {
-        lotusTransitionEnabled = !lotusTransitionEnabled;
-        this.textContent = lotusTransitionEnabled ? 'ON' : 'OFF';
-
-        // Disable ellipse animation if OFF
-        const circle = document.querySelector('.circle-container');
-        if (lotusTransitionEnabled) {
-          circle.style.animation = '';
-        } else {
-          circle.style.animation = 'none';
-        }
-      });
-
-      // Proper JavaScript handlers
-      const circle = document.querySelector('.circle-container');
-      let isOpen = false;
-
       dotsCircles.addEventListener('click', function () {
-        isOpen = !isOpen;
+        // Hide dots immediately
+        dotsOutside.classList.add('clicked');
 
-        if (isOpen) {
-          // Show ellipse immediately (no fade-in)
-          circle.classList.add('visible');
-          circle.style.opacity = '1';
-
-          // Hide dots
-          dotsOutside.classList.add('clicked');
-
-          // Start fade animation after brief delay
-          if (lotusTransitionEnabled) {
-            setTimeout(() => {
-              if (isOpen) {
-                circle.classList.add('fading');
-              }
-            }, 100);
-          }
-
-          // Auto-return timer
-          clearTimeout(returnTimer);
-          returnTimer = setTimeout(() => {
-            isOpen = false;
-            dotsOutside.classList.remove('clicked');
-            circle.classList.remove('visible', 'fading');
-            circle.style.opacity = '';
-          }, 3000);
-
-        } else {
-          // Hide everything immediately
+        // Auto-return after 30 seconds
+        clearTimeout(returnTimer);
+        returnTimer = setTimeout(() => {
           dotsOutside.classList.remove('clicked');
-          circle.classList.remove('visible', 'fading');
-          circle.style.opacity = '';
-          clearTimeout(returnTimer);
-        }
+        }, 30000);
       });
-
-      // Reset timer on mouse movement
-      dotsOutside.addEventListener('mousemove', function () {
-        if (isOpen) {
-          // Reset to immediate appearance (no animation)
-          circle.classList.remove('fading');
-          circle.style.opacity = '1';
-
-          // Restart fade animation
-          if (lotusTransitionEnabled) {
-            setTimeout(() => {
-              if (isOpen) {
-                circle.classList.add('fading');
-              }
-            }, 100);
-          }
-
-          // Reset timer
-          clearTimeout(returnTimer);
-          returnTimer = setTimeout(() => {
-            isOpen = false;
-            dotsOutside.classList.remove('clicked');
-            circle.classList.remove('visible', 'fading');
-            circle.style.opacity = '';
-          }, 3000);
-        }
-      });
-
-      // Start timer on page load
-      // Lotus is hidden by default via CSS
     </script>
   </body>
 </html>
