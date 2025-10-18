@@ -302,11 +302,12 @@
 
       .timer-container {
         position: fixed;
-        bottom: 30px;
+        bottom: 20px;
         left: 50%;
         transform: translateX(-50%);
-        width: 60px;
-        height: 60px;
+        width: 90vw;
+        max-width: 800px;
+        height: 6px;
         z-index: 100;
         opacity: 0;
         transition: opacity 0.3s ease;
@@ -314,6 +315,25 @@
 
       .timer-container.visible {
         opacity: 1;
+      }
+
+      .timer-background {
+        width: 100%;
+        height: 100%;
+        background-color: #ddd;
+        border-radius: 3px;
+        position: relative;
+      }
+
+      .timer-progress {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        background-color: var(--niceblue);
+        border-radius: 3px;
+        width: 100%;
+        transition: width 0.1s linear;
       }
 
       .circle-container.visible {
@@ -395,22 +415,9 @@
 
     <!-- Timer Progress Indicator -->
     <div class="timer-container" id="timerContainer">
-      <svg width="60" height="60" viewBox="0 0 60 60">
-        <!-- Background circle -->
-        <circle cx="30" cy="30" r="28" fill="none" stroke="#ddd" stroke-width="4"/>
-        <!-- Progress circle -->
-        <circle
-          cx="30" cy="30" r="28"
-          fill="none"
-          stroke="var(--niceblue)"
-          stroke-width="4"
-          stroke-linecap="round"
-          stroke-dasharray="176"
-          stroke-dashoffset="176"
-          transform="rotate(-90 30 30)"
-          id="timerProgress"
-        />
-      </svg>
+      <div class="timer-background">
+        <div class="timer-progress" id="timerProgress"></div>
+      </div>
     </div>
 
     
@@ -440,7 +447,6 @@
       });
 
       function animateTimer(duration) {
-        const circumference = 2 * Math.PI * 28; // radius = 28
         const startTime = Date.now();
 
         function updateTimer() {
@@ -448,9 +454,13 @@
           const remaining = Math.max(0, duration - elapsed);
           const progress = remaining / duration;
 
-          // Update stroke-dashoffset to show progress
-          const offset = circumference * (1 - progress);
-          timerProgress.style.strokeDashoffset = offset;
+          // Calculate width that shrinks from both ends toward center
+          const width = progress * 100; // percentage
+          const leftOffset = (100 - width) / 2; // center the shrinking line
+
+          // Update the progress bar
+          timerProgress.style.width = width + '%';
+          timerProgress.style.left = leftOffset + '%';
 
           if (remaining > 0) {
             requestAnimationFrame(updateTimer);
@@ -458,7 +468,8 @@
         }
 
         // Reset and start animation
-        timerProgress.style.strokeDashoffset = circumference;
+        timerProgress.style.width = '100%';
+        timerProgress.style.left = '0%';
         updateTimer();
       }
     </script>
