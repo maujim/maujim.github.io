@@ -300,6 +300,22 @@
         opacity: 0;
       }
 
+      .timer-container {
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60px;
+        height: 60px;
+        z-index: 100;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .timer-container.visible {
+        opacity: 1;
+      }
+
       .circle-container.visible {
         animation: circleFadeIn 0.6s cubic-bezier(0.83, 0, 0.17, 1) forwards;
       }
@@ -377,11 +393,33 @@
       </svg>
     </div>
 
+    <!-- Timer Progress Indicator -->
+    <div class="timer-container" id="timerContainer">
+      <svg width="60" height="60" viewBox="0 0 60 60">
+        <!-- Background circle -->
+        <circle cx="30" cy="30" r="28" fill="none" stroke="#ddd" stroke-width="4"/>
+        <!-- Progress circle -->
+        <circle
+          cx="30" cy="30" r="28"
+          fill="none"
+          stroke="var(--niceblue)"
+          stroke-width="4"
+          stroke-linecap="round"
+          stroke-dasharray="176"
+          stroke-dashoffset="176"
+          transform="rotate(-90 30 30)"
+          id="timerProgress"
+        />
+      </svg>
+    </div>
+
     
     <script>
       // Simple click handler - CSS does all the work
       const dotsOutside = document.querySelector('.dots-outside');
       const dotsCircles = document.querySelector('.dots-circles');
+      const timerContainer = document.getElementById('timerContainer');
+      const timerProgress = document.getElementById('timerProgress');
       let returnTimer;
       let lotusTransitionEnabled = true;
 
@@ -389,12 +427,40 @@
         // Hide dots immediately
         dotsOutside.classList.add('clicked');
 
+        // Show timer and start animation
+        timerContainer.classList.add('visible');
+        animateTimer(30); // 30 seconds
+
         // Auto-return after 30 seconds
         clearTimeout(returnTimer);
         returnTimer = setTimeout(() => {
           dotsOutside.classList.remove('clicked');
+          timerContainer.classList.remove('visible');
         }, 30000);
       });
+
+      function animateTimer(duration) {
+        const circumference = 2 * Math.PI * 28; // radius = 28
+        const startTime = Date.now();
+
+        function updateTimer() {
+          const elapsed = (Date.now() - startTime) / 1000; // seconds elapsed
+          const remaining = Math.max(0, duration - elapsed);
+          const progress = remaining / duration;
+
+          // Update stroke-dashoffset to show progress
+          const offset = circumference * (1 - progress);
+          timerProgress.style.strokeDashoffset = offset;
+
+          if (remaining > 0) {
+            requestAnimationFrame(updateTimer);
+          }
+        }
+
+        // Reset and start animation
+        timerProgress.style.strokeDashoffset = circumference;
+        updateTimer();
+      }
     </script>
   </body>
 </html>
