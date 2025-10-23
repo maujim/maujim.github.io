@@ -42,8 +42,8 @@ keyframes.push({ percent: 100, brightness: base_brightness });
 
 // Output
 console.log(explanation);
-console.log('@keyframes shimmer {');
+console.log("@keyframes shimmer {");
 keyframes.forEach(({ percent, brightness }) => {
   console.log(`${percent}% { filter: brightness(${brightness}); }`);
 });
-console.log('}');
+console.log("}");
