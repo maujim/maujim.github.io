@@ -62,12 +62,26 @@
         padding: 2vh 0;
       }
 
-      .text-center {
-        font-family: Palatino, "Times New Roman", serif;
-        font-style: italic;
-        font-size: 4vh;
-        font-size: clamp(1.5rem, 4vh, 4rem);
+      .name-pair {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: center;
         text-align: center;
+        font-family: palatino, "times new roman", serif;
+        font-style: italic;
+        font-size: clamp(1.5rem, 4vh, 4rem);
+      }
+
+      .name-latin {
+        justify-self: end;
+      }
+
+      .name-devanagari {
+        justify-self: start;
+      }
+
+      .name-separator {
+        padding: 0 0.3em;
       }
 
       .dots-outside {
@@ -374,7 +388,11 @@
   <body>
     <div class="label">
       <div class="label-header">
-        <div class="text-center">mukund | मुकुंद</div>
+        <div class="name-pair">
+          <span class="name-latin">mukund</span>
+          <span class="name-separator">|</span>
+          <span class="name-devanagari">मुकुंद</span>
+        </div>
       </div>
 
       <div class="dots-outside">
