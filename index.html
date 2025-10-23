@@ -437,16 +437,12 @@
       let timerShowTimer;
       let initialScreensaverTimeoutSeconds = 10;
       let screensaverTimeoutSeconds = 60;
-      let timerShowDelaySeconds = 10;
+      let timerShowDelaySeconds = Math.min(
+        10,
+        Math.floor(screensaverTimeoutSeconds / 8),
+      );
       let timerCountdownSeconds = 2; // Timer countdown duration
       let hasScreensaverTriggeredOnce = false; // Track if screensaver has been shown at least once
-
-      // Validate configuration
-      if (timerShowDelaySeconds >= screensaverTimeoutSeconds) {
-        throw new Error(
-          `timerShowDelaySeconds (${timerShowDelaySeconds}) must be less than screensaverTimeoutSeconds (${screensaverTimeoutSeconds})`,
-        );
-      }
 
       // Initialize: page starts with text visible (no dots)
       function initializePage() {
