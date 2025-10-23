@@ -40,7 +40,7 @@
 
         background-color: floralwhite;
         cursor:
-          url('assets/cursor-small.svg') 16 16,
+          url("assets/cursor-small.svg") 16 16,
           auto;
       }
 
@@ -52,8 +52,8 @@
         box-sizing: border-box; /* ensures padding is included inside the 100vh */
       }
 
-      .dots-outside.clicked .label {
-        height: 10vh; /* Reduce to 10% height when clicked */
+      .dots-outside.overlay .label {
+        height: 10vh; /* Reduce to 10% height when dots (screensaver) are active */
       }
 
       .label-header {
@@ -63,7 +63,7 @@
       }
 
       .text-center {
-        font-family: Palatino, 'Times New Roman', serif;
+        font-family: Palatino, "Times New Roman", serif;
         font-style: italic;
         font-size: 4vh;
         font-size: clamp(1.5rem, 4vh, 4rem);
@@ -88,17 +88,17 @@
 
       .dots-circles {
         z-index: 5;
-        opacity: 1;
-        visibility: visible;
+        opacity: 0;
+        visibility: hidden;
       }
 
       .dots-text {
         z-index: 1;
 
-        opacity: 0;
-        visibility: hidden;
+        opacity: 1;
+        visibility: visible;
 
-        font-family: Palatino, 'Times New Roman', serif;
+        font-family: Palatino, "Times New Roman", serif;
         font-style: italic;
         font-size: clamp(1rem, 2vh, 2rem);
         margin: 0;
@@ -123,24 +123,23 @@
         border-radius: 50%; /* This makes it an ellipse */
       }
 
-      
-      .dots-outside.clicked .dots-circles {
-        opacity: 0;
-        visibility: hidden;
-      }
-
-      .dots-outside.clicked .dots-text {
+      .dots-outside.overlay .dots-circles {
         opacity: 1;
         visibility: visible;
       }
 
+      .dots-outside.overlay .dots-text {
+        opacity: 0;
+        visibility: hidden;
+      }
+
       /* Auto-return after 30 seconds of no interaction */
-      .dots-outside.clicked {
+      .dots-outside.overlay {
         animation: autoReturn 30s linear forwards;
       }
 
-      .dots-outside.clicked:active,
-      .dots-outside.clicked:hover {
+      .dots-outside.overlay:active,
+      .dots-outside.overlay:hover {
         animation-play-state: paused;
         animation-delay: 30s;
         animation-duration: 30s;
@@ -155,7 +154,7 @@
         }
       }
 
-      .dots-circles {
+      .dots-outside.overlay .dots-circles {
         cursor: pointer;
       }
 
@@ -168,7 +167,7 @@
         border: 2px solid #ff6b6b;
         border-radius: 8px;
         padding: 24px;
-        font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
+        font-family: "SF Mono", "Monaco", "Inconsolata", monospace;
         font-size: 22px;
         color: #ffffff;
         min-width: 400px;
@@ -344,11 +343,13 @@
         animation: circleFadeOut 3s linear forwards;
       }
 
-      
-      
       @keyframes circleFadeIn {
-        0% { opacity: 0; }
-        100% { opacity: 1; }
+        0% {
+          opacity: 0;
+        }
+        100% {
+          opacity: 1;
+        }
       }
 
       @keyframes circleFadeOut {
@@ -392,13 +393,19 @@
         </div>
         <div class="dots dots-text transition">
           <div>
-            <p>Working on something new in the intersection of engineering and biology.</p>
+            <p>
+              Working on something new in the intersection of engineering and
+              biology.
+            </p>
             <br />
             <br />
             <br />
             <div style="font-size: 1rem">
               <a target="_blank" href="https://github.com/maujim">github</a> |
-              <a target="_blank" href="https://linkedin.com/in/mukund-mauji/">linkedin</a> |
+              <a target="_blank" href="https://linkedin.com/in/mukund-mauji/"
+                >linkedin</a
+              >
+              |
               <a target="_blank" href="https://x.com/mukundmauji">twitter</a>
             </div>
           </div>
@@ -409,7 +416,7 @@
     <!-- Circle Indicator -->
     <div class="circle-container" id="circleContainer">
       <svg width="40" height="40" viewBox="0 0 40 40">
-        <circle cx="20" cy="20" r="18" fill="var(--niceblue)"/>
+        <circle cx="20" cy="20" r="18" fill="var(--niceblue)" />
       </svg>
     </div>
 
@@ -420,31 +427,46 @@
       </div>
     </div>
 
-    
     <script>
-      // Simple click handler - CSS does all the work
-      const dotsOutside = document.querySelector('.dots-outside');
-      const dotsCircles = document.querySelector('.dots-circles');
-      const timerContainer = document.getElementById('timerContainer');
-      const timerProgress = document.getElementById('timerProgress');
-      let returnTimer;
-      let lotusTransitionEnabled = true;
+      // Screensaver functionality - shows dots after inactivity
+      const dotsOutside = document.querySelector(".dots-outside");
+      const dotsCircles = document.querySelector(".dots-circles");
+      const timerContainer = document.getElementById("timerContainer");
+      const timerProgress = document.getElementById("timerProgress");
+      let screensaverTimer;
+      let screensaverTimeout = 30000; // 30 seconds of inactivity before showing dots
+      let hasScreensaverTriggeredOnce = false; // Track if screensaver has been shown at least once
 
-      dotsCircles.addEventListener('click', function () {
-        // Hide dots immediately
-        dotsOutside.classList.add('clicked');
+      // Initialize: page starts with text visible (no dots)
+      function initializePage() {
+        startScreensaverTimer();
+      }
 
-        // Show timer and start animation
-        timerContainer.classList.add('visible');
-        animateTimer(30); // 30 seconds
+      function startScreensaverTimer() {
+        clearTimeout(screensaverTimer);
 
-        // Auto-return after 30 seconds
-        clearTimeout(returnTimer);
-        returnTimer = setTimeout(() => {
-          dotsOutside.classList.remove('clicked');
-          timerContainer.classList.remove('visible');
-        }, 30000);
-      });
+        // Only show timer if screensaver has been triggered before and dots are not visible
+        if (hasScreensaverTriggeredOnce && !dotsOutside.classList.contains("overlay")) {
+          timerContainer.classList.add("visible");
+          animateTimer(screensaverTimeout / 1000); // Show countdown timer
+        }
+
+        screensaverTimer = setTimeout(() => {
+          showDotsScreensaver();
+        }, screensaverTimeout);
+      }
+
+      function showDotsScreensaver() {
+        dotsOutside.classList.add("overlay");
+        hasScreensaverTriggeredOnce = true; // Mark that screensaver has been shown
+        timerContainer.classList.remove("visible"); // Hide timer when dots are visible
+      }
+
+      function hideDotsScreensaver() {
+        dotsOutside.classList.remove("overlay");
+        timerContainer.classList.remove("visible");
+        startScreensaverTimer(); // Restart the inactivity timer
+      }
 
       function animateTimer(duration) {
         const startTime = Date.now();
@@ -459,8 +481,8 @@
           const leftOffset = (100 - width) / 2; // center the shrinking line
 
           // Update the progress bar
-          timerProgress.style.width = width + '%';
-          timerProgress.style.left = leftOffset + '%';
+          timerProgress.style.width = width + "%";
+          timerProgress.style.left = leftOffset + "%";
 
           if (remaining > 0) {
             requestAnimationFrame(updateTimer);
@@ -468,10 +490,40 @@
         }
 
         // Reset and start animation
-        timerProgress.style.width = '100%';
-        timerProgress.style.left = '0%';
+        timerProgress.style.width = "100%";
+        timerProgress.style.left = "0%";
         updateTimer();
       }
+
+      // Click handler for dots when screensaver is active
+      dotsCircles.addEventListener("click", function () {
+        hideDotsScreensaver();
+      });
+
+      // Add event listeners for user interaction
+      const interactionEvents = ["click", "mousemove", "keypress", "touchstart", "scroll"];
+
+      interactionEvents.forEach(event => {
+        document.addEventListener(event, (e) => {
+          // If dots are showing and user clicks anywhere, hide them
+          if (dotsOutside.classList.contains("overlay") &&
+              !dotsOutside.contains(e.target)) {
+            hideDotsScreensaver();
+          } else if (dotsOutside.classList.contains("overlay")) {
+            // User is interacting with dots, restart the 30-second timer
+            clearTimeout(screensaverTimer);
+            screensaverTimer = setTimeout(() => {
+              hideDotsScreensaver();
+            }, 30000);
+          } else {
+            // User is active, restart the inactivity timer
+            startScreensaverTimer();
+          }
+        });
+      });
+
+      // Initialize the page
+      initializePage();
     </script>
   </body>
 </html>
