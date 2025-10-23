@@ -434,8 +434,19 @@
       const timerContainer = document.getElementById("timerContainer");
       const timerProgress = document.getElementById("timerProgress");
       let screensaverTimer;
-      let screensaverTimeout = 30000; // 30 seconds of inactivity before showing dots
+      let timerShowTimer;
+      let initialScreensaverTimeoutSeconds = 10;
+      let screensaverTimeoutSeconds = 60;
+      let timerShowDelaySeconds = 10;
+      let timerCountdownSeconds = 2; // Timer countdown duration
       let hasScreensaverTriggeredOnce = false; // Track if screensaver has been shown at least once
+
+      // Validate configuration
+      if (timerShowDelaySeconds >= screensaverTimeoutSeconds) {
+        throw new Error(
+          `timerShowDelaySeconds (${timerShowDelaySeconds}) must be less than screensaverTimeoutSeconds (${screensaverTimeoutSeconds})`,
+        );
+      }
 
       // Initialize: page starts with text visible (no dots)
       function initializePage() {
@@ -444,16 +455,34 @@
 
       function startScreensaverTimer() {
         clearTimeout(screensaverTimer);
+        clearTimeout(timerShowTimer);
+
+        // Use appropriate timeout based on whether this is the first activation
+        const currentTimeoutSeconds = hasScreensaverTriggeredOnce
+          ? screensaverTimeoutSeconds
+          : initialScreensaverTimeoutSeconds;
+        const currentTimeout = currentTimeoutSeconds * 1000;
 
         // Only show timer if screensaver has been triggered before and dots are not visible
-        if (hasScreensaverTriggeredOnce && !dotsOutside.classList.contains("overlay")) {
-          timerContainer.classList.add("visible");
-          animateTimer(screensaverTimeout / 1000); // Show countdown timer
+        if (
+          hasScreensaverTriggeredOnce &&
+          !dotsOutside.classList.contains("overlay")
+        ) {
+          // Schedule timer to show in the last timerShowDelaySeconds seconds
+          const timerShowDelayMs = timerShowDelaySeconds * 1000;
+          const actualTimerShowDelay = Math.min(
+            timerShowDelayMs,
+            currentTimeout,
+          );
+          timerShowTimer = setTimeout(() => {
+            timerContainer.classList.add("visible");
+            animateTimer(timerCountdownSeconds); // Always show timerCountdownSeconds countdown
+          }, currentTimeout - actualTimerShowDelay);
         }
 
         screensaverTimer = setTimeout(() => {
           showDotsScreensaver();
-        }, screensaverTimeout);
+        }, currentTimeout);
       }
 
       function showDotsScreensaver() {
@@ -465,6 +494,7 @@
       function hideDotsScreensaver() {
         dotsOutside.classList.remove("overlay");
         timerContainer.classList.remove("visible");
+        clearTimeout(timerShowTimer); // Clear any pending timer show
         startScreensaverTimer(); // Restart the inactivity timer
       }
 
@@ -477,12 +507,12 @@
           const progress = remaining / duration;
 
           // Calculate width that shrinks from both ends toward center
-          const width = progress * 100; // percentage
-          const leftOffset = (100 - width) / 2; // center the shrinking line
+          const widthPercentage = progress * 100; // percentage
+          const leftOffsetPercentage = (100 - widthPercentage) / 2; // center the shrinking line
 
           // Update the progress bar
-          timerProgress.style.width = width + "%";
-          timerProgress.style.left = leftOffset + "%";
+          timerProgress.style.width = widthPercentage + "%";
+          timerProgress.style.left = leftOffsetPercentage + "%";
 
           if (remaining > 0) {
             requestAnimationFrame(updateTimer);
@@ -501,22 +531,32 @@
       });
 
       // Add event listeners for user interaction
-      const interactionEvents = ["click", "mousemove", "keypress", "touchstart", "scroll"];
+      const interactionEvents = [
+        "click",
+        "mousemove",
+        "keypress",
+        "touchstart",
+        "scroll",
+      ];
 
-      interactionEvents.forEach(event => {
+      interactionEvents.forEach((event) => {
         document.addEventListener(event, (e) => {
           // If dots are showing and user clicks anywhere, hide them
-          if (dotsOutside.classList.contains("overlay") &&
-              !dotsOutside.contains(e.target)) {
+          if (
+            dotsOutside.classList.contains("overlay") &&
+            !dotsOutside.contains(e.target)
+          ) {
             hideDotsScreensaver();
           } else if (dotsOutside.classList.contains("overlay")) {
-            // User is interacting with dots, restart the 30-second timer
+            // User is interacting with dots, restart the screensaver timer
             clearTimeout(screensaverTimer);
             screensaverTimer = setTimeout(() => {
               hideDotsScreensaver();
-            }, 30000);
+            }, screensaverTimeoutSeconds * 1000);
           } else {
             // User is active, restart the inactivity timer
+            // Also hide timer if it's currently visible (edge case fix)
+            timerContainer.classList.remove("visible");
             startScreensaverTimer();
           }
         });
