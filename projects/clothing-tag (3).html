@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clothing Tag</title>
+    <style>
+        :root {
+            --navy: #3d3d7a;
+            --cream: #f5f3ef;
+            --stitch: #c0bdb8;
+            --padding: 20px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--navy);
+        }
+
+        .tag {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            border: 5px solid var(--navy);
+            border-radius: 8px;
+            background-color: var(--cream);
+            box-sizing: border-box;
+        }
+
+        .stitching {
+            height: 1px;
+            background: var(--stitch);
+            margin: 12px 0;
+            flex-shrink: 0;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 8px var(--padding) 0 var(--padding);
+            flex-shrink: 0;
+        }
+
+        .left-text {
+            font-size: clamp(14px, 2.5vw, 24px);
+            font-weight: 500;
+            color: var(--navy);
+            line-height: 1.2;
+        }
+
+        .right-text {
+            font-size: clamp(14px, 2.5vw, 24px);
+            color: var(--navy);
+            text-align: right;
+            line-height: 1.2;
+        }
+
+        .right-text .brand {
+            font-weight: 500;
+        }
+
+        .right-text .italic {
+            font-style: italic;
+        }
+
+        .leaves-outside {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            margin: 4vh var(--padding);
+        }
+
+        .leaves-container {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            justify-content: center;
+            flex-direction: row;
+        }
+
+        @media (orientation: portrait) {
+            .leaves-container {
+                flex-direction: column;
+            }
+        }
+
+        .leaf {
+            flex-grow: 1;
+            margin: -0.05rem;
+            background-color: var(--navy);
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <div class="tag">
+        <div class="stitching"></div>
+        <div class="header">
+            <div class="left-text">
+                Mockup<br>Clothing Label
+            </div>
+            <div class="right-text">
+                <span class="brand">Maison</span><br>
+                <span class="italic">Italique</span>
+            </div>
+        </div>
+        <div class="leaves-outside">
+            <div class="leaves-container">
+                <div class="leaf"></div>
+                <div class="leaf"></div>
+                <div class="leaf"></div>
+                <div class="leaf"></div>
+                <div class="leaf"></div>
+                <div class="leaf"></div>
+                <div class="leaf"></div>
+                <div class="leaf"></div>
+            </div>
+        </div>
+        <div class="stitching"></div>
+    </div>
+</body>
+</html>
