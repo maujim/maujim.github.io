@@ -1,0 +1,740 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Clinical Trials Viewer</title>
+
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"
+    ></script>
+
+    <!-- Alpine JS -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+      [x-cloak] {
+        display: none !important;
+      }
+
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+      }
+
+      .app-container {
+        height: calc(100vh - 56px); /* Subtract navbar height */
+        display: flex;
+        flex-direction: column;
+      }
+
+      .content-area {
+        flex: 1;
+        overflow: hidden;
+        display: flex;
+        position: relative;
+      }
+
+      .top-nav {
+        border-bottom: 1px solid #dee2e6;
+      }
+
+      .trials-container {
+        flex: 1;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        border-left: 1px solid #dee2e6;
+      }
+
+      .trials-list {
+        flex: 1;
+        overflow-y: auto;
+        padding: 1rem;
+      }
+
+      .filters-panel {
+        width: 300px;
+        overflow-y: auto;
+        transition: transform 0.3s ease;
+        background: white;
+      }
+
+      .filters-backdrop {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1029;
+      }
+
+      @media (max-width: 768px) {
+        .filters-panel {
+          position: fixed;
+          top: 56px; /* Set to navbar height */
+          left: 0;
+          bottom: 0;
+          width: 100%;
+          height: calc(100vh - 56px); /* Subtract navbar height */
+          z-index: 1030;
+          transform: translateX(-100%);
+          box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .filters-panel.show {
+          transform: translateX(0);
+        }
+
+        .filters-backdrop.show {
+          display: block;
+          top: 56px; /* Adjust backdrop to start below navbar */
+          height: calc(100vh - 56px); /* Adjust backdrop height */
+        }
+      }
+
+      .pagination-container {
+        padding: 0.5rem;
+        background: white;
+        border-top: 1px solid #dee2e6;
+      }
+
+      @media (max-width: 576px) {
+        .pagination-container {
+          padding: 0.25rem;
+        }
+
+        .page-link {
+          padding: 0.375rem 0.75rem;
+        }
+      }
+    </style>
+  </head>
+
+  <body x-data="clinicalTrials()" x-init="init()">
+    <!-- Navbar -->
+    <nav class="top-nav navbar navbar-expand-lg navbar-light bg-light">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">GANSID</a>
+        <button
+          class="btn btn-outline-secondary d-md-none"
+          @click="showSidebar = !showSidebar"
+          x-text="showSidebar ? 'Hide Sidebar' : 'Show Sidebar'"
+        ></button>
+      </div>
+    </nav>
+
+    <div class="app-container">
+      <div class="content-area">
+        <!-- Filters Panel -->
+        <div class="filters-panel" :class="{ 'show': showSidebar }">
+          <div class="card border-0">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <strong>Filters & Sorting</strong>
+            </div>
+
+            <div class="card-body">
+              <!-- Sort By -->
+              <div class="mb-3">
+                <label class="form-label">Sort By</label>
+                <select class="form-select" x-model="sortBy">
+                  <option selected value="default">Default</option>
+                  <option value="title">Title</option>
+                  <option value="start-date-asc">Start Date (ascending)</option>
+                  <option value="start-date-desc">Start Date (descending)</option>
+                </select>
+              </div>
+
+              <!-- Condition Filter -->
+              <div class="mb-3">
+                <label class="form-label">Condition</label>
+                <select
+                  class="form-select"
+                  id="country-select"
+                  x-model="filters.condition"
+                  @change="handleFilterChange"
+                >
+                  <option selected value="all">All</option>
+                  <template x-for="condition in possible_conditions" :key="condition">
+                    <option :value="condition" x-text="condition"></option>
+                  </template>
+                </select>
+              </div>
+
+              <!-- Location Filter (country) -->
+              <div class="mb-3">
+                <label for="country" class="form-label">Country</label>
+                <select class="form-select" id="country-select" x-model="filters.country" @change="handleFilterChange">
+                  <option value="all">All</option>
+                  <template x-for="country in possible_countries" :key="country">
+                    <option :value="country" x-text="country"></option>
+                  </template>
+                </select>
+              </div>
+
+              <!-- Study Status Filter -->
+              <div class="mb-3">
+                <label for="status" class="form-label">Status</label>
+                <select class="form-select" id="status" x-model="filters.status" @change="handleFilterChange">
+                  <option selected value="all">All</option>
+                  <template x-for="status in possible_statuses" :key="status">
+                    <option :value="status" x-text="status_to_label(status)"></option>
+                  </template>
+                </select>
+              </div>
+
+              <!-- Age Range Filter -->
+              <div class="mb-3">
+                <label class="form-label">How old are you:</label>
+                <div class="d-flex align-items-center">
+                  <input
+                    type="number"
+                    class="form-control me-2"
+                    min="0"
+                    step="1"
+                    x-model.number="filters.age"
+                    placeholder="All ages"
+                    @input="filters.age === '' ? filters.age = null : null"
+                    @change="handleFilterChange"
+                  />
+                </div>
+              </div>
+
+              <!-- Sex Filter -->
+              <div class="mb-3">
+                <label for="sex" class="form-label">Sex</label>
+                <div class="d-flex align-items-center gap-2">
+                  <select class="form-select" id="sex" x-model="filters.sex" @change="handleFilterChange">
+                    <option selected value="ALL">All</option>
+                    <option value="FEMALE">Female</option>
+                    <option value="MALE">Male</option>
+                  </select>
+                  <div class="form-check" x-show="filters.sex !== 'ALL'">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="sexOnly"
+                      x-model="filters.sexOnly"
+                      @change="handleFilterChange"
+                    />
+                    <label class="form-check-label" for="sexOnly">only</label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Healthy Volunteers Filter -->
+              <div class="mb-3">
+                <label for="healthyVolunteers" class="form-label">Healthy Volunteers</label>
+                <select
+                  class="form-select"
+                  id="healthyVolunteers"
+                  x-model="filters.healthyVolunteers"
+                  @change="handleFilterChange"
+                >
+                  <option selected value="all">All</option>
+                  <option value="true">Yes</option>
+                  <option value="false">No</option>
+                </select>
+              </div>
+
+              <button type="button" class="btn btn-outline-secondary w-100" @click="resetFilters()">Reset All</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Trials Container -->
+        <div class="trials-container">
+          <!-- Trials List -->
+          <div class="trials-list">
+            <!-- Loading Indicator -->
+            <template x-if="loading && trials.length === 0">
+              <div class="text-center my-3">
+                <div class="spinner-border" role="status"></div>
+                <p>Loading trials...</p>
+              </div>
+            </template>
+
+            <!-- No Trials Message -->
+            <template x-if="!loading && trials.length === 0">
+              <div class="alert alert-warning" role="alert">No trials found.</div>
+            </template>
+
+            <!-- Trials Cards -->
+            <template x-for="(trial, index) in filteredTrials()" :key="index">
+              <div class="card mb-3 overflow-hidden">
+                <div class="card-body" x-show.important="!showContactIndex.has(index)">
+                  <h5 class="card-title">
+                    <strong x-text="trial.protocolSection.identificationModule.briefTitle"></strong>
+                  </h5>
+
+                  <div class="d-flex flex-wrap">
+                    <span
+                      :class="{
+                        'bg-success': trial.protocolSection.statusModule.overallStatus === 'RECRUITING',
+                        'bg-primary': trial.protocolSection.statusModule.overallStatus === 'ENROLLING_BY_INVITATION',
+                        'bg-warning': trial.protocolSection.statusModule.overallStatus === 'ACTIVE_NOT_RECRUITING'
+                      }"
+                      class="badge me-2 text-white"
+                      x-text="trial.protocolSection.statusModule.overallStatus"
+                    ></span>
+                  </div>
+                </div>
+
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item">
+                    <strong>Start date:</strong> <span x-text="startDate(trial)"></span>
+                    <br />
+                    <strong>Completion date:</strong> <span x-text="completionDate(trial)"></span>
+                  </li>
+                  <li class="list-group-item"><strong>Age:</strong> <span x-text="ageRange(trial)"></span></li>
+
+                  <li class="list-group-item">
+                    <strong>Eligible sexes:</strong>
+                    <span x-text="trial.protocolSection.eligibilityModule.sex"></span>
+                  </li>
+
+                  <li class="list-group-item">
+                    <strong>Accepts healthy volunteers:</strong>
+                    <span x-text="trial.protocolSection.eligibilityModule.healthyVolunteers ? 'Yes' : 'No'"></span>
+                  </li>
+
+                  <li class="list-group-item">
+                    <strong>Locations:</strong>
+                    <span x-text="locationString(trial)"></span>
+                  </li>
+                </ul>
+
+                <!-- Footer Buttons -->
+                <a
+                  :href="`https://clinicaltrials.gov/study/${trial.protocolSection.identificationModule.nctId}`"
+                  target="_blank"
+                  class="btn text-center card-footer"
+                >
+                  View Trial Details
+                  <i data-lucide="external-link"></i>
+                </a>
+              </div>
+            </template>
+          </div>
+
+          <!-- Pagination -->
+          <div class="pagination-container">
+            <nav aria-label="Trial pagination">
+              <ul class="pagination justify-content-center mb-0">
+                <li class="page-item" :class="{ 'disabled': currentPage === 1 || totalCount === 0 }">
+                  <button
+                    class="page-link d-flex align-items-center h-100"
+                    @click="previousPage()"
+                    :disabled="currentPage === 1 || totalCount === 0"
+                  >
+                    <i
+                      data-lucide="chevron-left"
+                      class="d-none d-sm-inline-block"
+                      style="width: 16px; height: 16px"
+                    ></i>
+                    <span>Prev</span>
+                  </button>
+                </li>
+
+                <li class="page-item disabled">
+                  <span class="page-link pagination-info">
+                    <span class="d-none d-sm-inline">Page </span>
+                    <span x-text="currentPage"></span> of
+                    <span x-text="totalPages()"></span>
+                    <span class="d-none d-sm-inline"> (<span x-text="totalCount"></span> results) </span>
+                  </span>
+                </li>
+
+                <li class="page-item" :class="{ 'disabled': currentPage >= totalPages() || totalCount === 0 }">
+                  <button
+                    class="page-link d-flex align-items-center h-100"
+                    @click="nextPage()"
+                    :disabled="currentPage >= totalPages() || totalCount === 0"
+                  >
+                    <span>Next</span>
+                    <i
+                      data-lucide="chevron-right"
+                      class="d-none d-sm-inline-block"
+                      style="width: 16px; height: 16px"
+                    ></i>
+                  </button>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // url helper functions
+      function urlJoin(base, ...paths) {
+        let url = new URL(base);
+
+        // Normalize and join paths while handling slashes correctly
+        let newPath = [url.pathname, ...paths]
+          .map(p => p.replace(/^\/+|\/+$/g, '')) // Trim leading/trailing slashes
+          .filter(p => p.length) // Remove empty segments
+          .join('/');
+
+        url.pathname = '/' + newPath; // Ensure leading slash
+        return url;
+      }
+
+      function newUrl(base, paths, params) {
+        let url = urlJoin(base, paths);
+
+        for (const [key, value] of Object.entries(params)) {
+          url.searchParams.set(key, value);
+        }
+
+        return url;
+      }
+    </script>
+
+    <!-- Alpine JS Component -->
+    <script>
+      const baseUrl = 'https://clinicaltrials.gov/api/v2/';
+
+      function clinicalTrials() {
+        // todo this should probably be a class
+        // default value + callback used in the filteredTrials function
+        const defaultFilters = () => {
+          return {
+            age: null,
+            startDate: null,
+            endDate: null,
+            status: 'all',
+            country: 'all',
+            condition: 'all',
+            sex: 'ALL',
+            sexOnly: false,
+            healthyVolunteers: 'all',
+          };
+        };
+
+        return {
+          trials: [],
+          totalCount: 0,
+          currentPage: 1,
+          pageSize: 10,
+          loading: false,
+          nextPageToken: null,
+          sortBy: 'default',
+          showSidebar: false, // Start with filters hidden
+          showContactIndex: new Set(),
+          filters: defaultFilters(),
+          possible_countries: [],
+          possible_conditions: [
+            'Thalassemia',
+            'Sickle Cell',
+            'Aplastic Anemia',
+            'Diamond-Blackfan Anemia',
+            'Hemophilia',
+            'Hematologic Diseases',
+            'Myeloid Chimerism',
+            'Pyruvate Kinase Deficiency',
+          ],
+          possible_statuses: ['RECRUITING', 'ENROLLING_BY_INVITATION', 'ACTIVE_NOT_RECRUITING'],
+
+          status_to_label(status) {
+            return status
+              .replace(/_/g, ' ')
+              .toLowerCase()
+              .replace(/\b\w/g, c => c.toUpperCase());
+          },
+
+          toggleFilters() {
+            if (this.showSidebar) {
+              this.showSidebar = false;
+            } else {
+              this.showSidebar = true;
+            }
+          },
+
+          totalPages() {
+            // Return 1 if there are no results to avoid showing "page 1 of 0"
+            return Math.max(1, Math.ceil(this.totalCount / this.pageSize));
+          },
+
+          paginatedTrials() {
+            const start = (this.currentPage - 1) * this.pageSize;
+            const end = start + this.pageSize;
+            return this.sortTrials([...this.trials]).slice(start, end);
+          },
+
+          filteredTrials() {
+            this.$nextTick(() => lucide.createIcons());
+            return this.paginatedTrials();
+          },
+
+          nextPage() {
+            if (this.currentPage < this.totalPages()) {
+              this.currentPage++;
+              if (this.currentPage * this.pageSize > this.trials.length && this.nextPageToken) {
+                this.loadMore();
+              }
+            }
+          },
+
+          previousPage() {
+            if (this.currentPage > 1) {
+              this.currentPage--;
+            }
+          },
+
+          handleFilterChange() {
+            this.currentPage = 1;
+            this.nextPageToken = null;
+            this.trials = [];
+            this.fetchTrials();
+          },
+
+          resetFilters() {
+            this.filters = defaultFilters();
+            this.handleFilterChange();
+          },
+
+          startDate(trial) {
+            const startDate = trial.protocolSection.statusModule.startDateStruct;
+            if (!startDate) {
+              return 'Date not available';
+            }
+            return `${startDate.date} ${startDate.type === 'ESTIMATED' ? '(estimated)' : ''}`;
+          },
+
+          completionDate(trial) {
+            const completionDate = trial.protocolSection.statusModule.completionDateStruct;
+            if (!completionDate) {
+              return 'Date not available';
+            }
+            return `${completionDate.date} ${completionDate.type === 'ESTIMATED' ? '(estimated)' : ''}`;
+          },
+
+          ageRange(trial) {
+            const eligibilityModule = trial.protocolSection.eligibilityModule;
+            if (!eligibilityModule.minimumAge && !eligibilityModule.maximumAge) {
+              return 'Age not specified';
+            }
+            if (!eligibilityModule.minimumAge) {
+              return `Up to ${eligibilityModule.maximumAge}`;
+            }
+            if (!eligibilityModule.maximumAge) {
+              return `${eligibilityModule.minimumAge} or older`;
+            }
+            return `${eligibilityModule.minimumAge} to ${eligibilityModule.maximumAge}`;
+          },
+
+          locationString(trial) {
+            const locations = trial.protocolSection.contactsLocationsModule.locations;
+
+            const countries = locations.map(x => x.country);
+            const unique_countries = Array.from(new Set(countries));
+
+            const locationCount = locations.length;
+            const countryCount = unique_countries.length;
+
+            return `${locationCount} locations across ${countryCount} ${countryCount === 1 ? 'country' : 'countries'}`;
+          },
+
+          sortTrials(unsorted) {
+            if (this.sortBy === 'default') {
+              return unsorted;
+            }
+
+            const getSortFunction = () => {
+              switch (this.sortBy) {
+                case 'title':
+                  return (a, b) =>
+                    a.protocolSection.identificationModule.briefTitle.localeCompare(
+                      b.protocolSection.identificationModule.briefTitle,
+                    );
+
+                case 'start-date-asc':
+                  return (a, b) => {
+                    const dateA = new Date(a.protocolSection.statusModule.startDateStruct.date);
+                    const dateB = new Date(b.protocolSection.statusModule.startDateStruct.date);
+
+                    const res = dateA - dateB;
+
+                    console.log(dateA, dateB, res);
+                    return res;
+                  };
+
+                case 'start-date-desc':
+                  return (a, b) => {
+                    const dateA = new Date(a.protocolSection.statusModule.startDateStruct.date);
+                    const dateB = new Date(b.protocolSection.statusModule.startDateStruct.date);
+
+                    const res = dateB - dateA;
+
+                    console.log(dateA, dateB, res);
+                    return res;
+                  };
+              }
+            };
+            return unsorted.sort(getSortFunction());
+          },
+
+          async fetchAllCountries() {
+            let url = newUrl(baseUrl, '/stats/field/values/', {
+              fields: ['LocationCountry'],
+            });
+            try {
+              const response = await fetch(url);
+              if (!response.ok) {
+                throw new Error('Network response was not ok: ' + response.status);
+              }
+
+              const data = await response.json();
+              const countries = data[0].topValues.map(x => x.value).sort();
+
+              this.possible_countries = countries;
+            } catch (error) {
+              console.error('Error fetching field stats:', error);
+            }
+          },
+
+          async fetchTrials(token = null) {
+            this.loading = true;
+
+            // Base query parameters
+            const baseParams = {
+              format: 'json',
+              pageSize: '10',
+              fields: [
+                'NCTId',
+                'BriefTitle',
+                'StatusModule',
+                'SponsorCollaboratorsModule',
+                'ConditionsModule',
+                'EligibilityModule',
+                'ContactsLocationsModule',
+              ],
+            };
+
+            // Only request totalCount on initial load (not with page token)
+            if (!token) {
+              baseParams.countTotal = true;
+            }
+
+            const eligibilityData = [];
+
+            // Sex filter
+            if (this.filters.sex !== 'ALL' && !this.filters.sexOnly) {
+              eligibilityData.push(`AREA[Sex](${this.filters.sex} OR ALL)`);
+            } else {
+              eligibilityData.push(`AREA[Sex](${this.filters.sex})`);
+            }
+
+            // Age filter
+            if (this.filters.age !== null) {
+              eligibilityData.concat([
+                `AREA[MinimumAge]RANGE[MIN, ${this.filters.age} years]`,
+                `AREA[MaximumAge]RANGE[${this.filters.age} years, MAX]`,
+              ]);
+            }
+
+            // Healthy Volunteers filter
+            if (this.filters.healthyVolunteers !== 'all') {
+              eligibilityData.push(`AREA[HealthyVolunteers]${this.filters.healthyVolunteers}`);
+            }
+
+            // Filter-specific parameters
+            const filterParams = {
+              // Condition filter
+              'query.cond':
+                this.filters.condition === 'all'
+                  ? this.possible_conditions.map(cond => `"${cond}"`).join(' OR ')
+                  : this.filters.condition,
+
+              // Status filter
+              'filter.overallStatus':
+                this.filters.status === 'all' ? this.possible_statuses.join('|') : this.filters.status,
+
+              // Country filter
+              ...(this.filters.country !== 'all' && {
+                'query.locn': `AREA[LocationCountry](${this.filters.country})`,
+              }),
+
+              'filter.advanced': eligibilityData.join(' AND '),
+
+              // Pagination token
+              ...(token && { pageToken: token }),
+            };
+
+            // Combine all parameters
+            const params = {
+              ...baseParams,
+              ...filterParams,
+            };
+
+            const url = newUrl(baseUrl, '/studies/', params);
+
+            try {
+              const response = await fetch(url);
+              if (!response.ok) {
+                throw new Error('Network response was not ok: ' + response.status);
+              }
+
+              const data = await response.json();
+              if (data.studies) {
+                this.trials = token ? [...this.trials, ...data.studies] : data.studies;
+              } else {
+                // If no studies found, set trials to empty array
+                this.trials = [];
+              }
+              // Update totalCount on initial load or when no results
+              if (!token || !data.studies) {
+                this.totalCount = data.totalCount || 0;
+              }
+              this.nextPageToken = data.nextPageToken || null;
+              this.$nextTick(() => lucide.createIcons());
+            } catch (error) {
+              console.error('Error fetching trials:', error);
+            } finally {
+              this.loading = false;
+            }
+          },
+          loadMore() {
+            if (!this.nextPageToken) return;
+            this.fetchTrials(this.nextPageToken);
+          },
+
+          init() {
+            // Show filters by default only on desktop
+            this.showSidebar = window.innerWidth >= 768;
+
+            // Handle resize events
+            window.addEventListener('resize', () => {
+              if (window.innerWidth >= 768) {
+                this.showSidebar = true;
+              } else {
+                this.showSidebar = false;
+              }
+            });
+
+            this.fetchAllCountries();
+            if (this.loading) return; // Prevents re-triggering
+            this.fetchTrials();
+          },
+        };
+      }
+    </script>
+  </body>
+</html>
