@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Hand Metric Inspector</title>
+    <style>
+        :root {
+            --bg: #050505;
+            --panel: rgba(20, 20, 20, 0.9);
+            /* Colors */
+            --c-thumb: #ffcc00;   /* Yellow */
+            --c-knuckle: #ff00ff; /* Magenta */
+            --c-ring: #00ff00;    /* Green */
+            --c-mid: #00ccff;     /* Cyan */
+        }
+        body {
+            margin: 0; padding: 0; background: var(--bg);
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            overflow: hidden; height: 100vh; display: flex; flex-direction: column;
+        }
+        #viewport {
+            position: relative; flex-grow: 1; width: 100%;
+            background: #000;
+        }
+        /* Mirror video for UX */
+        video {
+            position: absolute; width: 100%; height: 100%;
+            object-fit: cover; transform: scaleX(-1);
+        }
+        /* Canvas is standard orientation */
+        canvas {
+            position: absolute; width: 100%; height: 100%;
+            object-fit: cover;
+        }
+
+        /* HUD: Bar Charts */
+        #hud {
+            position: absolute; top: 10px; left: 10px;
+            width: 240px; pointer-events: none;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .hand-card {
+            background: var(--panel);
+            border-left: 4px solid #fff;
+            padding: 8px; 
+            border-radius: 0 8px 8px 0;
+            backdrop-filter: blur(4px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.5);
+        }
+        .hand-title {
+            color: white; font-size: 11px; font-weight: 800;
+            text-transform: uppercase; margin-bottom: 6px;
+            border-bottom: 1px solid #444; padding-bottom: 2px;
+            letter-spacing: 1px;
+        }
+        
+        /* Bar Chart Rows */
+        .metric-row { display: flex; align-items: center; margin-bottom: 4px; }
+        .lbl { width: 45px; font-size: 9px; color: #aaa; font-weight: bold; }
+        .bar-track {
+            flex-grow: 1; height: 5px; background: #333;
+            margin: 0 6px; border-radius: 2px; overflow: hidden;
+        }
+        .bar-fill { height: 100%; width: 0%; transition: width 0.1s linear; }
+        .val { width: 25px; font-size: 10px; color: #fff; text-align: right; font-family: monospace; }
+
+        /* Centered Button */
+        #controls {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 50;
+            width: 100%; text-align: center;
+        }
+        button {
+            padding: 18px 36px; 
+            font-size: 16px; font-weight: 800;
+            background: white; color: black;
+            border: none; cursor: pointer;
+            border-radius: 50px; 
+            box-shadow: 0 0 25px rgba(255,255,255,0.3);
+            text-transform: uppercase; letter-spacing: 1px;
+            transition: opacity 0.3s;
+        }
+        button:disabled {
+            background: #444; color: #888; cursor: not-allowed;
+            box-shadow: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="viewport">
+        <video id="webcam" playsinline muted autoplay></video>
+        <canvas id="output_canvas"></canvas>
+        
+        <div id="hud">
+            <!-- Populated by JS -->
+        </div>
+
+        <div id="controls">
+            <button id="btn-main" disabled>Loading AI...</button>
+        </div>
+    </div>
+
+<script type="module">
+    // Pure ES Module Import (Fixes the "unexpected token export" error)
+    import { HandLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0";
+
+    const video = document.getElementById("webcam");
+    const canvas = document.getElementById("output_canvas");
+    const ctx = canvas.getContext("2d");
+    const hud = document.getElementById("hud");
+    const btnMain = document.getElementById("btn-main");
+
+    let handLandmarker = undefined;
+    let lastVideoTime = -1;
+
+    // --- 1. INITIALIZE AI IMMEDIATELY ---
+    async function initAI() {
+        try {
+            const vision = await FilesetResolver.forVisionTasks(
+                "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm"
+            );
+            handLandmarker = await HandLandmarker.createFromOptions(vision, {
+                baseOptions: {
+                    modelAssetPath: "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task",
+                    delegate: "GPU"
+                },
+                runningMode: "VIDEO",
+                numHands: 2
+            });
+            
+            // AI is ready, enable button
+            btnMain.innerText = "START CAMERA";
+            btnMain.removeAttribute("disabled");
+            
+            // Add click listener now that it's ready
+            btnMain.addEventListener("click", startCamera);
+
+        } catch (error) {
+            console.error(error);
+            btnMain.innerText = "ERROR LOADING AI";
+        }
+    }
+
+    // --- 2. CAMERA LOGIC ---
+    function startCamera() {
+        // Hide button while requesting camera
+        btnMain.style.opacity = "0"; 
+
+        const constraints = { 
+            video: { 
+                facingMode: "user", 
+                width: { ideal: 1280 }, 
+                height: { ideal: 720 } 
+            } 
+        };
+
+        navigator.mediaDevices.getUserMedia(constraints)
+            .then((stream) => {
+                video.srcObject = stream;
+                video.addEventListener("loadeddata", () => {
+                    // Fully hide controls once video starts
+                    document.getElementById("controls").style.display = "none";
+                    renderLoop();
+                });
+            })
+            .catch((err) => {
+                console.error(err);
+                btnMain.style.opacity = "1";
+                btnMain.innerText = "CAMERA DENIED";
+            });
+    }
+
+    // --- 3. MATH UTILS ---
+    function getPolyLength(landmarks, indices, width, height) {
+        let total = 0;
+        for (let i = 0; i < indices.length - 1; i++) {
+            const p1 = landmarks[indices[i]];
+            const p2 = landmarks[indices[i+1]];
+            const dx = (p1.x - p2.x) * width;
+            const dy = (p1.y - p2.y) * height;
+            total += Math.sqrt(dx*dx + dy*dy);
+        }
+        return total;
+    }
+
+    // --- 4. RENDER LOOP ---
+    function renderLoop() {
+        // Handle canvas resizing
+        if (canvas.width !== video.videoWidth) {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+        }
+
+        const currentTime = performance.now();
+        if (video.currentTime !== lastVideoTime) {
+            lastVideoTime = video.currentTime;
+            
+            // Detect
+            const results = handLandmarker.detectForVideo(video, currentTime);
+            
+            // Clear & Prep
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const w = canvas.width;
+            const h = canvas.height;
+            let hudHTML = "";
+
+            if (results.landmarks) {
+                results.landmarks.forEach((pts, index) => {
+                    // --- Calculations ---
+                    const vThumb = getPolyLength(pts, [0,1,2,3,4], w, h);
+                    const vKnuck = getPolyLength(pts, [17,13,9,5], w, h);
+                    const vRing  = getPolyLength(pts, [13,14,15,16], w, h);
+                    const vMid   = getPolyLength(pts, [9,10,11,12], w, h);
+
+                    // --- Build HUD ---
+                    // Scale bar chart: assumes ~300px is "max" for visualization
+                    const scale = (val) => Math.min((val / 300) * 100, 100);
+                    const color = index === 0 ? '#00ffcc' : '#ff00ff';
+
+                    hudHTML += `
+                    <div class="hand-card" style="border-left-color: ${color}">
+                        <div class="hand-title" style="color:${color}">HAND ${index}</div>
+                        
+                        <div class="metric-row">
+                            <div class="lbl">THUMB</div>
+                            <div class="bar-track"><div class="bar-fill" style="width:${scale(vThumb)}%; background:var(--c-thumb)"></div></div>
+                            <div class="val">${Math.round(vThumb)}</div>
+                        </div>
+                        <div class="metric-row">
+                            <div class="lbl">KNUCK</div>
+                            <div class="bar-track"><div class="bar-fill" style="width:${scale(vKnuck)}%; background:var(--c-knuckle)"></div></div>
+                            <div class="val">${Math.round(vKnuck)}</div>
+                        </div>
+                        <div class="metric-row">
+                            <div class="lbl">RING</div>
+                            <div class="bar-track"><div class="bar-fill" style="width:${scale(vRing)}%; background:var(--c-ring)"></div></div>
+                            <div class="val">${Math.round(vRing)}</div>
+                        </div>
+                        <div class="metric-row">
+                            <div class="lbl">MID</div>
+                            <div class="bar-track"><div class="bar-fill" style="width:${scale(vMid)}%; background:var(--c-mid)"></div></div>
+                            <div class="val">${Math.round(vMid)}</div>
+                        </div>
+                    </div>`;
+
+                    // --- Canvas Drawing ---
+                    // Coordinate Helper (Mirrors X)
+                    const toScreen = (p) => ({ x: (1 - p.x) * w, y: p.y * h });
+
+                    // Draw Helper
+                    const drawPath = (indices, color, width) => {
+                        ctx.lineWidth = width;
+                        ctx.strokeStyle = color;
+                        ctx.lineCap = "round";
+                        ctx.lineJoin = "round";
+                        ctx.beginPath();
+                        const start = toScreen(pts[indices[0]]);
+                        ctx.moveTo(start.x, start.y);
+                        for(let i=1; i<indices.length; i++) {
+                            const p = toScreen(pts[indices[i]]);
+                            ctx.lineTo(p.x, p.y);
+                        }
+                        ctx.stroke();
+                    };
+
+                    // 1. Faint Skeleton
+                    const fullSkel = [
+                        [0,1,2,3,4], [0,5,6,7,8], [0,9,10,11,12], 
+                        [0,13,14,15,16], [0,17,18,19,20], [5,9,13,17]
+                    ];
+                    fullSkel.forEach(chain => drawPath(chain, "rgba(255,255,255,0.15)", 1));
+
+                    // 2. Thick Target Paths
+                    drawPath([0,1,2,3,4],    '#ffcc00', 6); // Thumb
+                    drawPath([17,13,9,5],    '#ff00ff', 6); // Knuckles
+                    drawPath([13,14,15,16],  '#00ff00', 6); // Ring
+                    drawPath([9,10,11,12],   '#00ccff', 6); // Mid
+
+                    // 3. Points & Numbers
+                    ctx.font = "bold 10px Arial";
+                    ctx.textAlign = "center";
+                    ctx.textBaseline = "middle";
+
+                    pts.forEach((p, i) => {
+                        const s = toScreen(p);
+                        
+                        // Red Dot
+                        ctx.fillStyle = "#ff0000";
+                        ctx.beginPath();
+                        ctx.arc(s.x, s.y, 3, 0, Math.PI*2);
+                        ctx.fill();
+
+                        // Number Label
+                        ctx.lineWidth = 3;
+                        ctx.strokeStyle = "rgba(0,0,0,0.8)";
+                        ctx.strokeText(i, s.x + 8, s.y - 8);
+                        ctx.fillStyle = "white";
+                        ctx.fillText(i, s.x + 8, s.y - 8);
+                    });
+
+                    // 4. Hand ID
+                    const wrist = toScreen(pts[0]);
+                    ctx.fillStyle = color;
+                    ctx.font = "bold 14px Arial";
+                    ctx.fillText(`HAND ${index}`, wrist.x, wrist.y + 30);
+                });
+            }
+            hud.innerHTML = hudHTML;
+        }
+        requestAnimationFrame(renderLoop);
+    }
+
+    // Start background loading
+    initAI();
+</script>
+</body>
+</html>
