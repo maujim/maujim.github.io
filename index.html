@@ -1,584 +1,152 @@
+<!doctype html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/png" href="favicon.png" />
-    <title>mukund | मुकुंद</title>
-    <meta name="author" content="mukund singh mauji" />
-
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mukund Mauji</title>
     <style>
       :root {
-        --niceblue1: #4c5e9c;
-        --niceblue2: #45568c;
-        --niceblue3: #405082;
-        --niceblue: var(--niceblue3);
-
-        /* need to check contrast */
-        --burntorange1: #b34700;
-        --burntorange2: #e06c00;
-        --burntorange3: #cc5500;
-        --burntorange4: #cc6100;
-        --burntorange: var(--burntorange3);
-
-        /* 1,3,5 are quite nice */
-        /* need to check contrast for all of them tho */
-        --nicegreen1: #4f684f;
-        --nicegreen2: #5a6e4f;
-        --nicegreen3: #3f5e4f;
-        --nicegreen4: #6a7f5f;
-        --nicegreen5: #434e2e;
-        --nicegreen: var(--nicegreen1);
+        color-scheme: light;
       }
-      body,
-      html {
-        display: flex;
-        flex-direction: column;
 
-        color: #222222;
-        color: var(--niceblue);
+      body {
+        margin: 56px auto;
+        max-width: 680px;
+        line-height: 1.45;
+        font-size: 17px;
+        color: #2f2f2f;
+        padding: 0 16px;
+        background: #f3f3f3;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      }
+
+      h1 {
+        margin: 0 0 2px;
+        font-size: 44px;
+        line-height: 1.1;
+        font-weight: 520;
+        letter-spacing: -0.02em;
+      }
+
+      p {
+        margin: 0 0 28px;
+        color: #666;
+      }
+
+      .section-label {
+        margin: 34px 0 10px;
+        font-size: 15px;
+        font-weight: 500;
+        color: #8a8a8a;
+      }
+
+      .list {
+        list-style: none;
         margin: 0;
-
-        background-color: floralwhite;
-        cursor:
-          url("assets/cursor-small.svg") 16 16,
-          auto;
+        padding: 0;
       }
 
-      .label {
-        display: flex;
-        flex-direction: column;
-        height: 100vh;
-        padding: 1rem;
-        box-sizing: border-box; /* ensures padding is included inside the 100vh */
-      }
-
-      .dots-outside.overlay .label {
-        height: 10vh; /* Reduce to 10% height when dots (screensaver) are active */
-      }
-
-      .label-header {
-        display: flex;
-        justify-content: center;
-        padding: 2vh 0;
-      }
-
-      .name-pair {
+      .item {
         display: grid;
-        grid-template-columns: 1fr auto 1fr;
-        align-items: center;
-        text-align: center;
-        font-family: palatino, "times new roman", serif;
-        font-style: italic;
-        font-size: clamp(1.5rem, 4vh, 4rem);
+        grid-template-columns: minmax(0, 1fr) auto;
+        column-gap: 18px;
+        padding: 12px 12px;
+        border-radius: 12px;
       }
 
-      .name-latin {
-        justify-self: end;
+      .item:hover {
+        background: #e9e9e9;
       }
 
-      .name-devanagari {
-        justify-self: start;
+      .item-main {
+        min-width: 0;
       }
 
-      .name-separator {
-        padding: 0 0.3em;
-      }
-
-      .dots-outside {
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
-        position: relative;
-        margin: 4vh;
-      }
-
-      .dots {
-        position: absolute;
-        inset: 0;
-        display: flex;
-        justify-content: center;
-        flex-direction: row;
-      }
-
-      .dots-circles {
-        z-index: 5;
-        opacity: 0;
-        visibility: hidden;
-      }
-
-      .dots-text {
-        z-index: 1;
-
-        opacity: 1;
-        visibility: visible;
-
-        font-family: Palatino, "Times New Roman", serif;
-        font-style: italic;
-        font-size: clamp(1rem, 2vh, 2rem);
+      .item-title {
         margin: 0;
-        padding: 1rem;
+        font-size: 23px;
+        line-height: 1.25;
+        font-weight: 520;
+        letter-spacing: -0.01em;
       }
 
-      .dots.transition {
-        /* https://easings.net/#easeInOutQuint */
-        transition: all 0.6s cubic-bezier(0.83, 0, 0.17, 1);
+      .item-title a {
+        color: inherit;
+        text-decoration: none;
       }
 
-      @media (orientation: portrait) {
-        .dots {
-          flex-direction: column;
-        }
+      .item-title a:hover {
+        text-decoration: underline;
+        text-underline-offset: 2px;
       }
 
-      .dot {
-        flex-grow: 1;
-        margin: -0.05rem;
-        background-color: var(--niceblue);
-        border-radius: 50%; /* This makes it an ellipse */
+      .item-subtitle {
+        margin: 3px 0 0;
+        font-size: 17px;
+        line-height: 1.35;
+        color: #666;
       }
 
-      .dots-outside.overlay .dots-circles {
-        opacity: 1;
-        visibility: visible;
-      }
-
-      .dots-outside.overlay .dots-text {
-        opacity: 0;
-        visibility: hidden;
-      }
-
-      /* Auto-return after 30 seconds of no interaction */
-      .dots-outside.overlay {
-        animation: autoReturn 30s linear forwards;
-      }
-
-      .dots-outside.overlay:active,
-      .dots-outside.overlay:hover {
-        animation-play-state: paused;
-        animation-delay: 30s;
-        animation-duration: 30s;
-      }
-
-      @keyframes autoReturn {
-        0% {
-          /* Stay clicked */
-        }
-        100% {
-          /* Return to normal state - handled by removing class in JS */
-        }
-      }
-
-      .dots-outside.overlay .dots-circles {
-        cursor: pointer;
-      }
-
-      /* Debug Panel - Contrasting design */
-      .debug-panel {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        background: #1a1a1a;
-        border: 2px solid #ff6b6b;
-        border-radius: 8px;
-        padding: 24px;
-        font-family: "SF Mono", "Monaco", "Inconsolata", monospace;
-        font-size: 22px;
-        color: #ffffff;
-        min-width: 400px;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-        z-index: 1000;
-      }
-
-      .debug-title {
-        font-size: 20px;
-        font-weight: bold;
-        margin-bottom: 16px;
-        color: #ff6b6b;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-
-      .hide-btn {
-        background: rgba(255, 107, 107, 0.3);
-        border: 1px solid rgba(255, 107, 107, 0.5);
-        color: #ff6b6b;
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        font-size: 14px;
-        font-weight: bold;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-
-      .hide-btn:hover {
-        background: rgba(255, 107, 107, 0.5);
-        border-color: rgba(255, 107, 107, 0.8);
-        transform: scale(1.1);
-      }
-
-      .debug-item {
-        display: flex;
-        justify-content: space-between;
-        margin: 8px 0;
-        padding: 4px 0;
-        border-bottom: 1px solid #333;
-      }
-
-      .debug-item:last-child {
-        border-bottom: none;
-      }
-
-      .debug-label {
-        color: #999;
-        font-size: 20px;
-      }
-
-      .debug-value {
-        color: #4ecdc4;
-        font-weight: bold;
-        font-size: 20px;
-      }
-
-      /* Lotus Flower Styles */
-      .lotus-container {
-        position: fixed;
-        bottom: 30px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 120px;
-        height: 60px;
-        z-index: 100;
-      }
-
-      .lotus-petal {
-        position: absolute;
-        width: 20px;
-        height: 20px;
-        background-color: var(--niceblue);
-        border-radius: 50%;
-        opacity: 0.9;
-      }
-
-      .lotus-petal:nth-child(1) {
-        top: -10px;
-        left: 10px;
-      }
-      .lotus-petal:nth-child(2) {
-        top: 10px;
-        right: -10px;
-      }
-      .lotus-petal:nth-child(3) {
-        bottom: -10px;
-        left: 10px;
-      }
-      .lotus-petal:nth-child(4) {
-        top: 10px;
-        left: -10px;
-      }
-      .lotus-petal:nth-child(5) {
-        top: -7px;
-        right: -7px;
-        transform: scale(0.8);
-      }
-      .lotus-petal:nth-child(6) {
-        bottom: -7px;
-        right: -7px;
-        transform: scale(0.8);
-      }
-      .lotus-petal:nth-child(7) {
-        bottom: -7px;
-        left: -7px;
-        transform: scale(0.8);
-      }
-      .lotus-petal:nth-child(8) {
-        top: -7px;
-        left: -7px;
-        transform: scale(0.8);
-      }
-
-      .circle-container {
-        position: fixed;
-        top: 30px;
-        right: 30px;
-        width: 40px;
-        height: 40px;
-        z-index: 100;
-        opacity: 0;
-      }
-
-      .timer-container {
-        position: fixed;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 90vw;
-        max-width: 800px;
-        height: 6px;
-        z-index: 100;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-      }
-
-      .timer-container.visible {
-        opacity: 1;
-      }
-
-      .timer-background {
-        width: 100%;
-        height: 100%;
-        background-color: #ddd;
-        border-radius: 3px;
-        position: relative;
-      }
-
-      .timer-progress {
-        position: absolute;
-        top: 0;
-        left: 0;
-        height: 100%;
-        background-color: var(--niceblue);
-        border-radius: 3px;
-        width: 100%;
-        transition: width 0.1s linear;
-      }
-
-      .circle-container.visible {
-        animation: circleFadeIn 0.6s cubic-bezier(0.83, 0, 0.17, 1) forwards;
-      }
-
-      .circle-container.fading {
-        animation: circleFadeOut 3s linear forwards;
-      }
-
-      @keyframes circleFadeIn {
-        0% {
-          opacity: 0;
-        }
-        100% {
-          opacity: 1;
-        }
-      }
-
-      @keyframes circleFadeOut {
-        0% {
-          opacity: 1;
-        }
-        100% {
-          opacity: 0;
-        }
-      }
-
-      @keyframes spin {
-        from {
-          transform: translate(-50%, -50%) rotate(0deg);
-        }
-        to {
-          transform: translate(-50%, -50%) rotate(360deg);
-        }
+      .item-meta {
+        align-self: start;
+        margin-top: 1px;
+        min-width: 52px;
+        text-align: right;
+        font-size: 18px;
+        color: #777;
+        white-space: nowrap;
       }
     </style>
   </head>
   <body>
-    <div class="label">
-      <div class="label-header">
-        <div class="name-pair">
-          <span class="name-latin">mukund</span>
-          <span class="name-separator">|</span>
-          <span class="name-devanagari">मुकुंद</span>
-        </div>
-      </div>
+    <header>
+      <h1>Mukund Mauji</h1>
+      <p>systems engineer</p>
+    </header>
 
-      <div class="dots-outside">
-        <!-- the two divs here are styled to be directly above/below each other -->
-        <!-- on hover, we hide the circles and show the text -->
-        <!-- they use the same transition timings -->
-        <div class="dots dots-circles transition">
-          <div class="dot"></div>
-          <div class="dot"></div>
-          <div class="dot"></div>
-          <div class="dot"></div>
-          <div class="dot"></div>
-          <div class="dot"></div>
-          <div class="dot"></div>
-          <div class="dot"></div>
-        </div>
-        <div class="dots dots-text transition">
-          <div>
-            <p>
-            Life requires balance:
-            <a target="_blank" href="/projects/torus.html">something fun </a> and 
-            <a target="_blank" href="/projects/clinical-trials-viewer.html"> something useful </a>
-            </p>
-            <br />
-            <br />
-            <br />
-            <div style="font-size: 1rem">
-              <a target="_blank" href="https://github.com/maujim">github</a> |
-              <a target="_blank" href="https://linkedin.com/in/mukund-mauji/"
-                >linkedin</a
-              >
-              |
-              <a target="_blank" href="https://x.com/mukundmauji">twitter</a>
-            </div>
+    <main>
+      <h2 class="section-label">personal projects</h2>
+      <ul class="list">
+        <li class="item">
+          <div class="item-main">
+            <h3 class="item-title"><a href="/projects/clinical-trials-viewer.html">Clinical Trials Viewer</a></h3>
+            <p class="item-subtitle">Search and explore studies</p>
           </div>
-        </div>
-      </div>
-    </div>
+          <span class="item-meta">2026</span>
+        </li>
 
-    <!-- Circle Indicator -->
-    <div class="circle-container" id="circleContainer">
-      <svg width="40" height="40" viewBox="0 0 40 40">
-        <circle cx="20" cy="20" r="18" fill="var(--niceblue)" />
-      </svg>
-    </div>
+        <li class="item">
+          <div class="item-main">
+            <h3 class="item-title"><a href="/projects/hand-inspector.html">Hand Metric Inspector</a></h3>
+            <p class="item-subtitle">Measure and inspect landmarks</p>
+          </div>
+          <span class="item-meta">2026</span>
+        </li>
 
-    <!-- Timer Progress Indicator -->
-    <div class="timer-container" id="timerContainer">
-      <div class="timer-background">
-        <div class="timer-progress" id="timerProgress"></div>
-      </div>
-    </div>
+        <li class="item">
+          <div class="item-main">
+            <h3 class="item-title"><a href="/projects/pdb-visualizer.html">PDB Visualizer</a></h3>
+            <p class="item-subtitle">Protein structure viewer</p>
+          </div>
+          <span class="item-meta">2025</span>
+        </li>
 
-    <script>
-      // Screensaver functionality - shows dots after inactivity
-      const dotsOutside = document.querySelector(".dots-outside");
-      const dotsCircles = document.querySelector(".dots-circles");
-      const timerContainer = document.getElementById("timerContainer");
-      const timerProgress = document.getElementById("timerProgress");
-      let screensaverTimer;
-      let timerShowTimer;
-      let initialScreensaverTimeoutSeconds = 10;
-      let screensaverTimeoutSeconds = 60;
-      let timerShowDelaySeconds = Math.min(
-        10,
-        Math.floor(screensaverTimeoutSeconds / 8),
-      );
-      let timerCountdownSeconds = 2; // Timer countdown duration
-      let hasScreensaverTriggeredOnce = false; // Track if screensaver has been shown at least once
+        <li class="item">
+          <div class="item-main">
+            <h3 class="item-title"><a href="/projects/clothing-tag%20(3).html">Clothing Tag</a></h3>
+            <p class="item-subtitle">Tagging and lookup concept</p>
+          </div>
+          <span class="item-meta">2025</span>
+        </li>
 
-      // Initialize: page starts with text visible (no dots)
-      function initializePage() {
-        startScreensaverTimer();
-      }
-
-      function startScreensaverTimer() {
-        clearTimeout(screensaverTimer);
-        clearTimeout(timerShowTimer);
-
-        // Use appropriate timeout based on whether this is the first activation
-        const currentTimeoutSeconds = hasScreensaverTriggeredOnce
-          ? screensaverTimeoutSeconds
-          : initialScreensaverTimeoutSeconds;
-        const currentTimeout = currentTimeoutSeconds * 1000;
-
-        // Only show timer if screensaver has been triggered before and dots are not visible
-        if (
-          hasScreensaverTriggeredOnce &&
-          !dotsOutside.classList.contains("overlay")
-        ) {
-          // Schedule timer to show in the last timerShowDelaySeconds seconds
-          const timerShowDelayMs = timerShowDelaySeconds * 1000;
-          const actualTimerShowDelay = Math.min(
-            timerShowDelayMs,
-            currentTimeout,
-          );
-          timerShowTimer = setTimeout(() => {
-            timerContainer.classList.add("visible");
-            animateTimer(timerCountdownSeconds); // Always show timerCountdownSeconds countdown
-          }, currentTimeout - actualTimerShowDelay);
-        }
-
-        screensaverTimer = setTimeout(() => {
-          showDotsScreensaver();
-        }, currentTimeout);
-      }
-
-      function showDotsScreensaver() {
-        dotsOutside.classList.add("overlay");
-        hasScreensaverTriggeredOnce = true; // Mark that screensaver has been shown
-        timerContainer.classList.remove("visible"); // Hide timer when dots are visible
-      }
-
-      function hideDotsScreensaver() {
-        dotsOutside.classList.remove("overlay");
-        timerContainer.classList.remove("visible");
-        clearTimeout(timerShowTimer); // Clear any pending timer show
-        startScreensaverTimer(); // Restart the inactivity timer
-      }
-
-      function animateTimer(duration) {
-        const startTime = Date.now();
-
-        function updateTimer() {
-          const elapsed = (Date.now() - startTime) / 1000; // seconds elapsed
-          const remaining = Math.max(0, duration - elapsed);
-          const progress = remaining / duration;
-
-          // Calculate width that shrinks from both ends toward center
-          const widthPercentage = progress * 100; // percentage
-          const leftOffsetPercentage = (100 - widthPercentage) / 2; // center the shrinking line
-
-          // Update the progress bar
-          timerProgress.style.width = widthPercentage + "%";
-          timerProgress.style.left = leftOffsetPercentage + "%";
-
-          if (remaining > 0) {
-            requestAnimationFrame(updateTimer);
-          }
-        }
-
-        // Reset and start animation
-        timerProgress.style.width = "100%";
-        timerProgress.style.left = "0%";
-        updateTimer();
-      }
-
-      // Click handler for dots when screensaver is active
-      dotsCircles.addEventListener("click", function () {
-        hideDotsScreensaver();
-      });
-
-      // Add event listeners for user interaction
-      const interactionEvents = [
-        "click",
-        "mousemove",
-        "keypress",
-        "touchstart",
-        "scroll",
-      ];
-
-      interactionEvents.forEach((event) => {
-        document.addEventListener(event, (e) => {
-          // If dots are showing and user clicks anywhere, hide them
-          if (
-            dotsOutside.classList.contains("overlay") &&
-            !dotsOutside.contains(e.target)
-          ) {
-            hideDotsScreensaver();
-          } else if (dotsOutside.classList.contains("overlay")) {
-            // User is interacting with dots, restart the screensaver timer
-            clearTimeout(screensaverTimer);
-            screensaverTimer = setTimeout(() => {
-              hideDotsScreensaver();
-            }, screensaverTimeoutSeconds * 1000);
-          } else {
-            // User is active, restart the inactivity timer
-            // Also hide timer if it's currently visible (edge case fix)
-            timerContainer.classList.remove("visible");
-            startScreensaverTimer();
-          }
-        });
-      });
-
-      // Initialize the page
-      initializePage();
-    </script>
+        <li class="item">
+          <div class="item-main">
+            <h3 class="item-title"><a href="/projects/torus.html">Torus</a></h3>
+            <p class="item-subtitle">Experimental graphics page</p>
+          </div>
+          <span class="item-meta">2024</span>
+        </li>
+      </ul>
+    </main>
   </body>
 </html>
