@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Compute-Rich World Thesis — Visual Diagram</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --font-body: 'DM Sans', system-ui, sans-serif;
+      --font-mono: 'Fira Code', 'SF Mono', monospace;
+      --bg: #0b1220;
+      --surface: #121c2f;
+      --surface-elevated: #16243b;
+      --border: rgba(148, 163, 184, 0.18);
+      --text: #e2e8f0;
+      --text-dim: #93a4bd;
+      --accent: #22d3ee;
+      --accent-dim: rgba(34, 211, 238, 0.14);
+      --gold: #fbbf24;
+      --gold-dim: rgba(251, 191, 36, 0.14);
+      --green: #34d399;
+      --green-dim: rgba(52, 211, 153, 0.14);
+      --rose: #fb7185;
+      --rose-dim: rgba(251, 113, 133, 0.14);
+    }
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg: #f1f5f9;
+        --surface: #ffffff;
+        --surface-elevated: #f8fbff;
+        --border: rgba(30, 41, 59, 0.14);
+        --text: #0f172a;
+        --text-dim: #475569;
+        --accent: #0e7490;
+        --accent-dim: rgba(14, 116, 144, 0.1);
+        --gold: #b45309;
+        --gold-dim: rgba(180, 83, 9, 0.1);
+        --green: #047857;
+        --green-dim: rgba(4, 120, 87, 0.1);
+        --rose: #be123c;
+        --rose-dim: rgba(190, 18, 60, 0.08);
+      }
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-body);
+      color: var(--text);
+      background: var(--bg);
+      background-image:
+        radial-gradient(ellipse at 10% 0%, var(--accent-dim) 0%, transparent 50%),
+        radial-gradient(ellipse at 90% 100%, var(--gold-dim) 0%, transparent 45%);
+      padding: 34px;
+      line-height: 1.6;
+    }
+    .container { max-width: 1120px; margin: 0 auto; }
+
+    h1 {
+      font-size: clamp(34px, 5vw, 58px);
+      line-height: 1.03;
+      letter-spacing: -1.6px;
+      margin-bottom: 10px;
+    }
+    .subtitle {
+      font-family: var(--font-mono);
+      color: var(--text-dim);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1.3px;
+      margin-bottom: 24px;
+    }
+
+    .hero {
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 26px;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 18px;
+      align-items: center;
+    }
+    .hero p { color: var(--text-dim); font-size: 18px; }
+
+    .badge-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+    .badge {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--accent-dim);
+      color: var(--accent);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px;
+      min-width: 0;
+    }
+    .label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      margin-bottom: 9px;
+      color: var(--accent);
+    }
+    .card h3 {
+      font-size: clamp(21px, 2.8vw, 30px);
+      line-height: 1.15;
+      margin-bottom: 10px;
+    }
+
+    .bullets { list-style: none; }
+    .bullets li { position: relative; padding: 7px 0 7px 14px; color: var(--text-dim); }
+    .bullets li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 16px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    .mermaid-wrap {
+      position: relative;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      min-height: 430px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: auto;
+      margin-bottom: 16px;
+    }
+    .zoom-controls {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      display: flex;
+      gap: 2px;
+      z-index: 5;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 2px;
+    }
+    .zoom-controls button {
+      width: 28px;
+      height: 28px;
+      border: none;
+      border-radius: 5px;
+      background: transparent;
+      color: var(--text-dim);
+      cursor: pointer;
+      font-family: var(--font-mono);
+      font-size: 14px;
+    }
+    .zoom-controls button:hover { background: var(--accent-dim); color: var(--text); }
+    .mermaid .nodeLabel { color: var(--text) !important; font-size: 17px !important; }
+    .mermaid .edgeLabel { color: var(--text-dim) !important; background-color: var(--bg) !important; font-size: 12px !important; font-family: var(--font-mono) !important; }
+    .mermaid .edgeLabel rect { fill: var(--bg) !important; }
+
+    .table-wrap {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--surface);
+      margin-bottom: 16px;
+    }
+    .table-scroll { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      text-align: left;
+      background: var(--surface-elevated);
+      padding: 12px 14px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+    td {
+      padding: 13px 14px;
+      border-top: 1px solid var(--border);
+      font-size: 15px;
+      vertical-align: top;
+    }
+    tr:nth-child(even) td { background: color-mix(in srgb, var(--surface) 90%, var(--accent) 10%); }
+
+    .status {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+    }
+    .ok { color: var(--green); background: var(--green-dim); }
+    .risk { color: var(--rose); background: var(--rose-dim); }
+    .focus { color: var(--gold); background: var(--gold-dim); }
+
+    .footer-note {
+      border-left: 3px solid var(--accent);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left-color: var(--accent);
+      border-radius: 0 10px 10px 0;
+      padding: 14px 16px;
+      color: var(--text-dim);
+      font-size: 15px;
+    }
+
+    @media (max-width: 900px) {
+      body { padding: 16px; }
+      .hero-grid, .grid-2 { grid-template-columns: 1fr; }
+      .hero p { font-size: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Compute-Rich World Thesis</h1>
+    <p class="subtitle">visual explainer diagram · thesis-long.txt</p>
+
+    <section class="hero">
+      <div class="hero-grid">
+        <div>
+          <p>
+            Scientific advantage is shifting from <strong>who has compute</strong> to who can build better systems for
+            converting compute into trustworthy discovery: proprietary data, expert-grounded abstractions,
+            and tight hypothesis-testing loops.
+          </p>
+          <div class="badge-row">
+            <span class="badge">Compute is abundant</span>
+            <span class="badge">Truth loops are scarce</span>
+            <span class="badge">Biology = underused design space</span>
+          </div>
+        </div>
+        <div>
+          <svg viewBox="0 0 280 180" width="100%" height="auto" aria-label="concept illustration">
+            <rect x="10" y="12" width="260" height="156" rx="12" fill="none" stroke="var(--border)"/>
+            <circle cx="70" cy="90" r="26" fill="var(--accent-dim)" stroke="var(--accent)"/>
+            <circle cx="140" cy="90" r="26" fill="var(--gold-dim)" stroke="var(--gold)"/>
+            <circle cx="210" cy="90" r="26" fill="var(--green-dim)" stroke="var(--green)"/>
+            <line x1="96" y1="90" x2="114" y2="90" stroke="var(--text-dim)" stroke-dasharray="4 4"/>
+            <line x1="166" y1="90" x2="184" y2="90" stroke="var(--text-dim)" stroke-dasharray="4 4"/>
+            <text x="70" y="95" text-anchor="middle" fill="var(--text)" font-family="var(--font-mono)" font-size="10">BIO</text>
+            <text x="140" y="95" text-anchor="middle" fill="var(--text)" font-family="var(--font-mono)" font-size="10">AI</text>
+            <text x="210" y="95" text-anchor="middle" fill="var(--text)" font-family="var(--font-mono)" font-size="10">ENG</text>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid-2">
+      <article class="card">
+        <p class="label" style="color:var(--gold)">Problem Framing</p>
+        <h3>The Bottleneck Has Moved</h3>
+        <ul class="bullets">
+          <li>Compute access alone no longer guarantees differentiated research outcomes.</li>
+          <li>The scarce asset is organizational ability to define and validate high-value questions.</li>
+          <li>Epistemic rigor and reusable knowledge infrastructure become compounding moats.</li>
+        </ul>
+      </article>
+      <article class="card">
+        <p class="label" style="color:var(--green)">Opportunity Thesis</p>
+        <h3>Biology as a Searchable Design Space</h3>
+        <ul class="bullets">
+          <li>Nature encodes solved engineering strategies: thermal, structural, sensory, collective.</li>
+          <li>Current sources are fragmented across papers, collections, observations, and media.</li>
+          <li>A functional-trait ontology can translate biological intelligence into engineering transfer.</li>
+        </ul>
+      </article>
+    </section>
+
+    <div class="mermaid-wrap">
+      <div class="zoom-controls">
+        <button onclick="zoomDiagram(this,1.2)" title="Zoom in">+</button>
+        <button onclick="zoomDiagram(this,0.8)" title="Zoom out">−</button>
+        <button onclick="resetZoom(this)" title="Reset">↺</button>
+        <button onclick="openDiagramFullscreen(this)" title="Open full size">⛶</button>
+      </div>
+      <pre class="mermaid">flowchart TD
+  A[Biological Sources<br/>papers, field data, taxonomies, video] --> B[Functional Trait Ontology]
+  B --> C[AI-Assisted Extraction + Annotation]
+  C --> D[Transfer Search Layer]
+  D --> E[Hypothesis Generator]
+  E --> F[Ranking + Feasibility Filters]
+  F --> G[Expert Validation + Simulation]
+  G --> H[Commercial Design Recommendations]
+  H --> I[Customer Testing Feedback]
+  I --> B
+
+  classDef core fill:#22d3ee22,stroke:#22d3ee,stroke-width:2px
+  classDef build fill:#fbbf2422,stroke:#fbbf24,stroke-width:2px
+  classDef market fill:#34d39922,stroke:#34d399,stroke-width:2px
+  class A,B,C,D core
+  class E,F,G build
+  class H,I market</pre>
+    </div>
+
+    <div class="table-wrap">
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Layer</th>
+              <th>What Gets Built</th>
+              <th>Why It Matters</th>
+              <th>Risk Level</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Dataset Substrate</td>
+              <td>High-quality multimodal trait dataset</td>
+              <td>Creates proprietary interface to physical reality</td>
+              <td><span class="status focus">Execution-heavy</span></td>
+            </tr>
+            <tr>
+              <td>Research Engine</td>
+              <td>Search → analogy mapping → hypothesis generation</td>
+              <td>Converts biological patterns into engineering directions</td>
+              <td><span class="status ok">Compounding</span></td>
+            </tr>
+            <tr>
+              <td>Expert Loop</td>
+              <td>Biologists define ontology + validate outputs</td>
+              <td>Improves trust, precision, and transfer quality</td>
+              <td><span class="status focus">Talent-constrained</span></td>
+            </tr>
+            <tr>
+              <td>Commercial Wedge</td>
+              <td>Narrow vertical pilot (aerospace/robotics/materials)</td>
+              <td>Proves faster idea discovery vs conventional R&amp;D</td>
+              <td><span class="status risk">Go-to-market unknowns</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <p class="footer-note">
+      <strong>Program fit:</strong> Mila Ventures is positioned as the pressure-test loop to compress this from broad thesis into company formation:
+      first customer, first proprietary dataset, and first evidence that the biology-to-engineering engine yields non-obvious commercial insight.
+    </p>
+  </div>
+
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      look: 'classic',
+      themeVariables: {
+        primaryColor: isDark ? '#112233' : '#d8f8ff',
+        primaryBorderColor: isDark ? '#22d3ee' : '#0e7490',
+        primaryTextColor: isDark ? '#e2e8f0' : '#0f172a',
+        secondaryColor: isDark ? '#2a2511' : '#fff4d3',
+        secondaryBorderColor: isDark ? '#fbbf24' : '#b45309',
+        secondaryTextColor: isDark ? '#e2e8f0' : '#0f172a',
+        tertiaryColor: isDark ? '#0f2b25' : '#d9fff0',
+        tertiaryBorderColor: isDark ? '#34d399' : '#047857',
+        tertiaryTextColor: isDark ? '#e2e8f0' : '#0f172a',
+        lineColor: isDark ? '#93a4bd' : '#475569',
+        fontSize: '17px',
+        fontFamily: 'var(--font-body)'
+      }
+    });
+  </script>
+  <script>
+    var INITIAL_ZOOM = 1;
+    function zoomDiagram(btn, factor) {
+      const wrap = btn.closest('.mermaid-wrap');
+      const m = wrap.querySelector('.mermaid');
+      const current = parseFloat(m.dataset.zoom || INITIAL_ZOOM);
+      const next = Math.min(Math.max(current * factor, 0.5), 5);
+      m.dataset.zoom = next;
+      m.style.zoom = next;
+    }
+    function resetZoom(btn) {
+      const wrap = btn.closest('.mermaid-wrap');
+      const m = wrap.querySelector('.mermaid');
+      m.dataset.zoom = INITIAL_ZOOM;
+      m.style.zoom = INITIAL_ZOOM;
+    }
+    function openDiagramFullscreen(btn) {
+      const wrap = btn.closest('.mermaid-wrap');
+      const svg = wrap.querySelector('.mermaid svg');
+      if (!svg) return;
+      const clone = svg.cloneNode(true);
+      const bg = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#fff';
+      const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Diagram</title><style>body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px;background:${bg}}svg{max-width:100%;max-height:90vh;height:auto}</style></head><body>${clone.outerHTML}</body></html>`;
+      window.open(URL.createObjectURL(new Blob([html], { type: 'text/html' })), '_blank');
+    }
+    document.querySelectorAll('.mermaid-wrap').forEach(function(wrap){
+      wrap.addEventListener('wheel', function(e){
+        if (!e.ctrlKey && !e.metaKey) return;
+        e.preventDefault();
+        const m = wrap.querySelector('.mermaid');
+        const current = parseFloat(m.dataset.zoom || INITIAL_ZOOM);
+        const factor = e.deltaY < 0 ? 1.1 : 0.9;
+        const next = Math.min(Math.max(current * factor, 0.5), 5);
+        m.dataset.zoom = next;
+        m.style.zoom = next;
+      }, { passive: false });
+    });
+  </script>
+</body>
+</html>
