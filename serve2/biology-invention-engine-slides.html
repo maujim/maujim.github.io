@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Research in a Compute-Rich World — Slide Deck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Azeret+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
+    --font-mono: 'Azeret Mono', 'SF Mono', monospace;
+    --bg: #faf6f0;
+    --surface: #ffffff;
+    --surface2: #f5ece0;
+    --surface-elevated: #fffdf5;
+    --border: rgba(60, 40, 20, 0.10);
+    --border-bright: rgba(60, 40, 20, 0.18);
+    --text: #2c2a25;
+    --text-dim: #7c756a;
+    --accent: #c2410c;
+    --accent-dim: rgba(194, 65, 12, 0.10);
+    --green: #15803d;
+    --blue: #0e7490;
+    --amber: #b45309;
+    --code-bg: #2c2520;
+    --code-text: #f5ece0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1c1916;
+      --surface: #262220;
+      --surface2: #302b28;
+      --surface-elevated: #3a3430;
+      --border: rgba(200, 180, 160, 0.10);
+      --border-bright: rgba(200, 180, 160, 0.2);
+      --text: #f0e8dc;
+      --text-dim: #b3a998;
+      --accent: #e85d2a;
+      --accent-dim: rgba(232, 93, 42, 0.12);
+      --green: #4ade80;
+      --blue: #67e8f9;
+      --amber: #fbbf24;
+      --code-bg: #141210;
+      --code-text: #f0e8dc;
+    }
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font-body);
+    color: var(--text);
+    background: var(--bg);
+    overflow: hidden;
+  }
+  .deck {
+    height: 100dvh;
+    overflow-y: auto;
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+  }
+  .slide {
+    height: 100dvh;
+    scroll-snap-align: start;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: clamp(32px, 6vh, 72px) clamp(32px, 7vw, 110px);
+    opacity: 0;
+    transform: translateY(40px) scale(0.98);
+    transition: opacity .6s cubic-bezier(0.16,1,0.3,1), transform .6s cubic-bezier(0.16,1,0.3,1);
+    background-image: radial-gradient(ellipse at 20% 90%, var(--accent-dim) 0%, transparent 45%);
+  }
+  .slide.visible { opacity: 1; transform: none; }
+  .reveal { opacity: 0; transform: translateY(20px); transition: opacity .5s, transform .5s; }
+  .slide.visible .reveal { opacity: 1; transform: none; }
+  .slide.visible .reveal:nth-child(1){transition-delay:.1s}
+  .slide.visible .reveal:nth-child(2){transition-delay:.2s}
+  .slide.visible .reveal:nth-child(3){transition-delay:.3s}
+  .slide.visible .reveal:nth-child(4){transition-delay:.4s}
+  .slide.visible .reveal:nth-child(5){transition-delay:.5s}
+
+  .slide__display { font-size: clamp(44px, 9vw, 106px); font-weight: 800; letter-spacing: -2px; line-height: .95; text-wrap: balance; }
+  .slide__heading { font-size: clamp(28px, 5vw, 48px); font-weight: 750; line-height: 1.1; text-wrap: balance; }
+  .slide__subtitle { font-family: var(--font-mono); font-size: clamp(11px, 1.4vw, 16px); color: var(--text-dim); text-transform: uppercase; letter-spacing: 1.2px; }
+  .slide__body { font-size: clamp(16px, 2vw, 23px); line-height: 1.6; color: var(--text-dim); text-wrap: pretty; }
+  .slide__label { font-family: var(--font-mono); color: var(--accent); font-size: 12px; letter-spacing: 1.4px; text-transform: uppercase; margin-bottom: 12px; }
+
+  .deck-progress { position: fixed; top:0; left:0; height:3px; background:var(--accent); z-index:100; }
+  .deck-dots { position: fixed; right: 16px; top:50%; transform: translateY(-50%); display:flex; flex-direction: column; gap: 8px; z-index:100; padding:6px; border-radius:20px; background: color-mix(in srgb, var(--bg) 70%, transparent 30%); backdrop-filter: blur(4px); }
+  .deck-dot { width:8px; height:8px; border:0; border-radius:999px; background:var(--text-dim); opacity:.35; cursor:pointer; }
+  .deck-dot.active { opacity:1; transform:scale(1.4); background:var(--accent); }
+  .deck-counter { position: fixed; right:16px; bottom:14px; z-index:100; font-family: var(--font-mono); font-size: 12px; color:var(--text-dim); }
+  .deck-hints { position: fixed; left:50%; transform: translateX(-50%); bottom:14px; z-index:100; font-family: var(--font-mono); font-size:11px; color:var(--text-dim); }
+  .deck-hints.faded { opacity:0; }
+
+  .slide--title { align-items:center; text-align:center; background-image: radial-gradient(ellipse at 50% 30%, var(--accent-dim) 0%, transparent 52%); }
+  .slide--divider { justify-content:center; }
+  .slide--divider .num { position:absolute; left:50%; top:50%; transform:translate(-50%,-56%); font-size:clamp(90px,21vw,250px); font-weight:200; opacity:.09; color:var(--accent); }
+
+  .slide--content .inner { display:grid; grid-template-columns: 3fr 2fr; gap: clamp(18px,4vw,58px); align-items:center; }
+  .bullets { list-style:none; }
+  .bullets li { position:relative; padding: 9px 0 9px 18px; font-size: clamp(16px,1.8vw,22px); color: var(--text-dim); }
+  .bullets li::before { content:''; position:absolute; left:0; top:18px; width:6px; height:6px; border-radius:50%; background:var(--accent); }
+
+  .slide--split { padding:0; }
+  .panels { display:grid; grid-template-columns: 2fr 3fr; height:100%; }
+  .panel { padding: clamp(34px,6vh,80px) clamp(24px,4vw,56px); display:flex; flex-direction:column; justify-content:center; min-width:0; }
+  .panel.a { background: var(--surface2); }
+  .panel.b { background: var(--surface); }
+
+  .mermaid-wrap { position: relative; background: var(--surface); border:1px solid var(--border); border-radius: 12px; padding: 20px; display:flex; justify-content:center; align-items:center; min-height: 420px; overflow:auto; }
+  .zoom-controls { position:absolute; top:8px; right:8px; display:flex; gap:2px; background: var(--surface); border:1px solid var(--border); border-radius:6px; padding:2px; z-index:5; }
+  .zoom-controls button { width:28px; height:28px; border:0; background:transparent; color:var(--text-dim); cursor:pointer; border-radius:4px; }
+  .zoom-controls button:hover { background: var(--accent-dim); color: var(--text); }
+  .mermaid .nodeLabel { color: var(--text) !important; font-size: 18px !important; }
+  .mermaid .edgeLabel { color: var(--text-dim) !important; background-color: var(--bg) !important; font-family:var(--font-mono) !important; font-size: 13px !important; }
+  .mermaid .edgeLabel rect { fill: var(--bg) !important; }
+
+  .kpis { display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 14px; }
+  .kpi { background: var(--surface); border:1px solid var(--border); border-radius:12px; padding: 18px; min-width:0; }
+  .kpi .val { font-size: clamp(34px,5.6vw,62px); line-height:1.05; font-weight:760; letter-spacing:-1px; }
+  .kpi .lbl { font-family: var(--font-mono); color:var(--text-dim); font-size: 10px; text-transform:uppercase; letter-spacing:1.2px; margin-top:8px; }
+  .kpi .trend { font-family: var(--font-mono); font-size:11px; margin-top:4px; }
+
+  .table-wrap { border:1px solid var(--border); border-radius:12px; overflow:hidden; background: var(--surface); }
+  .table-scroll { overflow:auto; }
+  table { width:100%; border-collapse:collapse; }
+  th { background: var(--surface2); font-family:var(--font-mono); font-size:11px; letter-spacing:1px; text-transform:uppercase; color:var(--text-dim); text-align:left; padding:12px 16px; }
+  td { padding:13px 16px; border-top:1px solid var(--border); font-size: 17px; color: var(--text); vertical-align: top; }
+  tbody tr:nth-child(even){ background: color-mix(in srgb, var(--accent) 6%, var(--surface) 94%); }
+
+  .slide--quote { align-items:center; text-align:center; padding: clamp(50px,8vh,90px) clamp(50px,13vw,210px); }
+  .quote-mark { font-size: clamp(70px,11vw,140px); opacity:.11; color: var(--accent); line-height:.4; }
+  blockquote { font-size: clamp(24px,4vw,46px); line-height: 1.3; font-weight: 520; }
+  cite { margin-top: 14px; display:block; font-family: var(--font-mono); color: var(--text-dim); text-transform:uppercase; font-size: 12px; letter-spacing:1.2px; }
+
+  .slide--bleed { padding:0; justify-content:flex-end; }
+  .bg { position:absolute; inset:0; background: linear-gradient(130deg, #7c2d12 0%, #c2410c 40%, #f97316 100%); }
+  .scrim { position:absolute; inset:0; background: linear-gradient(to top, rgba(0,0,0,.62), rgba(0,0,0,.18) 45%, transparent); }
+  .bleed-content { position:relative; z-index:2; color:#fff; padding: clamp(30px,6vh,80px) clamp(34px,8vw,120px); }
+
+  @media (max-width: 900px) {
+    .slide--content .inner { grid-template-columns: 1fr; }
+    .panels { grid-template-columns: 1fr; }
+    .kpis { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .slide, .reveal { transition: none !important; transform:none !important; opacity:1 !important; }
+  }
+</style>
+</head>
+<body>
+<!-- surf unavailable, using CSS gradient fallback -->
+<div class="deck">
+  <section class="slide slide--title">
+    <p class="slide__subtitle reveal" style="margin-bottom:14px;">Venture Thesis Deck</p>
+    <h1 class="slide__display reveal">Research in a<br/>Compute-Rich World</h1>
+    <p class="slide__body reveal" style="max-width:850px; margin-top:18px;">If compute becomes abundant, the moat shifts: organizations that can repeatedly convert data + expert judgment into trustworthy discovery win.</p>
+  </section>
+
+  <section class="slide slide--divider" style="background-image: radial-gradient(ellipse at 78% 35%, var(--accent-dim) 0%, transparent 45%);">
+    <span class="num">01</span>
+    <h2 class="slide__heading reveal">The Bottleneck Has Moved</h2>
+    <p class="slide__subtitle reveal" style="margin-top:10px;">From raw FLOPs to truth-production systems</p>
+  </section>
+
+  <section class="slide slide--content" style="background-image: radial-gradient(ellipse at 15% 75%, var(--accent-dim) 0%, transparent 50%);">
+    <div class="inner">
+      <div>
+        <p class="slide__label reveal">Shift in Scarcity</p>
+        <h2 class="slide__heading reveal">Compute Is Necessary, Not Sufficient</h2>
+        <ul class="bullets">
+          <li class="reveal">Model scaling and hardware access are no longer the only strategic differentiators.</li>
+          <li class="reveal">The hard part becomes selecting high-value questions and testing them rigorously.</li>
+          <li class="reveal">Winning teams build loops that turn weak signals into durable knowledge assets.</li>
+          <li class="reveal">Proprietary interfaces to reality outperform generic internet-scale corpora.</li>
+        </ul>
+      </div>
+      <div class="reveal" style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px;">
+        <p class="slide__subtitle">Core Claim</p>
+        <p class="slide__body" style="color:var(--text); margin-top:8px;">Future research advantage = <strong>epistemic discipline × expert-grounded data × fast experimental loops</strong>.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide slide--split">
+    <div class="panels">
+      <div class="panel a">
+        <p class="slide__label reveal" style="color:var(--amber);">Opportunity</p>
+        <h2 class="slide__heading reveal">Biology Is an Under-Indexed Design Archive</h2>
+        <p class="slide__body reveal" style="margin-top:14px;">Nature already solved flight, thermal regulation, adhesion, distributed coordination, filtration, and resilience under constraints. We have the knowledge fragments, but not an AI-native substrate for transfer.</p>
+      </div>
+      <div class="panel b">
+        <p class="slide__label reveal" style="color:var(--blue);">Current Fragmentation</p>
+        <ul class="bullets" style="margin-top:8px;">
+          <li class="reveal">Papers and case studies (text-heavy, weakly linked)</li>
+          <li class="reveal">Museum/field observations (siloed metadata)</li>
+          <li class="reveal">Video/imagery (high signal, low structure)</li>
+          <li class="reveal">Sparse functional ontologies for engineering transfer</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" style="padding-top:34px; padding-bottom:34px; background-image: radial-gradient(ellipse at 82% 18%, var(--accent-dim) 0%, transparent 42%);">
+    <p class="slide__label reveal">System Design</p>
+    <h2 class="slide__heading reveal" style="margin-bottom:14px;">Biology → Engineering Invention Engine</h2>
+    <div class="mermaid-wrap reveal">
+      <div class="zoom-controls">
+        <button onclick="zoomDiagram(this,1.2)" title="Zoom in">+</button>
+        <button onclick="zoomDiagram(this,0.8)" title="Zoom out">−</button>
+        <button onclick="resetZoom(this)" title="Reset">↺</button>
+        <button onclick="openDiagramFullscreen(this)" title="Open">⛶</button>
+      </div>
+      <pre class="mermaid">flowchart TD
+  A[Multimodal Biology Data\npapers, media, field notes] --> B[Functional Trait Ontology]
+  B --> C[AI-Assisted Extraction + Annotation]
+  C --> D[Hypothesis Generator]
+  D --> E[Ranking + Feasibility Scoring]
+  E --> F[Simulation + Expert Validation]
+  F --> G[Commercial Design Recommendations]
+  G --> H[Customer Feedback + Test Results]
+  H --> B
+
+  classDef core fill:#c2410c22,stroke:#c2410c,stroke-width:2px
+  classDef infra fill:#0e749022,stroke:#0e7490,stroke-width:2px
+  classDef loop fill:#15803d22,stroke:#15803d,stroke-width:2px
+  class A,B,C core
+  class D,E,F infra
+  class G,H loop</pre>
+    </div>
+  </section>
+
+  <section class="slide" style="background-image: radial-gradient(ellipse at 12% 18%, var(--accent-dim) 0%, transparent 45%);">
+    <p class="slide__label reveal">Business Wedge</p>
+    <h2 class="slide__heading reveal" style="margin-bottom:14px;">Start Narrow, Compound Fast</h2>
+    <div class="kpis">
+      <div class="kpi reveal"><div class="val" style="color:var(--accent);">1</div><div class="lbl">Initial Vertical</div><div class="trend" style="color:var(--text-dim)">Aerospace / Robotics / Materials</div></div>
+      <div class="kpi reveal"><div class="val" style="color:var(--green);">3x</div><div class="lbl">Hypothesis Throughput</div><div class="trend" style="color:var(--green)">vs. conventional R&amp;D discovery loop</div></div>
+      <div class="kpi reveal"><div class="val" style="color:var(--blue);">10-15</div><div class="lbl">Expert Hours/Week</div><div class="trend" style="color:var(--text-dim)">as leverage, not report generation</div></div>
+      <div class="kpi reveal"><div class="val" style="color:var(--amber);">Compounding</div><div class="lbl">Asset Type</div><div class="trend" style="color:var(--text-dim)">Ontology + proprietary data + validated loops</div></div>
+    </div>
+  </section>
+
+  <section class="slide" style="padding-top:36px; padding-bottom:36px; background-image: radial-gradient(ellipse at 80% 80%, var(--accent-dim) 0%, transparent 45%);">
+    <p class="slide__label reveal">Go-To-Market Sequence</p>
+    <h2 class="slide__heading reveal" style="margin-bottom:14px;">From Thesis to First Customer Evidence</h2>
+    <div class="table-wrap reveal">
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>Phase</th><th>Build Focus</th><th>Output</th><th>Evidence Gate</th></tr></thead>
+          <tbody>
+            <tr><td>0. Wedge Selection</td><td>Pick one high-cost design loop</td><td>Customer profile + problem brief</td><td>3+ user interviews confirming urgency</td></tr>
+            <tr><td>1. Dataset v1</td><td>Trait ontology + curated corpus</td><td>Searchable transfer substrate</td><td>Experts rate precision/usefulness</td></tr>
+            <tr><td>2. Engine v1</td><td>Hypothesis generation + ranking</td><td>Candidate design principles</td><td>Non-obvious outputs judged novel</td></tr>
+            <tr><td>3. Validation Loop</td><td>Simulation + expert review</td><td>Prioritized test list</td><td>At least one validated improvement path</td></tr>
+            <tr><td>4. Pilot Product</td><td>Decision-support workflow</td><td>Paid or structured pilot</td><td>Faster cycle time than baseline</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide slide--quote" style="background-image: radial-gradient(ellipse at 50% 50%, var(--accent-dim) 0%, transparent 36%);">
+    <div class="quote-mark reveal">“</div>
+    <blockquote class="reveal">The frontier is not just bigger models. The frontier is better systems for discovery.</blockquote>
+    <cite class="reveal">Core thesis statement</cite>
+  </section>
+
+  <section class="slide slide--bleed">
+    <div class="bg"></div>
+    <div class="scrim"></div>
+    <div class="bleed-content">
+      <p class="slide__label reveal" style="color: rgba(255,255,255,.78);">Bootcamp Objective</p>
+      <h2 class="slide__heading reveal" style="color:#fff; max-width:900px;">Turn conviction into a company thesis: first customer, first proprietary dataset, first invention loop.</h2>
+      <p class="slide__subtitle reveal" style="color:rgba(255,255,255,.82); margin-top:10px; text-transform:none; letter-spacing:.2px; font-size:clamp(14px,1.5vw,19px);">Mila Ventures is the pressure-test environment to validate this now.</p>
+    </div>
+  </section>
+</div>
+
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+  const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'base',
+    look: 'classic',
+    themeVariables: {
+      primaryColor: isDark ? '#302b28' : '#fff1e8',
+      primaryBorderColor: isDark ? '#e85d2a' : '#c2410c',
+      primaryTextColor: isDark ? '#f0e8dc' : '#2c2a25',
+      secondaryColor: isDark ? '#23353a' : '#e6f7fb',
+      secondaryBorderColor: isDark ? '#67e8f9' : '#0e7490',
+      secondaryTextColor: isDark ? '#f0e8dc' : '#2c2a25',
+      tertiaryColor: isDark ? '#1d3023' : '#ecfdf3',
+      tertiaryBorderColor: isDark ? '#4ade80' : '#15803d',
+      tertiaryTextColor: isDark ? '#f0e8dc' : '#2c2a25',
+      lineColor: isDark ? '#b3a998' : '#7c756a',
+      fontSize: '18px',
+      fontFamily: 'var(--font-body)'
+    }
+  });
+
+  function autoFit() {
+    document.querySelectorAll('.mermaid svg').forEach(svg => {
+      svg.removeAttribute('height');
+      svg.style.width = '100%';
+      svg.style.maxWidth = '100%';
+      svg.style.height = 'auto';
+    });
+  }
+
+  mermaid.run().then(() => {
+    autoFit();
+    new SlideEngine();
+  });
+</script>
+<script>
+  var INITIAL_ZOOM = 1;
+  function zoomDiagram(b, f) { var w = b.closest('.mermaid-wrap'); var t = w.querySelector('.mermaid'); var c = parseFloat(t.dataset.zoom || INITIAL_ZOOM); var n = Math.min(Math.max(c * f, 0.5), 5); t.dataset.zoom = n; t.style.zoom = n; }
+  function resetZoom(b) { var w = b.closest('.mermaid-wrap'); var t = w.querySelector('.mermaid'); t.dataset.zoom = INITIAL_ZOOM; t.style.zoom = INITIAL_ZOOM; }
+  function openDiagramFullscreen(b) { openMermaidInNewTab(b.closest('.mermaid-wrap')); }
+  function openMermaidInNewTab(w) { var svg = w.querySelector('.mermaid svg'); if (!svg) return; var clone = svg.cloneNode(true); clone.style.zoom = ''; var styles = getComputedStyle(document.documentElement); var bg = styles.getPropertyValue('--bg').trim() || '#fff'; var html = '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Diagram</title><style>body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:' + bg + ';padding:40px}svg{max-width:100%;max-height:90vh;height:auto}</style></head><body>' + clone.outerHTML + '</body></html>'; window.open(URL.createObjectURL(new Blob([html], { type: 'text/html' })), '_blank'); }
+
+  document.querySelectorAll('.mermaid-wrap').forEach(function(w){
+    w.addEventListener('wheel', function(e){ if(!e.ctrlKey && !e.metaKey) return; e.preventDefault(); var t = w.querySelector('.mermaid'); var c = parseFloat(t.dataset.zoom || INITIAL_ZOOM); var f = e.deltaY < 0 ? 1.1 : 0.9; var n = Math.min(Math.max(c * f, 0.5), 5); t.dataset.zoom = n; t.style.zoom = n; }, {passive:false});
+  });
+
+  function SlideEngine(){ this.deck = document.querySelector('.deck'); this.slides = [].slice.call(document.querySelectorAll('.slide')); this.current = 0; this.total = this.slides.length; this.buildChrome(); this.bindEvents(); this.observe(); this.update(); }
+  SlideEngine.prototype.buildChrome = function(){ var bar = document.createElement('div'); bar.className='deck-progress'; document.body.appendChild(bar); this.bar = bar; var dots = document.createElement('div'); dots.className='deck-dots'; var self=this; this.slides.forEach(function(_,i){ var d=document.createElement('button'); d.className='deck-dot'; d.onclick=function(){ self.goTo(i); }; dots.appendChild(d); }); document.body.appendChild(dots); this.dots=[].slice.call(dots.children); var ctr=document.createElement('div'); ctr.className='deck-counter'; document.body.appendChild(ctr); this.counter=ctr; var hints=document.createElement('div'); hints.className='deck-hints'; hints.textContent='← → or scroll to navigate'; document.body.appendChild(hints); this.hints=hints; setTimeout(function(){hints.classList.add('faded');},4000); };
+  SlideEngine.prototype.bindEvents = function(){ var self=this; document.addEventListener('keydown', function(e){ if(e.target.closest('.mermaid-wrap,.table-scroll,input,textarea,[contenteditable]')) return; if(['ArrowDown','ArrowRight',' ','PageDown'].indexOf(e.key)>-1){e.preventDefault(); self.next();} else if(['ArrowUp','ArrowLeft','PageUp'].indexOf(e.key)>-1){e.preventDefault(); self.prev();} }); };
+  SlideEngine.prototype.observe = function(){ var self=this; var obs = new IntersectionObserver(function(entries){ entries.forEach(function(entry){ if(entry.isIntersecting){ entry.target.classList.add('visible'); self.current=self.slides.indexOf(entry.target); self.update(); } }); }, {threshold:0.5}); this.slides.forEach(function(s){ obs.observe(s); }); };
+  SlideEngine.prototype.goTo = function(i){ this.slides[Math.max(0, Math.min(i, this.total-1))].scrollIntoView({behavior:'smooth'}); };
+  SlideEngine.prototype.next = function(){ if(this.current < this.total-1) this.goTo(this.current+1); };
+  SlideEngine.prototype.prev = function(){ if(this.current > 0) this.goTo(this.current-1); };
+  SlideEngine.prototype.update = function(){ this.bar.style.width=((this.current+1)/this.total*100)+'%'; var c=this.current; this.dots.forEach(function(d,i){ d.classList.toggle('active', i===c); }); this.counter.textContent=(this.current+1)+' / '+this.total; };
+</script>
+</body>
+</html>
