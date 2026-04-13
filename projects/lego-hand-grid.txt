@@ -101,9 +101,12 @@ Main loop in `updateFromHand()`:
    - hide pointer/ghost
 4. if hand exists:
    - compute pinch metric: `dist(thumbTip,indexTip) / dist(indexMCP,pinkyMCP)`
-   - hysteresis thresholds:
-     - pinch on: `< 0.43`
-     - pinch off: `> 0.58`
+   - hysteresis thresholds (scaled ring):
+     - pinch on: `< 0.43 * 1.09` (~`0.469`)
+     - pinch off: `> 0.58 * 1.09` (~`0.632`)
+   - edge debounce (reduce accidental drop from jitter):
+     - pinch-on requires `2` consecutive frames
+     - pinch-off requires `3` consecutive frames
    - cursor = midpoint(thumbTip, indexTip)
    - convert cursor to NDC (mirrored x)
    - raycast to ground plane
@@ -149,7 +152,7 @@ Use these names when patching:
 - scene/material creation: `makeBrick(...)`
 - visual hierarchy: `updateSelectionVisuals()`
 - pointer projection: `updatePointerAndPlaneHit()`
-- hover detection: `updateHoverFromPointer()`
+- hover detection (raycast + tolerance): `updateHoverFromPointer()`, `pointInsideBrickXZ()`
 - drag targeting: `updateDragTarget(world)`
 - hand pipeline/state machine: `updateFromHand()`
 - HUD text: `renderHud()`
@@ -174,7 +177,11 @@ Use these names when patching:
 
 ## 11) Important constants to tune
 
-- Pinch hysteresis: `0.43 / 0.58`
+- Pinch hysteresis base: `0.43 / 0.58`
+- Pinch ring scale: `1.09` (9% larger effective pinch radius)
+- Effective thresholds: on~`0.469`, off~`0.632`
+- Pinch debounce frames: on=`2`, off=`3`
+- Hover footprint tolerance: `0.28` (increase a bit if grabbing feels too strict)
 - Grid size: `GRID_COLS`, `GRID_ROWS`
 - Brick footprint: `BRICK_W`, `BRICK_D`
 - Outline opacity/colors for hover/selected

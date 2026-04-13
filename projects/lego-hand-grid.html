@@ -192,6 +192,11 @@
   const BRICK_W = 2;
   const BRICK_D = 3;
 
+  // Pinch ring scaling: increase effective pinch radius by 9%
+  const PINCH_RING_SCALE = 1.09;
+  const PINCH_ON_THRESHOLD = 0.43 * PINCH_RING_SCALE;
+  const PINCH_OFF_THRESHOLD = 0.58 * PINCH_RING_SCALE;
+
   const HAND_LINKS = [
     [0,1],[1,2],[2,3],[3,4],
     [0,5],[5,6],[6,7],[7,8],
@@ -207,6 +212,8 @@
     handLabel: "-",
     pinchDown: false,
     pinchStrength: 0,
+    pinchOnFrames: 0,
+    pinchOffFrames: 0,
 
     hovered: false,
     selected: false,
@@ -393,6 +400,12 @@
     brick.position.set(p.x, 0, p.z);
   }
 
+  function pointInsideBrickXZ(worldPoint, tolerance = 0.28) {
+    const c = cornerToWorld(state.brickCornerI, state.brickCornerJ);
+    return Math.abs(worldPoint.x - c.x) <= BRICK_W * 0.5 + tolerance &&
+           Math.abs(worldPoint.z - c.z) <= BRICK_D * 0.5 + tolerance;
+  }
+
   function setGhostColor(valid) {
     const bodyMat = ghostBrick.userData.bodyMat;
     const studMat = ghostBrick.userData.studTopMat;
@@ -438,7 +451,8 @@
   function updateHoverFromPointer() {
     raycaster.setFromCamera(state.pointerNDC, camera);
     const hits = raycaster.intersectObjects(brick.userData.pickables, true);
-    state.hovered = hits.length > 0;
+    const nearByFootprint = state.pointerVisible ? pointInsideBrickXZ(state.pointerWorld, 0.28) : false;
+    state.hovered = hits.length > 0 || nearByFootprint;
   }
 
   function updateDragTarget(world) {
@@ -547,6 +561,8 @@
       state.hovered = false;
       state.selected = false;
       state.pinchDown = false;
+      state.pinchOnFrames = 0;
+      state.pinchOffFrames = 0;
       state.pointerVisible = false;
       pointer.visible = false;
       if (state.dragging) {
@@ -568,11 +584,26 @@
     const pinchNorm = pinch / palm;
     state.pinchStrength = clamp(1 - (pinchNorm - 0.25) / 0.55, 0, 1);
 
-    const pinchOn = pinchNorm < 0.43;
-    const pinchOff = pinchNorm > 0.58;
+    const pinchOn = pinchNorm < PINCH_ON_THRESHOLD;
+    const pinchOff = pinchNorm > PINCH_OFF_THRESHOLD;
     const prevPinch = state.pinchDown;
-    if (!state.pinchDown && pinchOn) state.pinchDown = true;
-    else if (state.pinchDown && pinchOff) state.pinchDown = false;
+
+    // Debounce pinch edges to avoid accidental drop/re-grab from landmark jitter.
+    if (!state.pinchDown) {
+      state.pinchOnFrames = pinchOn ? state.pinchOnFrames + 1 : 0;
+      state.pinchOffFrames = 0;
+      if (state.pinchOnFrames >= 2) {
+        state.pinchDown = true;
+        state.pinchOnFrames = 0;
+      }
+    } else {
+      state.pinchOffFrames = pinchOff ? state.pinchOffFrames + 1 : 0;
+      state.pinchOnFrames = 0;
+      if (state.pinchOffFrames >= 3) {
+        state.pinchDown = false;
+        state.pinchOffFrames = 0;
+      }
+    }
 
     const pinchStarted = !prevPinch && state.pinchDown;
     const pinchEnded = prevPinch && !state.pinchDown;
