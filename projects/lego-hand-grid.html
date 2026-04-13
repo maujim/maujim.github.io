@@ -3,17 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>LEGO Hand Grid (Three.js + MediaPipe)</title>
+  <title>LEGO Grid Editor v0 (Hand + Selection UI)</title>
   <style>
     :root {
       --bg: #090909;
       --panel: rgba(18, 18, 18, 0.82);
-      --accent: #00ffd5;
-      --warn: #ff7e3d;
+      --accent: #49d2ff;
+      --warn: #ff6159;
     }
 
-    html,
-    body {
+    html, body {
       margin: 0;
       width: 100%;
       height: 100%;
@@ -35,6 +34,11 @@
       height: 100%;
       display: block;
       background: radial-gradient(circle at 20% 0%, #1f2230 0%, #0f1119 48%, #07080c 100%);
+      cursor: grab;
+    }
+
+    #three.dragging {
+      cursor: grabbing;
     }
 
     #overlay {
@@ -43,6 +47,7 @@
       width: 100%;
       height: 100%;
       pointer-events: none;
+      z-index: 7;
     }
 
     #webcam {
@@ -64,7 +69,7 @@
       position: absolute;
       left: 10px;
       top: 10px;
-      width: 280px;
+      width: 300px;
       z-index: 10;
       display: flex;
       flex-direction: column;
@@ -107,6 +112,20 @@
       color: #fff;
     }
 
+    #hint {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      z-index: 9;
+      font-size: 12px;
+      color: #ddd;
+      background: rgba(0, 0, 0, 0.42);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 8px;
+      padding: 6px 8px;
+      pointer-events: none;
+    }
+
     #controls {
       position: absolute;
       left: 50%;
@@ -140,20 +159,6 @@
       cursor: not-allowed;
       box-shadow: none;
     }
-
-    #hint {
-      position: absolute;
-      bottom: 12px;
-      left: 12px;
-      z-index: 9;
-      font-size: 12px;
-      color: #ddd;
-      background: rgba(0, 0, 0, 0.4);
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      border-radius: 8px;
-      padding: 6px 8px;
-      pointer-events: none;
-    }
   </style>
 </head>
 <body>
@@ -163,10 +168,10 @@
   <video id="webcam" playsinline muted autoplay></video>
 
   <div id="hud"></div>
-  <div id="hint">Pinch on the brick to pick it up. Keep pinching to move. Release to place.</div>
+  <div id="hint">Pinch over brick = select/drag. Hover = faint outline · Selected = strong outline + tint · Drag = ghost preview.</div>
 
   <div id="controls">
-    <button id="btn-main" disabled>Loading AI...</button>
+    <button id="btn-main" disabled>Loading Hand AI...</button>
   </div>
 </div>
 
@@ -198,21 +203,26 @@
   const state = {
     handLandmarker: null,
     lastVideoTime: -1,
-    pinchDown: false,
-    pinchStrength: 0,
-    grabbed: false,
     hasHand: false,
     handLabel: "-",
-    pointerWorld: new THREE.Vector3(0, 0, 0),
+    pinchDown: false,
+    pinchStrength: 0,
+
+    hovered: false,
+    selected: false,
+    dragging: false,
+
+    pointerNDC: new THREE.Vector2(),
+    pointerWorld: new THREE.Vector3(),
     pointerVisible: false,
-    hoveredBrick: false,
+
     brickCornerI: 6,
     brickCornerJ: 6,
     targetCornerI: 6,
-    targetCornerJ: 6
+    targetCornerJ: 6,
+    validPlacement: true
   };
 
-  // --- Three.js scene ---
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.setSize(window.innerWidth, window.innerHeight);
@@ -225,7 +235,6 @@
   camera.lookAt(0, 0, 0);
 
   scene.add(new THREE.HemisphereLight(0xbfd5ff, 0x202020, 0.95));
-
   const dir = new THREE.DirectionalLight(0xffffff, 1.1);
   dir.position.set(8, 18, 6);
   scene.add(dir);
@@ -240,20 +249,14 @@
   floor.position.y = -0.12;
   scene.add(floor);
 
-  // Baseplate studs (instanced)
   const studGeo = new THREE.CylinderGeometry(0.23, 0.23, 0.1, 18);
   const studMat = new THREE.MeshStandardMaterial({ color: 0x2f3f56, roughness: 0.7, metalness: 0.12 });
-  const studCount = GRID_COLS * GRID_ROWS;
-  const studs = new THREE.InstancedMesh(studGeo, studMat, studCount);
-  let idx = 0;
+  const studs = new THREE.InstancedMesh(studGeo, studMat, GRID_COLS * GRID_ROWS);
   const temp = new THREE.Object3D();
+  let idx = 0;
   for (let i = 0; i < GRID_COLS; i++) {
     for (let j = 0; j < GRID_ROWS; j++) {
-      temp.position.set(
-        -GRID_COLS * 0.5 + i + 0.5,
-        0.05,
-        -GRID_ROWS * 0.5 + j + 0.5
-      );
+      temp.position.set(-GRID_COLS * 0.5 + i + 0.5, 0.05, -GRID_ROWS * 0.5 + j + 0.5);
       temp.updateMatrix();
       studs.setMatrixAt(idx++, temp.matrix);
     }
@@ -264,57 +267,99 @@
   gridHelper.position.y = 0.001;
   scene.add(gridHelper);
 
-  function makeBrick(color = 0xdf3131, ghost = false) {
+  function makeBrick(color = 0xd22f2f, transparent = false) {
     const group = new THREE.Group();
+    const pickables = [];
+
+    const bodyMat = new THREE.MeshStandardMaterial({
+      color,
+      roughness: 0.42,
+      metalness: 0.16,
+      transparent,
+      opacity: transparent ? 0.35 : 1,
+      emissive: 0x000000,
+      emissiveIntensity: 0
+    });
 
     const body = new THREE.Mesh(
       new THREE.BoxGeometry(BRICK_W * STUD, 0.58, BRICK_D * STUD),
-      new THREE.MeshStandardMaterial({
-        color,
-        roughness: ghost ? 0.35 : 0.42,
-        metalness: ghost ? 0.1 : 0.16,
-        transparent: ghost,
-        opacity: ghost ? 0.35 : 1
-      })
+      bodyMat
     );
     body.position.y = 0.29;
+    body.userData.pickable = true;
+    pickables.push(body);
     group.add(body);
 
-    const studTopGeo = new THREE.CylinderGeometry(0.22, 0.22, 0.1, 18);
     const studTopMat = new THREE.MeshStandardMaterial({
-      color: ghost ? 0x8bffec : 0xf15f5f,
+      color: transparent ? 0xbafcff : 0xf15f5f,
       roughness: 0.36,
       metalness: 0.22,
-      transparent: ghost,
-      opacity: ghost ? 0.4 : 1
+      transparent,
+      opacity: transparent ? 0.4 : 1,
+      emissive: 0x000000,
+      emissiveIntensity: 0
     });
 
     for (let i = 0; i < BRICK_W; i++) {
       for (let j = 0; j < BRICK_D; j++) {
-        const s = new THREE.Mesh(studTopGeo, studTopMat);
+        const s = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 0.1, 18), studTopMat);
         s.position.set(-BRICK_W / 2 + i + 0.5, 0.63, -BRICK_D / 2 + j + 0.5);
+        s.userData.pickable = true;
+        pickables.push(s);
         group.add(s);
       }
     }
 
+    group.userData = { bodyMat, studTopMat, pickables };
     return group;
   }
 
   const brick = makeBrick(0xd22f2f, false);
-  const ghostBrick = makeBrick(0x3effd2, true);
-  ghostBrick.visible = false;
   scene.add(brick);
+
+  const ghostBrick = makeBrick(0x49d2ff, true);
+  ghostBrick.visible = false;
   scene.add(ghostBrick);
 
   const pointer = new THREE.Mesh(
     new THREE.SphereGeometry(0.16, 18, 18),
-    new THREE.MeshStandardMaterial({ color: 0x00ffd5, emissive: 0x005a50, roughness: 0.3, metalness: 0.2 })
+    new THREE.MeshStandardMaterial({ color: 0x49d2ff, emissive: 0x0c4b64, roughness: 0.3, metalness: 0.2 })
   );
   pointer.visible = false;
   scene.add(pointer);
 
+  // Selection visual hierarchy
+  const hoverOutline = new THREE.LineSegments(
+    new THREE.EdgesGeometry(new THREE.BoxGeometry(BRICK_W * 1.03, 0.62, BRICK_D * 1.03)),
+    new THREE.LineBasicMaterial({ color: 0x89e5ff, transparent: true, opacity: 0.45 })
+  );
+  hoverOutline.position.y = 0.31;
+  hoverOutline.visible = false;
+  brick.add(hoverOutline);
+
+  const selectedOutline = new THREE.LineSegments(
+    new THREE.EdgesGeometry(new THREE.BoxGeometry(BRICK_W * 1.06, 0.66, BRICK_D * 1.06)),
+    new THREE.LineBasicMaterial({ color: 0x49d2ff, transparent: true, opacity: 1 })
+  );
+  selectedOutline.position.y = 0.31;
+  selectedOutline.visible = false;
+  brick.add(selectedOutline);
+
+  const gizmo = new THREE.AxesHelper(1.7);
+  gizmo.position.set(0, 0.95, 0);
+  gizmo.visible = false;
+  brick.add(gizmo);
+
   function clamp(v, lo, hi) {
     return Math.max(lo, Math.min(hi, v));
+  }
+
+  function dist2(a, b) {
+    return Math.hypot(a.x - b.x, a.y - b.y);
+  }
+
+  function toScreen(p, w, h) {
+    return { x: (1 - p.x) * w, y: p.y * h };
   }
 
   function cornerToWorld(i, j) {
@@ -324,37 +369,95 @@
     };
   }
 
-  function worldToCorner(x, z) {
-    const i = clamp(Math.round(x + GRID_COLS * 0.5 - BRICK_W * 0.5), 0, GRID_COLS - BRICK_W);
-    const j = clamp(Math.round(z + GRID_ROWS * 0.5 - BRICK_D * 0.5), 0, GRID_ROWS - BRICK_D);
-    return { i, j };
+  function worldToCornerRaw(x, z) {
+    return {
+      i: Math.round(x + GRID_COLS * 0.5 - BRICK_W * 0.5),
+      j: Math.round(z + GRID_ROWS * 0.5 - BRICK_D * 0.5)
+    };
+  }
+
+  function isValidCorner(i, j) {
+    return i >= 0 && i <= GRID_COLS - BRICK_W && j >= 0 && j <= GRID_ROWS - BRICK_D;
+  }
+
+  function worldToCornerClamped(x, z) {
+    const raw = worldToCornerRaw(x, z);
+    return {
+      i: clamp(raw.i, 0, GRID_COLS - BRICK_W),
+      j: clamp(raw.j, 0, GRID_ROWS - BRICK_D)
+    };
   }
 
   function applyBrickTransform() {
     const p = cornerToWorld(state.brickCornerI, state.brickCornerJ);
-    brick.position.set(p.x, state.grabbed ? 0.95 : 0, p.z);
+    brick.position.set(p.x, 0, p.z);
   }
 
-  applyBrickTransform();
-
-  function pointInsideBrickXZ(worldPoint) {
-    const c = cornerToWorld(state.brickCornerI, state.brickCornerJ);
-    const tol = 0.45;
-    return Math.abs(worldPoint.x - c.x) <= BRICK_W * 0.5 + tol &&
-           Math.abs(worldPoint.z - c.z) <= BRICK_D * 0.5 + tol;
+  function setGhostColor(valid) {
+    const bodyMat = ghostBrick.userData.bodyMat;
+    const studMat = ghostBrick.userData.studTopMat;
+    if (valid) {
+      bodyMat.color.setHex(0x49d2ff);
+      studMat.color.setHex(0xbafcff);
+    } else {
+      bodyMat.color.setHex(0xff6159);
+      studMat.color.setHex(0xffb8b3);
+    }
   }
 
-  function dist2(a, b) {
-    const dx = a.x - b.x;
-    const dy = a.y - b.y;
-    return Math.hypot(dx, dy);
+  function updateSelectionVisuals() {
+    hoverOutline.visible = state.hovered && !state.selected;
+    selectedOutline.visible = state.selected;
+    gizmo.visible = state.selected;
+
+    const boost = state.selected ? 0.12 : state.hovered ? 0.06 : 0;
+    brick.userData.bodyMat.emissive.setHex(0x4a88aa);
+    brick.userData.bodyMat.emissiveIntensity = boost;
+    brick.userData.studTopMat.emissive.setHex(0x74d6ff);
+    brick.userData.studTopMat.emissiveIntensity = boost * 0.9;
   }
 
-  function toScreen(p, w, h) {
-    return { x: (1 - p.x) * w, y: p.y * h };
+  function updatePointerAndPlaneHit() {
+    raycaster.setFromCamera(state.pointerNDC, camera);
+
+    const world = new THREE.Vector3();
+    const ok = raycaster.ray.intersectPlane(plane, world);
+
+    state.pointerVisible = !!ok;
+    pointer.visible = !!ok;
+
+    if (!ok) return null;
+
+    state.pointerWorld.copy(world);
+    pointer.position.copy(world);
+    pointer.position.y = 0.25;
+
+    return world;
   }
 
-  function drawHandDebug(pts, w, h) {
+  function updateHoverFromPointer() {
+    raycaster.setFromCamera(state.pointerNDC, camera);
+    const hits = raycaster.intersectObjects(brick.userData.pickables, true);
+    state.hovered = hits.length > 0;
+  }
+
+  function updateDragTarget(world) {
+    const raw = worldToCornerRaw(world.x, world.z);
+    state.validPlacement = isValidCorner(raw.i, raw.j);
+
+    const corner = state.validPlacement ? raw : worldToCornerClamped(world.x, world.z);
+    state.targetCornerI = corner.i;
+    state.targetCornerJ = corner.j;
+
+    const p = cornerToWorld(corner.i, corner.j);
+    ghostBrick.position.set(p.x, 0.01, p.z);
+    ghostBrick.visible = true;
+    setGhostColor(state.validPlacement);
+  }
+
+  function drawHandDebug(pts, w, h, cursor) {
+    octx.clearRect(0, 0, w, h);
+
     octx.lineCap = "round";
     octx.lineJoin = "round";
     octx.strokeStyle = "rgba(255,212,0,0.85)";
@@ -371,11 +474,18 @@
 
     pts.forEach((p, i) => {
       const s = toScreen(p, w, h);
-      octx.fillStyle = i === 4 || i === 8 ? "#00ffd5" : "#ff5ca8";
+      octx.fillStyle = i === 4 || i === 8 ? "#49d2ff" : "#ff5ca8";
       octx.beginPath();
       octx.arc(s.x, s.y, i === 4 || i === 8 ? 4 : 2.3, 0, Math.PI * 2);
       octx.fill();
     });
+
+    const c = toScreen(cursor, w, h);
+    octx.strokeStyle = state.pinchDown ? "#49d2ff" : "#ffffff";
+    octx.lineWidth = 3;
+    octx.beginPath();
+    octx.arc(c.x, c.y, 14, 0, Math.PI * 2);
+    octx.stroke();
   }
 
   async function initAI() {
@@ -404,7 +514,6 @@
 
   async function startCamera() {
     btnMain.style.opacity = "0";
-
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
@@ -427,38 +536,33 @@
 
   function updateFromHand() {
     if (!state.handLandmarker || !video.videoWidth) return;
-
     if (video.currentTime === state.lastVideoTime) return;
     state.lastVideoTime = video.currentTime;
 
-    const t = performance.now();
-    const results = state.handLandmarker.detectForVideo(video, t);
-
-    state.hasHand = false;
-    state.pointerVisible = false;
-    state.hoveredBrick = false;
-
-    octx.clearRect(0, 0, overlay.width, overlay.height);
+    const results = state.handLandmarker.detectForVideo(video, performance.now());
 
     if (!results.landmarks?.length) {
+      state.hasHand = false;
+      state.handLabel = "-";
+      state.hovered = false;
+      state.selected = false;
       state.pinchDown = false;
-      if (state.grabbed) {
-        state.grabbed = false;
-        state.brickCornerI = state.targetCornerI;
-        state.brickCornerJ = state.targetCornerJ;
+      state.pointerVisible = false;
+      pointer.visible = false;
+      if (state.dragging) {
+        state.dragging = false;
+        ghostBrick.visible = false;
+        canvas.classList.remove("dragging");
       }
-      ghostBrick.visible = false;
+      octx.clearRect(0, 0, overlay.width, overlay.height);
+      updateSelectionVisuals();
       return;
     }
 
     const pts = results.landmarks[0];
-    const handed = results.handedness?.[0]?.[0]?.categoryName || "Unknown";
-    state.handLabel = handed;
+    state.handLabel = results.handedness?.[0]?.[0]?.categoryName || "Unknown";
     state.hasHand = true;
 
-    drawHandDebug(pts, overlay.width, overlay.height);
-
-    // Pinch estimate normalized by palm width
     const pinch = dist2(pts[4], pts[8]);
     const palm = Math.max(0.0001, dist2(pts[5], pts[17]));
     const pinchNorm = pinch / palm;
@@ -466,91 +570,85 @@
 
     const pinchOn = pinchNorm < 0.43;
     const pinchOff = pinchNorm > 0.58;
+    const prevPinch = state.pinchDown;
     if (!state.pinchDown && pinchOn) state.pinchDown = true;
     else if (state.pinchDown && pinchOff) state.pinchDown = false;
 
-    // Use pinch midpoint as cursor
+    const pinchStarted = !prevPinch && state.pinchDown;
+    const pinchEnded = prevPinch && !state.pinchDown;
+
     const cursor = {
       x: (pts[4].x + pts[8].x) * 0.5,
       y: (pts[4].y + pts[8].y) * 0.5
     };
 
-    const ndc = new THREE.Vector2((1 - cursor.x) * 2 - 1, 1 - cursor.y * 2);
-    raycaster.setFromCamera(ndc, camera);
-    const worldPoint = new THREE.Vector3();
-    const ok = raycaster.ray.intersectPlane(plane, worldPoint);
+    // mirror X to match mirrored webcam UX
+    state.pointerNDC.set((1 - cursor.x) * 2 - 1, 1 - cursor.y * 2);
 
-    if (ok) {
-      state.pointerWorld.copy(worldPoint);
-      state.pointerVisible = true;
-      pointer.visible = true;
-      pointer.position.copy(worldPoint);
-      pointer.position.y = 0.25;
+    const world = updatePointerAndPlaneHit();
+    state.hovered = false;
+    if (world) updateHoverFromPointer();
 
-      const target = worldToCorner(worldPoint.x, worldPoint.z);
-      state.targetCornerI = target.i;
-      state.targetCornerJ = target.j;
-      state.hoveredBrick = pointInsideBrickXZ(worldPoint);
-
-      const startedGrab = state.pinchDown && !state.grabbed && state.hoveredBrick;
-      if (startedGrab) state.grabbed = true;
-
-      if (state.grabbed) {
-        const p = cornerToWorld(state.targetCornerI, state.targetCornerJ);
-        brick.position.set(p.x, 0.95, p.z);
+    if (pinchStarted) {
+      if (state.hovered || state.selected) {
+        state.selected = true;
+        state.dragging = true;
+        canvas.classList.add("dragging");
+      } else {
+        state.selected = false;
       }
+    }
 
-      if (!state.pinchDown && state.grabbed) {
-        state.grabbed = false;
+    if (state.dragging && world) {
+      updateDragTarget(world);
+    } else if (!state.dragging) {
+      ghostBrick.visible = false;
+      state.validPlacement = true;
+    }
+
+    if (pinchEnded) {
+      if (state.dragging && state.validPlacement) {
         state.brickCornerI = state.targetCornerI;
         state.brickCornerJ = state.targetCornerJ;
       }
-
-      if (!state.grabbed) {
-        applyBrickTransform();
-      }
-
-      ghostBrick.visible = true;
-      const g = cornerToWorld(state.targetCornerI, state.targetCornerJ);
-      ghostBrick.position.set(g.x, 0.01, g.z);
-    } else {
-      pointer.visible = false;
+      state.dragging = false;
+      state.selected = false;
       ghostBrick.visible = false;
+      canvas.classList.remove("dragging");
     }
 
-    // 2D cursor ring
-    const s = toScreen(cursor, overlay.width, overlay.height);
-    octx.strokeStyle = state.grabbed ? "#00ffd5" : "#ffffff";
-    octx.lineWidth = 3;
-    octx.beginPath();
-    octx.arc(s.x, s.y, 14, 0, Math.PI * 2);
-    octx.stroke();
+    drawHandDebug(pts, overlay.width, overlay.height, cursor);
+    updateSelectionVisuals();
   }
 
   function renderHud() {
-    const statusColor = state.grabbed ? "#00ffd5" : "#ffffff";
-    const p = cornerToWorld(state.targetCornerI, state.targetCornerJ);
+    const p = cornerToWorld(state.brickCornerI, state.brickCornerJ);
 
     hud.innerHTML = `
-      <div class="card" style="border-left-color:${statusColor}">
-        <div class="title">Grab status</div>
+      <div class="card" style="border-left-color:#49d2ff">
+        <div class="title">Hand + Selection</div>
         <div class="row"><span>Hand</span><span class="mono">${state.hasHand ? state.handLabel : "-"}</span></div>
         <div class="row"><span>Pinch</span><span class="mono">${state.pinchDown ? "DOWN" : "UP"}</span></div>
-        <div class="row"><span>Strength</span><span class="mono">${Math.round(state.pinchStrength * 100)}%</span></div>
-        <div class="row"><span>Brick</span><span class="mono">${state.grabbed ? "HELD" : "PLACED"}</span></div>
+        <div class="row"><span>Pinch strength</span><span class="mono">${Math.round(state.pinchStrength * 100)}%</span></div>
+        <div class="row"><span>Hover</span><span class="mono">${state.hovered ? "YES" : "NO"}</span></div>
+        <div class="row"><span>Selected</span><span class="mono">${state.selected ? "YES" : "NO"}</span></div>
+        <div class="row"><span>Dragging</span><span class="mono">${state.dragging ? "YES" : "NO"}</span></div>
       </div>
 
-      <div class="card" style="border-left-color:#ff7e3d">
-        <div class="title">Grid target</div>
-        <div class="row"><span>Corner I,J</span><span class="mono">${state.targetCornerI}, ${state.targetCornerJ}</span></div>
+      <div class="card" style="border-left-color:${state.validPlacement ? "#49d2ff" : "#ff6159"}">
+        <div class="title">Placement</div>
+        <div class="row"><span>Corner I,J</span><span class="mono">${state.brickCornerI}, ${state.brickCornerJ}</span></div>
         <div class="row"><span>World X,Z</span><span class="mono">${p.x.toFixed(1)}, ${p.z.toFixed(1)}</span></div>
-        <div class="row"><span>Over brick</span><span class="mono">${state.hoveredBrick ? "YES" : "NO"}</span></div>
+        <div class="row"><span>Target I,J</span><span class="mono">${state.targetCornerI}, ${state.targetCornerJ}</span></div>
+        <div class="row"><span>Valid target</span><span class="mono">${state.validPlacement ? "YES" : "NO"}</span></div>
       </div>
     `;
   }
 
   function tick() {
     updateFromHand();
+
+    applyBrickTransform();
 
     const t = performance.now() * 0.001;
     pointer.material.emissiveIntensity = state.pointerVisible ? (0.5 + Math.sin(t * 6) * 0.15) : 0;
@@ -574,6 +672,8 @@
 
   window.addEventListener("resize", resize);
   resize();
+  applyBrickTransform();
+  updateSelectionVisuals();
 
   initAI();
   tick();
