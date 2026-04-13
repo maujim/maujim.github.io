@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>LEGO Hand Grid (Three.js + MediaPipe)</title>
+  <style>
+    :root {
+      --bg: #090909;
+      --panel: rgba(18, 18, 18, 0.82);
+      --accent: #00ffd5;
+      --warn: #ff7e3d;
+    }
+
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg);
+      font-family: Inter, Segoe UI, Roboto, sans-serif;
+    }
+
+    #app {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    #three {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      background: radial-gradient(circle at 20% 0%, #1f2230 0%, #0f1119 48%, #07080c 100%);
+    }
+
+    #overlay {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    #webcam {
+      position: absolute;
+      right: 12px;
+      bottom: 12px;
+      width: min(28vw, 280px);
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      transform: scaleX(-1);
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+      background: #000;
+      z-index: 8;
+    }
+
+    #hud {
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      width: 280px;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    .card {
+      background: var(--panel);
+      color: #efefef;
+      border-left: 4px solid #fff;
+      border-radius: 0 9px 9px 0;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      padding: 8px 10px;
+      font-size: 12px;
+    }
+
+    .title {
+      font-size: 10px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 4px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+      padding-bottom: 3px;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 2px 0;
+      color: #ddd;
+    }
+
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: #fff;
+    }
+
+    #controls {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 15;
+      text-align: center;
+      width: 100%;
+      pointer-events: none;
+    }
+
+    #btn-main {
+      pointer-events: auto;
+      border: none;
+      border-radius: 999px;
+      padding: 16px 30px;
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: 0.6px;
+      color: #000;
+      background: #fff;
+      box-shadow: 0 0 24px rgba(255, 255, 255, 0.35);
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: opacity 0.2s ease;
+    }
+
+    #btn-main:disabled {
+      background: #404040;
+      color: #9d9d9d;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    #hint {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      z-index: 9;
+      font-size: 12px;
+      color: #ddd;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 8px;
+      padding: 6px 8px;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+  <canvas id="three"></canvas>
+  <canvas id="overlay"></canvas>
+  <video id="webcam" playsinline muted autoplay></video>
+
+  <div id="hud"></div>
+  <div id="hint">Pinch on the brick to pick it up. Keep pinching to move. Release to place.</div>
+
+  <div id="controls">
+    <button id="btn-main" disabled>Loading AI...</button>
+  </div>
+</div>
+
+<script type="module">
+  import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.183.2/build/three.module.js";
+  import { HandLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0";
+
+  const canvas = document.getElementById("three");
+  const overlay = document.getElementById("overlay");
+  const octx = overlay.getContext("2d");
+  const video = document.getElementById("webcam");
+  const hud = document.getElementById("hud");
+  const btnMain = document.getElementById("btn-main");
+
+  const GRID_COLS = 16;
+  const GRID_ROWS = 16;
+  const STUD = 1;
+  const BRICK_W = 2;
+  const BRICK_D = 3;
+
+  const HAND_LINKS = [
+    [0,1],[1,2],[2,3],[3,4],
+    [0,5],[5,6],[6,7],[7,8],
+    [0,9],[9,10],[10,11],[11,12],
+    [0,13],[13,14],[14,15],[15,16],
+    [0,17],[17,18],[18,19],[19,20],[5,9],[9,13],[13,17]
+  ];
+
+  const state = {
+    handLandmarker: null,
+    lastVideoTime: -1,
+    pinchDown: false,
+    pinchStrength: 0,
+    grabbed: false,
+    hasHand: false,
+    handLabel: "-",
+    pointerWorld: new THREE.Vector3(0, 0, 0),
+    pointerVisible: false,
+    hoveredBrick: false,
+    brickCornerI: 6,
+    brickCornerJ: 6,
+    targetCornerI: 6,
+    targetCornerJ: 6
+  };
+
+  // --- Three.js scene ---
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+
+  const scene = new THREE.Scene();
+  scene.fog = new THREE.Fog(0x0a0e14, 14, 40);
+
+  const camera = new THREE.PerspectiveCamera(46, window.innerWidth / window.innerHeight, 0.1, 120);
+  camera.position.set(0, 14, 13);
+  camera.lookAt(0, 0, 0);
+
+  scene.add(new THREE.HemisphereLight(0xbfd5ff, 0x202020, 0.95));
+
+  const dir = new THREE.DirectionalLight(0xffffff, 1.1);
+  dir.position.set(8, 18, 6);
+  scene.add(dir);
+
+  const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+  const raycaster = new THREE.Raycaster();
+
+  const floor = new THREE.Mesh(
+    new THREE.BoxGeometry(GRID_COLS * STUD + 0.4, 0.22, GRID_ROWS * STUD + 0.4),
+    new THREE.MeshStandardMaterial({ color: 0x243042, roughness: 0.86, metalness: 0.06 })
+  );
+  floor.position.y = -0.12;
+  scene.add(floor);
+
+  // Baseplate studs (instanced)
+  const studGeo = new THREE.CylinderGeometry(0.23, 0.23, 0.1, 18);
+  const studMat = new THREE.MeshStandardMaterial({ color: 0x2f3f56, roughness: 0.7, metalness: 0.12 });
+  const studCount = GRID_COLS * GRID_ROWS;
+  const studs = new THREE.InstancedMesh(studGeo, studMat, studCount);
+  let idx = 0;
+  const temp = new THREE.Object3D();
+  for (let i = 0; i < GRID_COLS; i++) {
+    for (let j = 0; j < GRID_ROWS; j++) {
+      temp.position.set(
+        -GRID_COLS * 0.5 + i + 0.5,
+        0.05,
+        -GRID_ROWS * 0.5 + j + 0.5
+      );
+      temp.updateMatrix();
+      studs.setMatrixAt(idx++, temp.matrix);
+    }
+  }
+  scene.add(studs);
+
+  const gridHelper = new THREE.GridHelper(GRID_COLS, GRID_COLS, 0x34445e, 0x2a3550);
+  gridHelper.position.y = 0.001;
+  scene.add(gridHelper);
+
+  function makeBrick(color = 0xdf3131, ghost = false) {
+    const group = new THREE.Group();
+
+    const body = new THREE.Mesh(
+      new THREE.BoxGeometry(BRICK_W * STUD, 0.58, BRICK_D * STUD),
+      new THREE.MeshStandardMaterial({
+        color,
+        roughness: ghost ? 0.35 : 0.42,
+        metalness: ghost ? 0.1 : 0.16,
+        transparent: ghost,
+        opacity: ghost ? 0.35 : 1
+      })
+    );
+    body.position.y = 0.29;
+    group.add(body);
+
+    const studTopGeo = new THREE.CylinderGeometry(0.22, 0.22, 0.1, 18);
+    const studTopMat = new THREE.MeshStandardMaterial({
+      color: ghost ? 0x8bffec : 0xf15f5f,
+      roughness: 0.36,
+      metalness: 0.22,
+      transparent: ghost,
+      opacity: ghost ? 0.4 : 1
+    });
+
+    for (let i = 0; i < BRICK_W; i++) {
+      for (let j = 0; j < BRICK_D; j++) {
+        const s = new THREE.Mesh(studTopGeo, studTopMat);
+        s.position.set(-BRICK_W / 2 + i + 0.5, 0.63, -BRICK_D / 2 + j + 0.5);
+        group.add(s);
+      }
+    }
+
+    return group;
+  }
+
+  const brick = makeBrick(0xd22f2f, false);
+  const ghostBrick = makeBrick(0x3effd2, true);
+  ghostBrick.visible = false;
+  scene.add(brick);
+  scene.add(ghostBrick);
+
+  const pointer = new THREE.Mesh(
+    new THREE.SphereGeometry(0.16, 18, 18),
+    new THREE.MeshStandardMaterial({ color: 0x00ffd5, emissive: 0x005a50, roughness: 0.3, metalness: 0.2 })
+  );
+  pointer.visible = false;
+  scene.add(pointer);
+
+  function clamp(v, lo, hi) {
+    return Math.max(lo, Math.min(hi, v));
+  }
+
+  function cornerToWorld(i, j) {
+    return {
+      x: -GRID_COLS * 0.5 + i + BRICK_W * 0.5,
+      z: -GRID_ROWS * 0.5 + j + BRICK_D * 0.5
+    };
+  }
+
+  function worldToCorner(x, z) {
+    const i = clamp(Math.round(x + GRID_COLS * 0.5 - BRICK_W * 0.5), 0, GRID_COLS - BRICK_W);
+    const j = clamp(Math.round(z + GRID_ROWS * 0.5 - BRICK_D * 0.5), 0, GRID_ROWS - BRICK_D);
+    return { i, j };
+  }
+
+  function applyBrickTransform() {
+    const p = cornerToWorld(state.brickCornerI, state.brickCornerJ);
+    brick.position.set(p.x, state.grabbed ? 0.95 : 0, p.z);
+  }
+
+  applyBrickTransform();
+
+  function pointInsideBrickXZ(worldPoint) {
+    const c = cornerToWorld(state.brickCornerI, state.brickCornerJ);
+    const tol = 0.45;
+    return Math.abs(worldPoint.x - c.x) <= BRICK_W * 0.5 + tol &&
+           Math.abs(worldPoint.z - c.z) <= BRICK_D * 0.5 + tol;
+  }
+
+  function dist2(a, b) {
+    const dx = a.x - b.x;
+    const dy = a.y - b.y;
+    return Math.hypot(dx, dy);
+  }
+
+  function toScreen(p, w, h) {
+    return { x: (1 - p.x) * w, y: p.y * h };
+  }
+
+  function drawHandDebug(pts, w, h) {
+    octx.lineCap = "round";
+    octx.lineJoin = "round";
+    octx.strokeStyle = "rgba(255,212,0,0.85)";
+    octx.lineWidth = 2;
+
+    HAND_LINKS.forEach(([a, b]) => {
+      const p1 = toScreen(pts[a], w, h);
+      const p2 = toScreen(pts[b], w, h);
+      octx.beginPath();
+      octx.moveTo(p1.x, p1.y);
+      octx.lineTo(p2.x, p2.y);
+      octx.stroke();
+    });
+
+    pts.forEach((p, i) => {
+      const s = toScreen(p, w, h);
+      octx.fillStyle = i === 4 || i === 8 ? "#00ffd5" : "#ff5ca8";
+      octx.beginPath();
+      octx.arc(s.x, s.y, i === 4 || i === 8 ? 4 : 2.3, 0, Math.PI * 2);
+      octx.fill();
+    });
+  }
+
+  async function initAI() {
+    try {
+      const vision = await FilesetResolver.forVisionTasks(
+        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm"
+      );
+
+      state.handLandmarker = await HandLandmarker.createFromOptions(vision, {
+        baseOptions: {
+          modelAssetPath: "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task",
+          delegate: "GPU"
+        },
+        runningMode: "VIDEO",
+        numHands: 1
+      });
+
+      btnMain.textContent = "Start Camera";
+      btnMain.disabled = false;
+      btnMain.addEventListener("click", startCamera);
+    } catch (err) {
+      console.error(err);
+      btnMain.textContent = "AI Load Error";
+    }
+  }
+
+  async function startCamera() {
+    btnMain.style.opacity = "0";
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: "user",
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        }
+      });
+
+      video.srcObject = stream;
+      video.addEventListener("loadeddata", () => {
+        document.getElementById("controls").style.display = "none";
+      }, { once: true });
+    } catch (err) {
+      console.error(err);
+      btnMain.style.opacity = "1";
+      btnMain.textContent = "Camera Denied";
+    }
+  }
+
+  function updateFromHand() {
+    if (!state.handLandmarker || !video.videoWidth) return;
+
+    if (video.currentTime === state.lastVideoTime) return;
+    state.lastVideoTime = video.currentTime;
+
+    const t = performance.now();
+    const results = state.handLandmarker.detectForVideo(video, t);
+
+    state.hasHand = false;
+    state.pointerVisible = false;
+    state.hoveredBrick = false;
+
+    octx.clearRect(0, 0, overlay.width, overlay.height);
+
+    if (!results.landmarks?.length) {
+      state.pinchDown = false;
+      if (state.grabbed) {
+        state.grabbed = false;
+        state.brickCornerI = state.targetCornerI;
+        state.brickCornerJ = state.targetCornerJ;
+      }
+      ghostBrick.visible = false;
+      return;
+    }
+
+    const pts = results.landmarks[0];
+    const handed = results.handedness?.[0]?.[0]?.categoryName || "Unknown";
+    state.handLabel = handed;
+    state.hasHand = true;
+
+    drawHandDebug(pts, overlay.width, overlay.height);
+
+    // Pinch estimate normalized by palm width
+    const pinch = dist2(pts[4], pts[8]);
+    const palm = Math.max(0.0001, dist2(pts[5], pts[17]));
+    const pinchNorm = pinch / palm;
+    state.pinchStrength = clamp(1 - (pinchNorm - 0.25) / 0.55, 0, 1);
+
+    const pinchOn = pinchNorm < 0.43;
+    const pinchOff = pinchNorm > 0.58;
+    if (!state.pinchDown && pinchOn) state.pinchDown = true;
+    else if (state.pinchDown && pinchOff) state.pinchDown = false;
+
+    // Use pinch midpoint as cursor
+    const cursor = {
+      x: (pts[4].x + pts[8].x) * 0.5,
+      y: (pts[4].y + pts[8].y) * 0.5
+    };
+
+    const ndc = new THREE.Vector2((1 - cursor.x) * 2 - 1, 1 - cursor.y * 2);
+    raycaster.setFromCamera(ndc, camera);
+    const worldPoint = new THREE.Vector3();
+    const ok = raycaster.ray.intersectPlane(plane, worldPoint);
+
+    if (ok) {
+      state.pointerWorld.copy(worldPoint);
+      state.pointerVisible = true;
+      pointer.visible = true;
+      pointer.position.copy(worldPoint);
+      pointer.position.y = 0.25;
+
+      const target = worldToCorner(worldPoint.x, worldPoint.z);
+      state.targetCornerI = target.i;
+      state.targetCornerJ = target.j;
+      state.hoveredBrick = pointInsideBrickXZ(worldPoint);
+
+      const startedGrab = state.pinchDown && !state.grabbed && state.hoveredBrick;
+      if (startedGrab) state.grabbed = true;
+
+      if (state.grabbed) {
+        const p = cornerToWorld(state.targetCornerI, state.targetCornerJ);
+        brick.position.set(p.x, 0.95, p.z);
+      }
+
+      if (!state.pinchDown && state.grabbed) {
+        state.grabbed = false;
+        state.brickCornerI = state.targetCornerI;
+        state.brickCornerJ = state.targetCornerJ;
+      }
+
+      if (!state.grabbed) {
+        applyBrickTransform();
+      }
+
+      ghostBrick.visible = true;
+      const g = cornerToWorld(state.targetCornerI, state.targetCornerJ);
+      ghostBrick.position.set(g.x, 0.01, g.z);
+    } else {
+      pointer.visible = false;
+      ghostBrick.visible = false;
+    }
+
+    // 2D cursor ring
+    const s = toScreen(cursor, overlay.width, overlay.height);
+    octx.strokeStyle = state.grabbed ? "#00ffd5" : "#ffffff";
+    octx.lineWidth = 3;
+    octx.beginPath();
+    octx.arc(s.x, s.y, 14, 0, Math.PI * 2);
+    octx.stroke();
+  }
+
+  function renderHud() {
+    const statusColor = state.grabbed ? "#00ffd5" : "#ffffff";
+    const p = cornerToWorld(state.targetCornerI, state.targetCornerJ);
+
+    hud.innerHTML = `
+      <div class="card" style="border-left-color:${statusColor}">
+        <div class="title">Grab status</div>
+        <div class="row"><span>Hand</span><span class="mono">${state.hasHand ? state.handLabel : "-"}</span></div>
+        <div class="row"><span>Pinch</span><span class="mono">${state.pinchDown ? "DOWN" : "UP"}</span></div>
+        <div class="row"><span>Strength</span><span class="mono">${Math.round(state.pinchStrength * 100)}%</span></div>
+        <div class="row"><span>Brick</span><span class="mono">${state.grabbed ? "HELD" : "PLACED"}</span></div>
+      </div>
+
+      <div class="card" style="border-left-color:#ff7e3d">
+        <div class="title">Grid target</div>
+        <div class="row"><span>Corner I,J</span><span class="mono">${state.targetCornerI}, ${state.targetCornerJ}</span></div>
+        <div class="row"><span>World X,Z</span><span class="mono">${p.x.toFixed(1)}, ${p.z.toFixed(1)}</span></div>
+        <div class="row"><span>Over brick</span><span class="mono">${state.hoveredBrick ? "YES" : "NO"}</span></div>
+      </div>
+    `;
+  }
+
+  function tick() {
+    updateFromHand();
+
+    const t = performance.now() * 0.001;
+    pointer.material.emissiveIntensity = state.pointerVisible ? (0.5 + Math.sin(t * 6) * 0.15) : 0;
+
+    renderHud();
+    renderer.render(scene, camera);
+    requestAnimationFrame(tick);
+  }
+
+  function resize() {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+
+    renderer.setSize(w, h);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+
+    overlay.width = w;
+    overlay.height = h;
+  }
+
+  window.addEventListener("resize", resize);
+  resize();
+
+  initAI();
+  tick();
+</script>
+</body>
+</html>
