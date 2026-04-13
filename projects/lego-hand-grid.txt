@@ -1,0 +1,187 @@
+# lego-hand-grid.txt
+
+Purpose: **human/model-friendly architecture notes** for `projects/lego-hand-grid.html`.
+
+This is a summary doc, not a code mirror.
+
+---
+
+## 0) What this page does
+
+`lego-hand-grid.html` is a **Three.js + MediaPipe HandLandmarker** prototype where:
+- a single 2x3 LEGO brick sits on a stud grid,
+- hand pinch acts like click+drag,
+- selection uses editor-style visual hierarchy:
+  - hover = faint outline
+  - selected = stronger outline + subtle tint + gizmo
+  - dragging = ghost preview
+  - invalid placement = red ghost preview
+
+---
+
+## 1) High-level structure in HTML
+
+Main DOM elements:
+- `#three` → Three.js render canvas
+- `#overlay` → 2D debug canvas for hand landmark drawing/cursor ring
+- `#webcam` → mirrored camera preview
+- `#hud` → status/debug cards
+- `#controls > #btn-main` → start camera gate after model load
+
+---
+
+## 2) Main runtime state (`state` object)
+
+Core fields:
+- AI/camera:
+  - `handLandmarker`, `lastVideoTime`, `hasHand`, `handLabel`
+- pinch:
+  - `pinchDown`, `pinchStrength`
+- editor selection:
+  - `hovered`, `selected`, `dragging`
+- pointer/raycast:
+  - `pointerNDC`, `pointerWorld`, `pointerVisible`
+- placement:
+  - `brickCornerI/J` (committed placement)
+  - `targetCornerI/J` (candidate while dragging)
+  - `validPlacement`
+
+---
+
+## 3) Scene objects (Three.js)
+
+Created once at startup:
+- base scene: renderer, scene, camera, fog, lights
+- floor/baseplate + instanced studs + grid helper
+- `brick` (actual 2x3 brick)
+- `ghostBrick` (transparent preview during drag)
+- `pointer` (small sphere at hand cursor projected onto plane)
+- selection visuals attached to `brick`:
+  - `hoverOutline`
+  - `selectedOutline`
+  - `gizmo` (AxesHelper)
+
+---
+
+## 4) Coordinate + placement helpers
+
+Key helpers:
+- `cornerToWorld(i, j)`
+  - grid corner index → world X/Z brick center position
+- `worldToCornerRaw(x, z)`
+  - world X/Z → nearest grid corner index (unclamped)
+- `isValidCorner(i, j)`
+  - checks footprint bounds for 2x3 brick
+- `worldToCornerClamped(x, z)`
+  - safe in-bounds fallback for preview
+- `setGhostColor(valid)`
+  - cyan when valid, red when invalid
+
+---
+
+## 5) Selection visuals behavior
+
+`updateSelectionVisuals()` controls hierarchy:
+- hover only: show faint outline
+- selected: show strong outline + gizmo
+- both states also drive subtle emissive tint on brick materials
+
+Design intent: outline is the primary cue; tint is secondary support.
+
+---
+
+## 6) Hand input pipeline
+
+Main loop in `updateFromHand()`:
+1. skip if no new video frame (`video.currentTime` guard)
+2. run `detectForVideo(...)`
+3. if no hand:
+   - clear hand state
+   - stop dragging if needed
+   - hide pointer/ghost
+4. if hand exists:
+   - compute pinch metric: `dist(thumbTip,indexTip) / dist(indexMCP,pinkyMCP)`
+   - hysteresis thresholds:
+     - pinch on: `< 0.43`
+     - pinch off: `> 0.58`
+   - cursor = midpoint(thumbTip, indexTip)
+   - convert cursor to NDC (mirrored x)
+   - raycast to ground plane
+   - update hover from raycast against brick pickable meshes
+
+Pinch edge events:
+- pinch start:
+  - if hovered or already selected → select + start dragging
+  - else deselect
+- while dragging + plane hit:
+  - update target corner, preview ghost, validity color
+- pinch end:
+  - if dragging and valid → commit placement
+  - always clear selection (selected = false)
+  - stop dragging + hide ghost
+
+---
+
+## 7) Rendering loop
+
+`tick()` runs continuously:
+- `updateFromHand()`
+- `applyBrickTransform()` (uses committed corner)
+- pointer emissive pulse when visible
+- `renderHud()`
+- `renderer.render(scene, camera)`
+
+---
+
+## 8) HUD contents
+
+Two cards:
+1. Hand + Selection
+   - hand label, pinch state/strength, hover/selected/dragging
+2. Placement
+   - committed corner, world coords, target corner, validity
+
+---
+
+## 9) Function map (quick navigation)
+
+Use these names when patching:
+- scene/material creation: `makeBrick(...)`
+- visual hierarchy: `updateSelectionVisuals()`
+- pointer projection: `updatePointerAndPlaneHit()`
+- hover detection: `updateHoverFromPointer()`
+- drag targeting: `updateDragTarget(world)`
+- hand pipeline/state machine: `updateFromHand()`
+- HUD text: `renderHud()`
+
+---
+
+## 10) Common edits you’ll likely do next
+
+- Reduce jitter:
+  - add smoothing for cursor world pos
+  - require pinch hold N ms before drag start
+- Better placement rules:
+  - add collision system once multi-brick exists
+- Better affordances:
+  - add rotation gesture/button
+  - add multi-select color/group box
+- Performance pass:
+  - lower detect cadence (e.g., every Nth frame)
+  - decouple hand detect FPS from render FPS
+
+---
+
+## 11) Important constants to tune
+
+- Pinch hysteresis: `0.43 / 0.58`
+- Grid size: `GRID_COLS`, `GRID_ROWS`
+- Brick footprint: `BRICK_W`, `BRICK_D`
+- Outline opacity/colors for hover/selected
+- Ghost colors for valid/invalid placement
+
+---
+
+## 12) Editing rule for future models
+
+When changing behavior, prefer **targeted edits by function** instead of rewriting the entire HTML file.
