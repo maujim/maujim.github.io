@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Hand Inspector Modes</title>
+    <style>
+        :root {
+            --bg: #050505;
+            --panel: rgba(20, 20, 20, 0.9);
+            --panel-soft: rgba(20, 20, 20, 0.75);
+            --accent: #00ffe0;
+            --accent2: #ff4fcb;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg);
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #viewport {
+            position: relative;
+            flex-grow: 1;
+            width: 100%;
+            background: #000;
+        }
+
+        video {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+        }
+
+        canvas {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        #hud {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 290px;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 20;
+        }
+
+        .card {
+            background: var(--panel);
+            border-left: 4px solid #fff;
+            padding: 8px;
+            border-radius: 0 8px 8px 0;
+            backdrop-filter: blur(4px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.5);
+        }
+
+        .title {
+            color: white;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            border-bottom: 1px solid #444;
+            padding-bottom: 2px;
+            letter-spacing: 1px;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #ddd;
+            font-size: 11px;
+            margin-bottom: 3px;
+            gap: 12px;
+        }
+
+        .mono {
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        }
+
+        #mode-picker {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 250px;
+            max-height: 230px;
+            display: flex;
+            flex-direction: column;
+            background: var(--panel-soft);
+            border: 1px solid rgba(255,255,255,0.14);
+            border-radius: 10px;
+            overflow: hidden;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.45);
+            z-index: 30;
+            pointer-events: auto;
+        }
+
+        #mode-title {
+            font-size: 11px;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 8px 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.12);
+            background: rgba(0,0,0,0.25);
+        }
+
+        #mode-list {
+            overflow-y: auto;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .mode-btn {
+            border: 1px solid rgba(255,255,255,0.16);
+            border-radius: 7px;
+            background: rgba(255,255,255,0.04);
+            color: #e6e6e6;
+            padding: 7px 9px;
+            text-align: left;
+            font-size: 11px;
+            cursor: pointer;
+            transition: background 0.14s, border-color 0.14s;
+        }
+
+        .mode-btn:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .mode-btn.active {
+            border-color: var(--accent);
+            background: rgba(0,255,224,0.14);
+            color: #fff;
+        }
+
+        #controls {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 50;
+            width: 100%;
+            text-align: center;
+        }
+
+        button#btn-main {
+            padding: 18px 36px;
+            font-size: 16px;
+            font-weight: 800;
+            background: white;
+            color: black;
+            border: none;
+            cursor: pointer;
+            border-radius: 50px;
+            box-shadow: 0 0 25px rgba(255,255,255,0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: opacity 0.3s;
+        }
+
+        button#btn-main:disabled {
+            background: #444;
+            color: #888;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+    </style>
+</head>
+<body>
+<div id="viewport">
+    <video id="webcam" playsinline muted autoplay></video>
+    <canvas id="output_canvas"></canvas>
+
+    <div id="hud"></div>
+
+    <div id="mode-picker">
+        <div id="mode-title">Overlay Modes</div>
+        <div id="mode-list"></div>
+    </div>
+
+    <div id="controls">
+        <button id="btn-main" disabled>Loading AI...</button>
+    </div>
+</div>
+
+<script type="module">
+    import { HandLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0";
+
+    const video = document.getElementById("webcam");
+    const canvas = document.getElementById("output_canvas");
+    const ctx = canvas.getContext("2d");
+    const hud = document.getElementById("hud");
+    const btnMain = document.getElementById("btn-main");
+    const modeList = document.getElementById("mode-list");
+
+    let handLandmarker;
+    let lastVideoTime = -1;
+
+    const tracks = new Map();
+
+    const MODES = [
+        { id: "skeleton", label: "0) Skeleton Debug" },
+        { id: "static", label: "1) Static hand-shapes" },
+        { id: "fingers", label: "2) Finger-state detectors" },
+        { id: "orientation", label: "3) Palm orientation" },
+        { id: "position", label: "4) Hand position zones" },
+        { id: "motion", label: "5) Motion detectors" },
+        { id: "twohand", label: "6) Two-hand relation" },
+        { id: "contact", label: "7) Contact / proximity" },
+        { id: "analog", label: "8) Analog controls" },
+        { id: "sequence", label: "9) Gesture sequences" },
+        { id: "all", label: "10) All overlays" }
+    ];
+
+    let activeMode = "static";
+
+    const F = {
+        thumb: { name: "THUMB", mcp: 1, pip: 2, dip: 3, tip: 4, chain: [0,1,2,3,4] },
+        index: { name: "INDEX", mcp: 5, pip: 6, dip: 7, tip: 8, chain: [0,5,6,7,8] },
+        middle:{ name: "MIDDLE",mcp: 9, pip:10, dip:11, tip:12, chain: [0,9,10,11,12] },
+        ring:  { name: "RING",  mcp:13, pip:14, dip:15, tip:16, chain: [0,13,14,15,16] },
+        pinky: { name: "PINKY", mcp:17, pip:18, dip:19, tip:20, chain: [0,17,18,19,20] }
+    };
+
+    const HAND_SKELETON = [
+        F.thumb.chain, F.index.chain, F.middle.chain, F.ring.chain, F.pinky.chain, [5,9,13,17]
+    ];
+
+    function renderModeButtons() {
+        modeList.innerHTML = MODES.map((m) => `
+            <button class="mode-btn ${m.id === activeMode ? "active" : ""}" data-mode="${m.id}">${m.label}</button>
+        `).join("");
+    }
+
+    modeList.addEventListener("click", (e) => {
+        const btn = e.target.closest(".mode-btn");
+        if (!btn) return;
+        activeMode = btn.dataset.mode;
+        renderModeButtons();
+    });
+
+    function clamp(v, lo, hi) {
+        return Math.max(lo, Math.min(hi, v));
+    }
+
+    function distXY(a, b, w, h) {
+        const dx = (a.x - b.x) * w;
+        const dy = (a.y - b.y) * h;
+        return Math.hypot(dx, dy);
+    }
+
+    function dist(pts, i, j, w, h) {
+        return distXY(pts[i], pts[j], w, h);
+    }
+
+    function angleABC(a, b, c) {
+        const abx = a.x - b.x, aby = a.y - b.y;
+        const cbx = c.x - b.x, cby = c.y - b.y;
+        const dot = abx * cbx + aby * cby;
+        const m1 = Math.hypot(abx, aby);
+        const m2 = Math.hypot(cbx, cby);
+        if (!m1 || !m2) return 0;
+        const cos = clamp(dot / (m1 * m2), -1, 1);
+        return Math.acos(cos) * 180 / Math.PI;
+    }
+
+    function palmCenter(pts, w, h) {
+        const idx = [0, 5, 9, 13, 17];
+        let sx = 0, sy = 0;
+        idx.forEach((i) => {
+            sx += pts[i].x * w;
+            sy += pts[i].y * h;
+        });
+        return { x: sx / idx.length, y: sy / idx.length };
+    }
+
+    function toScreen(p, w, h) {
+        return { x: (1 - p.x) * w, y: p.y * h };
+    }
+
+    function centerToScreen(center) {
+        return { x: canvas.width - center.x, y: center.y };
+    }
+
+    function fingerExtended(pts, finger, w, h) {
+        const wrist = pts[0];
+        const f = F[finger];
+        const tipD = distXY(wrist, pts[f.tip], w, h);
+        const pipD = distXY(wrist, pts[f.pip], w, h);
+        const mcpD = distXY(wrist, pts[f.mcp], w, h);
+        const bend = angleABC(pts[f.mcp], pts[f.pip], pts[f.tip]);
+        const bendThresh = finger === "thumb" ? 145 : 155;
+        return tipD > pipD * 1.08 && tipD > mcpD * 1.12 && bend > bendThresh;
+    }
+
+    function makeTrack(id) {
+        return {
+            id,
+            lastCenter: null,
+            lastTs: 0,
+            vx: 0,
+            vy: 0,
+            speed: 0,
+            trail: [],
+            vxHist: [],
+            vyHist: [],
+            stillFrames: 0,
+            lastSwipeTs: -9999,
+            seqOpenTs: -1,
+            raisedTs: -1,
+            pinchStart: null,
+            prevPinch: false,
+            lastPinchTs: -9999,
+            events: {}
+        };
+    }
+
+    function updateTrack(id, center, now, scale, pinchActive) {
+        if (!tracks.has(id)) tracks.set(id, makeTrack(id));
+        const t = tracks.get(id);
+
+        t.events = {
+            swipeLeft: false,
+            swipeRight: false,
+            swipeUp: false,
+            swipeDown: false,
+            wave: false,
+            doublePinch: false,
+            openToFist: false,
+            pinchDrag: false,
+            raiseThenPoint: false
+        };
+
+        if (t.lastCenter) {
+            const dt = Math.max(1, now - t.lastTs);
+            t.vx = (center.x - t.lastCenter.x) * 1000 / dt;
+            t.vy = (center.y - t.lastCenter.y) * 1000 / dt;
+            t.speed = Math.hypot(t.vx, t.vy);
+        }
+
+        t.lastCenter = center;
+        t.lastTs = now;
+
+        t.trail.push({ ...center, t: now });
+        t.vxHist.push(t.vx);
+        t.vyHist.push(t.vy);
+        if (t.trail.length > 28) t.trail.shift();
+        if (t.vxHist.length > 28) t.vxHist.shift();
+        if (t.vyHist.length > 28) t.vyHist.shift();
+
+        if (t.speed < 30) t.stillFrames += 1;
+        else t.stillFrames = 0;
+
+        const n = Math.min(6, t.vxHist.length);
+        const avgVx = n ? t.vxHist.slice(-n).reduce((a,b) => a + b, 0) / n : 0;
+        const avgVy = n ? t.vyHist.slice(-n).reduce((a,b) => a + b, 0) / n : 0;
+
+        const canSwipe = now - t.lastSwipeTs > 350;
+        if (canSwipe) {
+            if (Math.abs(avgVx) > 320 && Math.abs(avgVx) > Math.abs(avgVy) * 1.35) {
+                t.events.swipeRight = avgVx > 0;
+                t.events.swipeLeft = avgVx < 0;
+                t.lastSwipeTs = now;
+            } else if (Math.abs(avgVy) > 320 && Math.abs(avgVy) > Math.abs(avgVx) * 1.35) {
+                t.events.swipeDown = avgVy > 0;
+                t.events.swipeUp = avgVy < 0;
+                t.lastSwipeTs = now;
+            }
+        }
+
+        const recent = t.vxHist.slice(-16);
+        let flips = 0;
+        for (let i = 1; i < recent.length; i++) {
+            if (Math.abs(recent[i]) > 120 && Math.abs(recent[i - 1]) > 120 && Math.sign(recent[i]) !== Math.sign(recent[i - 1])) {
+                flips += 1;
+            }
+        }
+        t.events.wave = flips >= 3;
+
+        if (pinchActive && !t.prevPinch) {
+            if (now - t.lastPinchTs < 600) t.events.doublePinch = true;
+            t.lastPinchTs = now;
+            t.pinchStart = { ...center, t: now };
+        }
+
+        if (pinchActive && t.pinchStart) {
+            const moved = Math.hypot(center.x - t.pinchStart.x, center.y - t.pinchStart.y);
+            if (moved > scale * 0.75) t.events.pinchDrag = true;
+        }
+
+        if (!pinchActive) t.pinchStart = null;
+        t.prevPinch = pinchActive;
+
+        return t;
+    }
+
+    function drawPolyline(pts, indices, color, width, w, h, closed = false) {
+        ctx.strokeStyle = color;
+        ctx.lineWidth = width;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        ctx.beginPath();
+        const p0 = toScreen(pts[indices[0]], w, h);
+        ctx.moveTo(p0.x, p0.y);
+        for (let i = 1; i < indices.length; i++) {
+            const p = toScreen(pts[indices[i]], w, h);
+            ctx.lineTo(p.x, p.y);
+        }
+        if (closed) ctx.closePath();
+        ctx.stroke();
+    }
+
+    function drawPoint(p, color, r, w, h) {
+        const s = toScreen(p, w, h);
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    function analyzeHand(pts, handed, handIndex, w, h, now) {
+        const center = palmCenter(pts, w, h);
+        const scale = Math.max(1, (dist(pts, 5, 17, w, h) + dist(pts, 0, 9, w, h)) / 2);
+
+        const states = {
+            thumb: fingerExtended(pts, "thumb", w, h),
+            index: fingerExtended(pts, "index", w, h),
+            middle: fingerExtended(pts, "middle", w, h),
+            ring: fingerExtended(pts, "ring", w, h),
+            pinky: fingerExtended(pts, "pinky", w, h)
+        };
+
+        const extCount = Object.values(states).filter(Boolean).length;
+
+        const avgTip = [4,8,12,16,20]
+            .map((i) => distXY({ x: center.x / w, y: center.y / h }, pts[i], w, h))
+            .reduce((a,b) => a + b, 0) / 5;
+
+        const openness = clamp((avgTip / scale - 0.9) / 1.0, 0, 1);
+        const grip = 1 - openness;
+
+        const dThumbIndex = dist(pts, 4, 8, w, h) / scale;
+        const dThumbMiddle = dist(pts, 4, 12, w, h) / scale;
+
+        const contacts = {
+            thumbIndexPinch: dThumbIndex < 0.45,
+            thumbMiddlePinch: dThumbMiddle < 0.48,
+            fingertipCluster: ((dist(pts,8,12,w,h) + dist(pts,12,16,w,h) + dist(pts,16,20,w,h)) / 3) / scale < 0.55
+        };
+
+        const gestures = {
+            openPalm: extCount >= 4 && openness > 0.58,
+            fist: extCount <= 1 && openness < 0.32,
+            point: states.index && !states.middle && !states.ring && !states.pinky,
+            thumbsUp: states.thumb && !states.index && !states.middle && !states.ring && !states.pinky && pts[4].y < pts[0].y,
+            thumbsDown: states.thumb && !states.index && !states.middle && !states.ring && !states.pinky && pts[4].y > pts[0].y,
+            peace: states.index && states.middle && !states.ring && !states.pinky,
+            okSign: contacts.thumbIndexPinch && states.middle && states.ring && states.pinky,
+            threeCount: states.index && states.middle && states.ring && !states.pinky,
+            fourCount: states.index && states.middle && states.ring && states.pinky,
+            fingerGun: states.thumb && states.index && !states.middle && !states.ring && !states.pinky
+        };
+
+        const wrist = pts[0];
+        const iMcp = pts[5];
+        const pMcp = pts[17];
+        const mMcp = pts[9];
+
+        const across = { x: (pMcp.x - iMcp.x) * w, y: (pMcp.y - iMcp.y) * h };
+        const up = { x: (mMcp.x - wrist.x) * w, y: (mMcp.y - wrist.y) * h };
+
+        const crossZ = (iMcp.x - wrist.x) * (pMcp.y - wrist.y) - (iMcp.y - wrist.y) * (pMcp.x - wrist.x);
+
+        const orientation = {
+            palmFacing: Math.abs(crossZ) > 0.01,
+            palmSideways: Math.abs(crossZ) <= 0.01,
+            tilt: across.y / (Math.abs(across.x) + Math.abs(across.y) + 1e-6),
+            wristRotation: Math.atan2(across.y, across.x) * 180 / Math.PI,
+            handPitch: Math.atan2(up.y, up.x) * 180 / Math.PI
+        };
+
+        const xNorm = center.x / w;
+        const yNorm = center.y / h;
+
+        const position = {
+            xNorm,
+            yNorm,
+            zoneX: xNorm < 1/3 ? "LEFT" : (xNorm < 2/3 ? "CENTER" : "RIGHT"),
+            zoneY: yNorm < 1/3 ? "TOP" : (yNorm < 2/3 ? "MIDDLE" : "BOTTOM"),
+            insideButton: xNorm > 0.43 && xNorm < 0.57 && yNorm > 0.42 && yNorm < 0.58
+        };
+
+        const id = `${handed}-${handIndex}`;
+        const track = updateTrack(id, center, now, scale, contacts.thumbIndexPinch);
+
+        if (gestures.openPalm) track.seqOpenTs = now;
+        if (track.seqOpenTs > 0 && gestures.fist && now - track.seqOpenTs < 1200) {
+            track.events.openToFist = true;
+            track.seqOpenTs = -1;
+        }
+
+        if (yNorm < 0.34) track.raisedTs = now;
+        if (track.raisedTs > 0 && now - track.raisedTs < 1300 && gestures.point) {
+            track.events.raiseThenPoint = true;
+            track.raisedTs = -1;
+        }
+
+        const motion = {
+            vx: track.vx,
+            vy: track.vy,
+            speed: track.speed,
+            still: track.stillFrames > 10,
+            swipeLeft: track.events.swipeLeft,
+            swipeRight: track.events.swipeRight,
+            swipeUp: track.events.swipeUp,
+            swipeDown: track.events.swipeDown,
+            wave: track.events.wave,
+            trail: track.trail
+        };
+
+        const sequences = {
+            openToFist: track.events.openToFist,
+            doublePinch: track.events.doublePinch,
+            pinchDrag: track.events.pinchDrag,
+            fistHold: gestures.fist && track.stillFrames > 15,
+            raiseThenPoint: track.events.raiseThenPoint
+        };
+
+        const analog = {
+            pinchStrength: clamp(1 - dThumbIndex / 0.55, 0, 1),
+            gripStrength: grip,
+            openness,
+            handScale: scale,
+            throttle: clamp(1 - yNorm, 0, 1),
+            steer: clamp((xNorm - 0.5) * 2, -1, 1)
+        };
+
+        return {
+            pts, handed, handIndex, id,
+            center, scale,
+            states, gestures, orientation, position, motion, contacts, analog, sequences
+        };
+    }
+
+    function drawBaseSkeleton(hand, w, h) {
+        HAND_SKELETON.forEach((chain) => drawPolyline(hand.pts, chain, "rgba(255,255,255,0.2)", 1.5, w, h));
+        hand.pts.forEach((p) => drawPoint(p, "rgba(255,255,255,0.28)", 2, w, h));
+    }
+
+    function drawFingerMode(hand, w, h) {
+        ["thumb","index","middle","ring","pinky"].forEach((name) => {
+            const color = hand.states[name] ? "#00ff7a" : "#ff6b5a";
+            drawPolyline(hand.pts, F[name].chain, color, 4, w, h);
+        });
+    }
+
+    function drawStaticMode(hand, w, h) {
+        drawFingerMode(hand, w, h);
+
+        const tags = Object.entries(hand.gestures)
+            .filter(([,v]) => v)
+            .map(([k]) => k.replace(/([A-Z])/g, " $1").toUpperCase());
+
+        const s = centerToScreen(hand.center);
+        ctx.font = "bold 12px Arial";
+        ctx.textAlign = "left";
+        ctx.fillStyle = hand.handed === "Left" ? "#00ffe0" : "#ff4fcb";
+        ctx.fillText(`${hand.handed.toUpperCase()} HAND`, s.x + 8, s.y - 20);
+
+        ctx.font = "bold 11px Arial";
+        ctx.fillStyle = "#fff";
+        tags.slice(0, 3).forEach((t, i) => {
+            ctx.fillText(t, s.x + 8, s.y - 4 + i * 13);
+        });
+    }
+
+    function drawOrientationMode(hand, w, h) {
+        const wrist = toScreen(hand.pts[0], w, h);
+        const iMcp = toScreen(hand.pts[5], w, h);
+        const pMcp = toScreen(hand.pts[17], w, h);
+        const mMcp = toScreen(hand.pts[9], w, h);
+
+        ctx.strokeStyle = "#00ccff";
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.moveTo(iMcp.x, iMcp.y);
+        ctx.lineTo(pMcp.x, pMcp.y);
+        ctx.stroke();
+
+        ctx.strokeStyle = "#ffcc00";
+        ctx.beginPath();
+        ctx.moveTo(wrist.x, wrist.y);
+        ctx.lineTo(mMcp.x, mMcp.y);
+        ctx.stroke();
+
+        const c = centerToScreen(hand.center);
+        const angle = hand.orientation.wristRotation * Math.PI / 180;
+        const len = hand.scale * 0.6;
+        ctx.strokeStyle = "#ff4fcb";
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(c.x, c.y);
+        ctx.lineTo(c.x + Math.cos(angle) * len, c.y + Math.sin(angle) * len);
+        ctx.stroke();
+    }
+
+    function drawPositionMode(hand, w, h) {
+        ctx.strokeStyle = "rgba(255,255,255,0.23)";
+        ctx.lineWidth = 1;
+        [w / 3, (2 * w) / 3].forEach((x) => {
+            ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
+        });
+        [h / 3, (2 * h) / 3].forEach((y) => {
+            ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+        });
+
+        const c = centerToScreen(hand.center);
+        ctx.fillStyle = hand.position.insideButton ? "#00ff7a" : "#ff6633";
+        ctx.beginPath();
+        ctx.arc(c.x, c.y, 10, 0, Math.PI * 2);
+        ctx.fill();
+
+        if (hand.position.insideButton) {
+            ctx.strokeStyle = "rgba(0,255,122,0.85)";
+            ctx.lineWidth = 3;
+            ctx.strokeRect(w * 0.43, h * 0.42, w * 0.14, h * 0.16);
+        }
+    }
+
+    function drawMotionMode(hand, w, h) {
+        const trail = hand.motion.trail;
+        if (trail.length > 1) {
+            ctx.strokeStyle = "rgba(255,255,255,0.55)";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            const p0 = { x: w - trail[0].x, y: trail[0].y };
+            ctx.moveTo(p0.x, p0.y);
+            for (let i = 1; i < trail.length; i++) {
+                const p = { x: w - trail[i].x, y: trail[i].y };
+                ctx.lineTo(p.x, p.y);
+            }
+            ctx.stroke();
+        }
+
+        const c = { x: w - hand.center.x, y: hand.center.y };
+        ctx.strokeStyle = "#00ffea";
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(c.x, c.y);
+        ctx.lineTo(c.x - hand.motion.vx * 0.07, c.y + hand.motion.vy * 0.07);
+        ctx.stroke();
+
+        const eventTxt = hand.motion.swipeLeft ? "SWIPE LEFT" : hand.motion.swipeRight ? "SWIPE RIGHT" : hand.motion.swipeUp ? "SWIPE UP" : hand.motion.swipeDown ? "SWIPE DOWN" : hand.motion.wave ? "WAVE" : hand.motion.still ? "STILL" : "";
+        if (eventTxt) {
+            ctx.fillStyle = "#fff";
+            ctx.font = "bold 13px Arial";
+            ctx.fillText(eventTxt, c.x + 10, c.y + 18);
+        }
+    }
+
+    function drawContactMode(hand, w, h) {
+        const tipIdx = [4,8,12,16,20];
+        tipIdx.forEach((i) => drawPoint(hand.pts[i], "#ffffff", 4, w, h));
+
+        const links = [
+            [4,8, hand.contacts.thumbIndexPinch ? "#00ff7a" : "rgba(255,255,255,0.2)"],
+            [4,12, hand.contacts.thumbMiddlePinch ? "#00ff7a" : "rgba(255,255,255,0.2)"],
+            [8,12, hand.contacts.fingertipCluster ? "#ff4fcb" : "rgba(255,255,255,0.2)"]
+        ];
+
+        links.forEach(([a,b,color]) => {
+            const s1 = toScreen(hand.pts[a], w, h);
+            const s2 = toScreen(hand.pts[b], w, h);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = color.includes("0.2") ? 2 : 5;
+            ctx.beginPath();
+            ctx.moveTo(s1.x, s1.y);
+            ctx.lineTo(s2.x, s2.y);
+            ctx.stroke();
+        });
+    }
+
+    function drawAnalogMode(hand, w, h) {
+        const c = { x: w - hand.center.x, y: hand.center.y };
+
+        ctx.strokeStyle = "rgba(255,255,255,0.25)";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(c.x, c.y, hand.scale * 0.9, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.strokeStyle = "#00ff7a";
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.arc(c.x, c.y, hand.scale * 0.9, -Math.PI / 2, -Math.PI / 2 + hand.analog.openness * Math.PI * 2);
+        ctx.stroke();
+
+        drawContactMode(hand, w, h);
+    }
+
+    function drawSequenceMode(hand, w, h) {
+        drawStaticMode(hand, w, h);
+        const c = { x: w - hand.center.x, y: hand.center.y };
+        const tags = Object.entries(hand.sequences).filter(([,v]) => v).map(([k]) => k.toUpperCase());
+        if (tags.length) {
+            ctx.font = "bold 11px Arial";
+            ctx.fillStyle = "#00ffea";
+            tags.slice(0, 2).forEach((t, i) => ctx.fillText(t, c.x + 10, c.y + 26 + i * 14));
+        }
+    }
+
+    function buildHud(mode, hands) {
+        if (!hands.length) {
+            hud.innerHTML = `
+                <div class="card" style="border-left-color:#666">
+                    <div class="title">No Hand</div>
+                    <div class="row"><span>Show your hand to camera</span><span class="mono">--</span></div>
+                </div>
+            `;
+            return;
+        }
+
+        const cards = hands.map((h) => {
+            const color = h.handed === "Left" ? "#00ffe0" : "#ff4fcb";
+
+            const rowsByMode = {
+                skeleton: [
+                    ["Hand", `${h.handed} #${h.handIndex}`],
+                    ["Scale", `${Math.round(h.scale)}`],
+                    ["Open", `${Math.round(h.analog.openness * 100)}%`]
+                ],
+                static: [
+                    ["Open/Fist", `${h.gestures.openPalm ? "OPEN" : ""}${h.gestures.fist ? "FIST" : ""}` || "-"],
+                    ["Point/Peace", `${h.gestures.point ? "POINT " : ""}${h.gestures.peace ? "PEACE" : ""}` || "-"],
+                    ["Thumb", `${h.gestures.thumbsUp ? "UP" : h.gestures.thumbsDown ? "DOWN" : "-"}`]
+                ],
+                fingers: [
+                    ["Thumb", h.states.thumb ? "EXT" : "CURL"],
+                    ["Index", h.states.index ? "EXT" : "CURL"],
+                    ["Middle", h.states.middle ? "EXT" : "CURL"],
+                    ["Ring", h.states.ring ? "EXT" : "CURL"],
+                    ["Pinky", h.states.pinky ? "EXT" : "CURL"]
+                ],
+                orientation: [
+                    ["Facing", h.orientation.palmFacing ? "CAMERA" : "SIDE"],
+                    ["Tilt", h.orientation.tilt > 0.2 ? "LEFT" : h.orientation.tilt < -0.2 ? "RIGHT" : "NEUTRAL"],
+                    ["Rotation", `${Math.round(h.orientation.wristRotation)}°`]
+                ],
+                position: [
+                    ["Zone X", h.position.zoneX],
+                    ["Zone Y", h.position.zoneY],
+                    ["Button", h.position.insideButton ? "INSIDE" : "OUTSIDE"]
+                ],
+                motion: [
+                    ["Vx", `${Math.round(h.motion.vx)}`],
+                    ["Vy", `${Math.round(h.motion.vy)}`],
+                    ["Still", h.motion.still ? "YES" : "NO"],
+                    ["Swipe", h.motion.swipeLeft ? "LEFT" : h.motion.swipeRight ? "RIGHT" : h.motion.swipeUp ? "UP" : h.motion.swipeDown ? "DOWN" : "-"]
+                ],
+                twohand: [
+                    ["Openness", `${Math.round(h.analog.openness * 100)}%`],
+                    ["Pinch", h.contacts.thumbIndexPinch ? "YES" : "NO"],
+                    ["Speed", `${Math.round(h.motion.speed)}`]
+                ],
+                contact: [
+                    ["Thumb-Index", h.contacts.thumbIndexPinch ? "PINCH" : "OPEN"],
+                    ["Thumb-Middle", h.contacts.thumbMiddlePinch ? "PINCH" : "OPEN"],
+                    ["Tip Cluster", h.contacts.fingertipCluster ? "YES" : "NO"]
+                ],
+                analog: [
+                    ["Pinch Strength", `${Math.round(h.analog.pinchStrength * 100)}%`],
+                    ["Grip", `${Math.round(h.analog.gripStrength * 100)}%`],
+                    ["Throttle", `${Math.round(h.analog.throttle * 100)}%`],
+                    ["Steer", `${h.analog.steer.toFixed(2)}`]
+                ],
+                sequence: [
+                    ["Open->Fist", h.sequences.openToFist ? "TRIGGER" : "-"],
+                    ["Double Pinch", h.sequences.doublePinch ? "TRIGGER" : "-"],
+                    ["Pinch Drag", h.sequences.pinchDrag ? "YES" : "-"],
+                    ["Fist Hold", h.sequences.fistHold ? "YES" : "-"],
+                    ["Raise->Point", h.sequences.raiseThenPoint ? "TRIGGER" : "-"]
+                ],
+                all: [
+                    ["Open", `${Math.round(h.analog.openness * 100)}%`],
+                    ["Pinch", `${Math.round(h.analog.pinchStrength * 100)}%`],
+                    ["Swipe", h.motion.swipeLeft ? "L" : h.motion.swipeRight ? "R" : h.motion.swipeUp ? "U" : h.motion.swipeDown ? "D" : "-"]
+                ]
+            };
+
+            const rows = rowsByMode[mode] || rowsByMode.static;
+
+            return `
+                <div class="card" style="border-left-color:${color}">
+                    <div class="title" style="color:${color}">${h.handed.toUpperCase()} HAND ${h.handIndex}</div>
+                    ${rows.map(([k,v]) => `<div class="row"><span>${k}</span><span class="mono">${v}</span></div>`).join("")}
+                </div>
+            `;
+        }).join("");
+
+        let twoHandExtra = "";
+        if ((mode === "twohand" || mode === "all") && hands.length >= 2) {
+            const a = hands[0], b = hands[1];
+            const d = Math.hypot(a.center.x - b.center.x, a.center.y - b.center.y);
+            const ang = Math.atan2(b.center.y - a.center.y, b.center.x - a.center.x) * 180 / Math.PI;
+            twoHandExtra = `
+                <div class="card" style="border-left-color:#ffffff">
+                    <div class="title" style="color:#fff">Two-hand relation</div>
+                    <div class="row"><span>Distance</span><span class="mono">${Math.round(d)}</span></div>
+                    <div class="row"><span>Angle</span><span class="mono">${Math.round(ang)}°</span></div>
+                    <div class="row"><span>Status</span><span class="mono">${d < (a.scale + b.scale) * 0.9 ? "TOGETHER" : "APART"}</span></div>
+                </div>
+            `;
+        }
+
+        hud.innerHTML = cards + twoHandExtra;
+    }
+
+    function renderLoop() {
+        if (canvas.width !== video.videoWidth) {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+        }
+
+        const now = performance.now();
+        if (video.currentTime !== lastVideoTime) {
+            lastVideoTime = video.currentTime;
+
+            const results = handLandmarker.detectForVideo(video, now);
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const w = canvas.width;
+            const h = canvas.height;
+
+            const hands = [];
+            if (results.landmarks?.length) {
+                results.landmarks.forEach((pts, i) => {
+                    const handed = results.handedness?.[i]?.[0]?.categoryName || (i === 0 ? "Left" : "Right");
+                    const hand = analyzeHand(pts, handed, i, w, h, now);
+                    hands.push(hand);
+                });
+            }
+
+            const doMode = (id) => activeMode === id || activeMode === "all";
+
+            hands.forEach((hand) => {
+                if (doMode("skeleton") || activeMode === "all") drawBaseSkeleton(hand, w, h);
+                if (doMode("fingers")) drawFingerMode(hand, w, h);
+                if (doMode("static")) drawStaticMode(hand, w, h);
+                if (doMode("orientation")) drawOrientationMode(hand, w, h);
+                if (doMode("position")) drawPositionMode(hand, w, h);
+                if (doMode("motion")) drawMotionMode(hand, w, h);
+                if (doMode("contact")) drawContactMode(hand, w, h);
+                if (doMode("analog")) drawAnalogMode(hand, w, h);
+                if (doMode("sequence")) drawSequenceMode(hand, w, h);
+            });
+
+            if ((activeMode === "twohand" || activeMode === "all") && hands.length >= 2) {
+                const a = { x: w - hands[0].center.x, y: hands[0].center.y };
+                const b = { x: w - hands[1].center.x, y: hands[1].center.y };
+                const d = Math.hypot(a.x - b.x, a.y - b.y);
+                ctx.strokeStyle = d < (hands[0].scale + hands[1].scale) * 0.9 ? "#00ff7a" : "#ffffff";
+                ctx.lineWidth = 5;
+                ctx.beginPath();
+                ctx.moveTo(a.x, a.y);
+                ctx.lineTo(b.x, b.y);
+                ctx.stroke();
+
+                ctx.fillStyle = "#fff";
+                ctx.font = "bold 13px Arial";
+                ctx.fillText(`D=${Math.round(d)}`, (a.x + b.x) / 2 + 8, (a.y + b.y) / 2 - 8);
+            }
+
+            buildHud(activeMode, hands);
+        }
+
+        requestAnimationFrame(renderLoop);
+    }
+
+    async function initAI() {
+        try {
+            const vision = await FilesetResolver.forVisionTasks(
+                "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm"
+            );
+            handLandmarker = await HandLandmarker.createFromOptions(vision, {
+                baseOptions: {
+                    modelAssetPath: "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task",
+                    delegate: "GPU"
+                },
+                runningMode: "VIDEO",
+                numHands: 2
+            });
+
+            btnMain.innerText = "START CAMERA";
+            btnMain.removeAttribute("disabled");
+            btnMain.addEventListener("click", startCamera);
+            renderModeButtons();
+        } catch (err) {
+            console.error(err);
+            btnMain.innerText = "ERROR LOADING AI";
+        }
+    }
+
+    function startCamera() {
+        btnMain.style.opacity = "0";
+        navigator.mediaDevices.getUserMedia({
+            video: {
+                facingMode: "user",
+                width: { ideal: 1280 },
+                height: { ideal: 720 }
+            }
+        }).then((stream) => {
+            video.srcObject = stream;
+            video.addEventListener("loadeddata", () => {
+                document.getElementById("controls").style.display = "none";
+                renderLoop();
+            });
+        }).catch((err) => {
+            console.error(err);
+            btnMain.style.opacity = "1";
+            btnMain.innerText = "CAMERA DENIED";
+        });
+    }
+
+    initAI();
+</script>
+</body>
+</html>
