@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>LEGO Grid Editor v0 (Hand + Selection UI)</title>
+  <title>LEGO Grid Editor v0 (Hand + Infinite Side Pile)</title>
   <style>
     :root {
       --bg: #090909;
@@ -69,7 +69,7 @@
       position: absolute;
       left: 10px;
       top: 10px;
-      width: 300px;
+      width: 320px;
       z-index: 10;
       display: flex;
       flex-direction: column;
@@ -124,6 +124,7 @@
       border-radius: 8px;
       padding: 6px 8px;
       pointer-events: none;
+      max-width: min(62vw, 780px);
     }
 
     #controls {
@@ -168,7 +169,7 @@
   <video id="webcam" playsinline muted autoplay></video>
 
   <div id="hud"></div>
-  <div id="hint">Pinch over brick = select/drag. Hover = faint outline · Selected = strong outline + tint · Drag = ghost preview.</div>
+  <div id="hint">Pinch on a brick to pick it up. Unpinch to drop. Left side is an infinite supply spot: if empty, a new red brick spawns every second.</div>
 
   <div id="controls">
     <button id="btn-main" disabled>Loading Hand AI...</button>
@@ -192,6 +193,11 @@
   const BRICK_W = 2;
   const BRICK_D = 3;
 
+  // Side supply pile behavior
+  const PILE_SPAWN = { x: -GRID_COLS * 0.5 - 1.9, z: 0 };
+  const PILE_OCCUPY_RADIUS = 0.75;
+  const PILE_SPAWN_POLL_MS = 1000;
+
   // Pinch ring scaling: increase effective pinch radius by 9%
   const PINCH_RING_SCALE = 1.09;
   const PINCH_ON_THRESHOLD = 0.43 * PINCH_RING_SCALE;
@@ -205,6 +211,9 @@
     [0,17],[17,18],[18,19],[19,20],[5,9],[9,13],[13,17]
   ];
 
+  const bricks = [];
+  let brickIdSeq = 1;
+
   const state = {
     handLandmarker: null,
     lastVideoTime: -1,
@@ -215,16 +224,15 @@
     pinchOnFrames: 0,
     pinchOffFrames: 0,
 
-    hovered: false,
-    selected: false,
-    dragging: false,
+    hoveredBrick: null,
+    selectedBrick: null,
+    draggingBrick: null,
+    dragStart: null,
 
     pointerNDC: new THREE.Vector2(),
     pointerWorld: new THREE.Vector3(),
     pointerVisible: false,
 
-    brickCornerI: 6,
-    brickCornerJ: 6,
     targetCornerI: 6,
     targetCornerJ: 6,
     validPlacement: true
@@ -255,6 +263,22 @@
   );
   floor.position.y = -0.12;
   scene.add(floor);
+
+  // supply pad to show side spawn spot
+  const supplyPad = new THREE.Mesh(
+    new THREE.CylinderGeometry(1.0, 1.0, 0.09, 28),
+    new THREE.MeshStandardMaterial({ color: 0x3d2a2a, roughness: 0.82, metalness: 0.05 })
+  );
+  supplyPad.position.set(PILE_SPAWN.x, 0.04, PILE_SPAWN.z);
+  scene.add(supplyPad);
+
+  const supplyRing = new THREE.Mesh(
+    new THREE.TorusGeometry(1.02, 0.04, 16, 48),
+    new THREE.MeshStandardMaterial({ color: 0x7f3a3a, emissive: 0x2f0f0f, roughness: 0.6, metalness: 0.2 })
+  );
+  supplyRing.rotation.x = Math.PI / 2;
+  supplyRing.position.set(PILE_SPAWN.x, 0.08, PILE_SPAWN.z);
+  scene.add(supplyRing);
 
   const studGeo = new THREE.CylinderGeometry(0.23, 0.23, 0.1, 18);
   const studMat = new THREE.MeshStandardMaterial({ color: 0x2f3f56, roughness: 0.7, metalness: 0.12 });
@@ -293,7 +317,6 @@
       bodyMat
     );
     body.position.y = 0.29;
-    body.userData.pickable = true;
     pickables.push(body);
     group.add(body);
 
@@ -311,7 +334,6 @@
       for (let j = 0; j < BRICK_D; j++) {
         const s = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 0.1, 18), studTopMat);
         s.position.set(-BRICK_W / 2 + i + 0.5, 0.63, -BRICK_D / 2 + j + 0.5);
-        s.userData.pickable = true;
         pickables.push(s);
         group.add(s);
       }
@@ -320,42 +342,6 @@
     group.userData = { bodyMat, studTopMat, pickables };
     return group;
   }
-
-  const brick = makeBrick(0xd22f2f, false);
-  scene.add(brick);
-
-  const ghostBrick = makeBrick(0x49d2ff, true);
-  ghostBrick.visible = false;
-  scene.add(ghostBrick);
-
-  const pointer = new THREE.Mesh(
-    new THREE.SphereGeometry(0.16, 18, 18),
-    new THREE.MeshStandardMaterial({ color: 0x49d2ff, emissive: 0x0c4b64, roughness: 0.3, metalness: 0.2 })
-  );
-  pointer.visible = false;
-  scene.add(pointer);
-
-  // Selection visual hierarchy
-  const hoverOutline = new THREE.LineSegments(
-    new THREE.EdgesGeometry(new THREE.BoxGeometry(BRICK_W * 1.03, 0.62, BRICK_D * 1.03)),
-    new THREE.LineBasicMaterial({ color: 0x89e5ff, transparent: true, opacity: 0.45 })
-  );
-  hoverOutline.position.y = 0.31;
-  hoverOutline.visible = false;
-  brick.add(hoverOutline);
-
-  const selectedOutline = new THREE.LineSegments(
-    new THREE.EdgesGeometry(new THREE.BoxGeometry(BRICK_W * 1.06, 0.66, BRICK_D * 1.06)),
-    new THREE.LineBasicMaterial({ color: 0x49d2ff, transparent: true, opacity: 1 })
-  );
-  selectedOutline.position.y = 0.31;
-  selectedOutline.visible = false;
-  brick.add(selectedOutline);
-
-  const gizmo = new THREE.AxesHelper(1.7);
-  gizmo.position.set(0, 0.95, 0);
-  gizmo.visible = false;
-  brick.add(gizmo);
 
   function clamp(v, lo, hi) {
     return Math.max(lo, Math.min(hi, v));
@@ -395,13 +381,25 @@
     };
   }
 
-  function applyBrickTransform() {
-    const p = cornerToWorld(state.brickCornerI, state.brickCornerJ);
-    brick.position.set(p.x, 0, p.z);
+  function getBrickCenterXZ(brickData) {
+    if (brickData.onGrid) return cornerToWorld(brickData.cornerI, brickData.cornerJ);
+    return { x: brickData.worldX, z: brickData.worldZ };
   }
 
-  function pointInsideBrickXZ(worldPoint, tolerance = 0.28) {
-    const c = cornerToWorld(state.brickCornerI, state.brickCornerJ);
+  function syncBrickPose(brickData, lift = false) {
+    const p = getBrickCenterXZ(brickData);
+    brickData.group.position.set(p.x, lift ? 0.82 : 0, p.z);
+  }
+
+  function syncAllBrickPoses() {
+    for (const b of bricks) {
+      if (state.draggingBrick && b.id === state.draggingBrick.id) continue;
+      syncBrickPose(b, false);
+    }
+  }
+
+  function pointInsideBrickXZ(worldPoint, brickData, tolerance = 0.28) {
+    const c = getBrickCenterXZ(brickData);
     return Math.abs(worldPoint.x - c.x) <= BRICK_W * 0.5 + tolerance &&
            Math.abs(worldPoint.z - c.z) <= BRICK_D * 0.5 + tolerance;
   }
@@ -418,16 +416,102 @@
     }
   }
 
-  function updateSelectionVisuals() {
-    hoverOutline.visible = state.hovered && !state.selected;
-    selectedOutline.visible = state.selected;
-    gizmo.visible = state.selected;
+  function createBrickInstance({ onGrid = false, cornerI = 0, cornerJ = 0, worldX = 0, worldZ = 0 } = {}) {
+    const group = makeBrick(0xd22f2f, false);
+    const data = {
+      id: brickIdSeq++,
+      group,
+      onGrid,
+      cornerI,
+      cornerJ,
+      worldX,
+      worldZ
+    };
 
-    const boost = state.selected ? 0.12 : state.hovered ? 0.06 : 0;
-    brick.userData.bodyMat.emissive.setHex(0x4a88aa);
-    brick.userData.bodyMat.emissiveIntensity = boost;
-    brick.userData.studTopMat.emissive.setHex(0x74d6ff);
-    brick.userData.studTopMat.emissiveIntensity = boost * 0.9;
+    group.userData.brickData = data;
+    for (const mesh of group.userData.pickables) {
+      mesh.userData.brickData = data;
+    }
+
+    bricks.push(data);
+    scene.add(group);
+    syncBrickPose(data, false);
+    return data;
+  }
+
+  function isPileSpotEmpty() {
+    return !bricks.some((b) => {
+      const c = getBrickCenterXZ(b);
+      return Math.hypot(c.x - PILE_SPAWN.x, c.z - PILE_SPAWN.z) <= PILE_OCCUPY_RADIUS;
+    });
+  }
+
+  function maybeSpawnSupplyBrick() {
+    if (!isPileSpotEmpty()) return;
+    createBrickInstance({ onGrid: false, worldX: PILE_SPAWN.x, worldZ: PILE_SPAWN.z });
+  }
+
+  const ghostBrick = makeBrick(0x49d2ff, true);
+  ghostBrick.visible = false;
+  scene.add(ghostBrick);
+
+  const pointer = new THREE.Mesh(
+    new THREE.SphereGeometry(0.16, 18, 18),
+    new THREE.MeshStandardMaterial({ color: 0x49d2ff, emissive: 0x0c4b64, roughness: 0.3, metalness: 0.2 })
+  );
+  pointer.visible = false;
+  scene.add(pointer);
+
+  // Shared selection decorators that move between bricks
+  const hoverOutline = new THREE.LineSegments(
+    new THREE.EdgesGeometry(new THREE.BoxGeometry(BRICK_W * 1.03, 0.62, BRICK_D * 1.03)),
+    new THREE.LineBasicMaterial({ color: 0x89e5ff, transparent: true, opacity: 0.45 })
+  );
+  hoverOutline.position.y = 0.31;
+  hoverOutline.visible = false;
+  scene.add(hoverOutline);
+
+  const selectedOutline = new THREE.LineSegments(
+    new THREE.EdgesGeometry(new THREE.BoxGeometry(BRICK_W * 1.06, 0.66, BRICK_D * 1.06)),
+    new THREE.LineBasicMaterial({ color: 0x49d2ff, transparent: true, opacity: 1 })
+  );
+  selectedOutline.position.y = 0.31;
+  selectedOutline.visible = false;
+  scene.add(selectedOutline);
+
+  const gizmo = new THREE.AxesHelper(1.7);
+  gizmo.position.set(0, 0.95, 0);
+  gizmo.visible = false;
+  scene.add(gizmo);
+
+  function attachDecorator(decorator, brickData) {
+    if (!brickData) {
+      decorator.visible = false;
+      return;
+    }
+    if (decorator.parent !== brickData.group) {
+      brickData.group.add(decorator);
+    }
+    decorator.visible = true;
+  }
+
+  function updateSelectionVisuals() {
+    const hovered = state.hoveredBrick;
+    const selected = state.selectedBrick;
+
+    attachDecorator(hoverOutline, hovered && (!selected || hovered.id !== selected.id) ? hovered : null);
+    attachDecorator(selectedOutline, selected);
+    attachDecorator(gizmo, selected);
+
+    for (const b of bricks) {
+      const isSelected = selected && b.id === selected.id;
+      const isHovered = hovered && b.id === hovered.id;
+      const boost = isSelected ? 0.12 : isHovered ? 0.06 : 0;
+      b.group.userData.bodyMat.emissive.setHex(0x4a88aa);
+      b.group.userData.bodyMat.emissiveIntensity = boost;
+      b.group.userData.studTopMat.emissive.setHex(0x74d6ff);
+      b.group.userData.studTopMat.emissiveIntensity = boost * 0.9;
+    }
   }
 
   function updatePointerAndPlaneHit() {
@@ -449,10 +533,35 @@
   }
 
   function updateHoverFromPointer() {
+    // 1) mesh hit test (most precise)
     raycaster.setFromCamera(state.pointerNDC, camera);
-    const hits = raycaster.intersectObjects(brick.userData.pickables, true);
-    const nearByFootprint = state.pointerVisible ? pointInsideBrickXZ(state.pointerWorld, 0.28) : false;
-    state.hovered = hits.length > 0 || nearByFootprint;
+    const pickables = bricks.flatMap((b) => b.group.userData.pickables);
+    const hits = raycaster.intersectObjects(pickables, true);
+
+    if (hits.length > 0) {
+      state.hoveredBrick = hits[0].object.userData.brickData || null;
+      return;
+    }
+
+    // 2) footprint tolerance fallback (more forgiving)
+    if (!state.pointerVisible) {
+      state.hoveredBrick = null;
+      return;
+    }
+
+    let best = null;
+    let bestDist = Infinity;
+    for (const b of bricks) {
+      if (!pointInsideBrickXZ(state.pointerWorld, b, 0.28)) continue;
+      const c = getBrickCenterXZ(b);
+      const d = Math.hypot(state.pointerWorld.x - c.x, state.pointerWorld.z - c.z);
+      if (d < bestDist) {
+        best = b;
+        bestDist = d;
+      }
+    }
+
+    state.hoveredBrick = best;
   }
 
   function updateDragTarget(world) {
@@ -467,6 +576,49 @@
     ghostBrick.position.set(p.x, 0.01, p.z);
     ghostBrick.visible = true;
     setGhostColor(state.validPlacement);
+
+    if (state.draggingBrick) {
+      state.draggingBrick.group.position.set(p.x, 0.82, p.z);
+    }
+  }
+
+  function startDraggingBrick(brickData) {
+    state.selectedBrick = brickData;
+    state.draggingBrick = brickData;
+    state.dragStart = {
+      onGrid: brickData.onGrid,
+      cornerI: brickData.cornerI,
+      cornerJ: brickData.cornerJ,
+      worldX: brickData.worldX,
+      worldZ: brickData.worldZ
+    };
+    canvas.classList.add("dragging");
+  }
+
+  function finishDragging({ commit = true } = {}) {
+    const b = state.draggingBrick;
+    if (!b) return;
+
+    if (commit && state.validPlacement) {
+      b.onGrid = true;
+      b.cornerI = state.targetCornerI;
+      b.cornerJ = state.targetCornerJ;
+    } else if (state.dragStart) {
+      b.onGrid = state.dragStart.onGrid;
+      b.cornerI = state.dragStart.cornerI;
+      b.cornerJ = state.dragStart.cornerJ;
+      b.worldX = state.dragStart.worldX;
+      b.worldZ = state.dragStart.worldZ;
+    }
+
+    syncBrickPose(b, false);
+
+    state.draggingBrick = null;
+    state.dragStart = null;
+    state.selectedBrick = null; // always clear selection after unpinch
+    state.validPlacement = true;
+    ghostBrick.visible = false;
+    canvas.classList.remove("dragging");
   }
 
   function drawHandDebug(pts, w, h, cursor) {
@@ -558,18 +710,17 @@
     if (!results.landmarks?.length) {
       state.hasHand = false;
       state.handLabel = "-";
-      state.hovered = false;
-      state.selected = false;
+      state.hoveredBrick = null;
       state.pinchDown = false;
       state.pinchOnFrames = 0;
       state.pinchOffFrames = 0;
       state.pointerVisible = false;
       pointer.visible = false;
-      if (state.dragging) {
-        state.dragging = false;
-        ghostBrick.visible = false;
-        canvas.classList.remove("dragging");
+
+      if (state.draggingBrick) {
+        finishDragging({ commit: false });
       }
+
       octx.clearRect(0, 0, overlay.width, overlay.height);
       updateSelectionVisuals();
       return;
@@ -617,35 +768,30 @@
     state.pointerNDC.set((1 - cursor.x) * 2 - 1, 1 - cursor.y * 2);
 
     const world = updatePointerAndPlaneHit();
-    state.hovered = false;
+    state.hoveredBrick = null;
     if (world) updateHoverFromPointer();
 
     if (pinchStarted) {
-      if (state.hovered || state.selected) {
-        state.selected = true;
-        state.dragging = true;
-        canvas.classList.add("dragging");
+      if (state.hoveredBrick) {
+        startDraggingBrick(state.hoveredBrick);
       } else {
-        state.selected = false;
+        state.selectedBrick = null;
       }
     }
 
-    if (state.dragging && world) {
+    if (state.draggingBrick && world) {
       updateDragTarget(world);
-    } else if (!state.dragging) {
+    } else if (!state.draggingBrick) {
       ghostBrick.visible = false;
       state.validPlacement = true;
     }
 
     if (pinchEnded) {
-      if (state.dragging && state.validPlacement) {
-        state.brickCornerI = state.targetCornerI;
-        state.brickCornerJ = state.targetCornerJ;
+      if (state.draggingBrick) {
+        finishDragging({ commit: true });
+      } else {
+        state.selectedBrick = null;
       }
-      state.dragging = false;
-      state.selected = false;
-      ghostBrick.visible = false;
-      canvas.classList.remove("dragging");
     }
 
     drawHandDebug(pts, overlay.width, overlay.height, cursor);
@@ -653,7 +799,10 @@
   }
 
   function renderHud() {
-    const p = cornerToWorld(state.brickCornerI, state.brickCornerJ);
+    const selected = state.selectedBrick;
+    const hovering = state.hoveredBrick;
+    const dragging = !!state.draggingBrick;
+    const selectedCenter = selected ? getBrickCenterXZ(selected) : null;
 
     hud.innerHTML = `
       <div class="card" style="border-left-color:#49d2ff">
@@ -661,28 +810,29 @@
         <div class="row"><span>Hand</span><span class="mono">${state.hasHand ? state.handLabel : "-"}</span></div>
         <div class="row"><span>Pinch</span><span class="mono">${state.pinchDown ? "DOWN" : "UP"}</span></div>
         <div class="row"><span>Pinch strength</span><span class="mono">${Math.round(state.pinchStrength * 100)}%</span></div>
-        <div class="row"><span>Hover</span><span class="mono">${state.hovered ? "YES" : "NO"}</span></div>
-        <div class="row"><span>Selected</span><span class="mono">${state.selected ? "YES" : "NO"}</span></div>
-        <div class="row"><span>Dragging</span><span class="mono">${state.dragging ? "YES" : "NO"}</span></div>
+        <div class="row"><span>Hover</span><span class="mono">${hovering ? `BRICK ${hovering.id}` : "NO"}</span></div>
+        <div class="row"><span>Selected</span><span class="mono">${selected ? `BRICK ${selected.id}` : "NO"}</span></div>
+        <div class="row"><span>Dragging</span><span class="mono">${dragging ? `BRICK ${state.draggingBrick.id}` : "NO"}</span></div>
       </div>
 
       <div class="card" style="border-left-color:${state.validPlacement ? "#49d2ff" : "#ff6159"}">
         <div class="title">Placement</div>
-        <div class="row"><span>Corner I,J</span><span class="mono">${state.brickCornerI}, ${state.brickCornerJ}</span></div>
-        <div class="row"><span>World X,Z</span><span class="mono">${p.x.toFixed(1)}, ${p.z.toFixed(1)}</span></div>
+        <div class="row"><span>Total bricks</span><span class="mono">${bricks.length}</span></div>
+        <div class="row"><span>Supply spot</span><span class="mono">${isPileSpotEmpty() ? "EMPTY" : "OCCUPIED"}</span></div>
         <div class="row"><span>Target I,J</span><span class="mono">${state.targetCornerI}, ${state.targetCornerJ}</span></div>
         <div class="row"><span>Valid target</span><span class="mono">${state.validPlacement ? "YES" : "NO"}</span></div>
+        <div class="row"><span>Selected X,Z</span><span class="mono">${selectedCenter ? `${selectedCenter.x.toFixed(1)}, ${selectedCenter.z.toFixed(1)}` : "-"}</span></div>
       </div>
     `;
   }
 
   function tick() {
     updateFromHand();
-
-    applyBrickTransform();
+    syncAllBrickPoses();
 
     const t = performance.now() * 0.001;
     pointer.material.emissiveIntensity = state.pointerVisible ? (0.5 + Math.sin(t * 6) * 0.15) : 0;
+    supplyRing.material.emissiveIntensity = isPileSpotEmpty() ? 0.6 : 0.25;
 
     renderHud();
     renderer.render(scene, camera);
@@ -703,8 +853,10 @@
 
   window.addEventListener("resize", resize);
   resize();
-  applyBrickTransform();
-  updateSelectionVisuals();
+
+  // Start with one side supply brick and poll spawn continuously.
+  maybeSpawnSupplyBrick();
+  setInterval(maybeSpawnSupplyBrick, PILE_SPAWN_POLL_MS);
 
   initAI();
   tick();

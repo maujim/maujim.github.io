@@ -1,194 +1,190 @@
 # lego-hand-grid.txt
 
-Purpose: **human/model-friendly architecture notes** for `projects/lego-hand-grid.html`.
+Purpose: architecture notes for `projects/lego-hand-grid.html`.
 
-This is a summary doc, not a code mirror.
-
----
-
-## 0) What this page does
-
-`lego-hand-grid.html` is a **Three.js + MediaPipe HandLandmarker** prototype where:
-- a single 2x3 LEGO brick sits on a stud grid,
-- hand pinch acts like click+drag,
-- selection uses editor-style visual hierarchy:
-  - hover = faint outline
-  - selected = stronger outline + subtle tint + gizmo
-  - dragging = ghost preview
-  - invalid placement = red ghost preview
+This file explains the moving parts quickly so future edits can be targeted.
 
 ---
 
-## 1) High-level structure in HTML
+## 0) What this version does
 
-Main DOM elements:
-- `#three` → Three.js render canvas
-- `#overlay` → 2D debug canvas for hand landmark drawing/cursor ring
-- `#webcam` → mirrored camera preview
-- `#hud` → status/debug cards
-- `#controls > #btn-main` → start camera gate after model load
+Three.js + MediaPipe HandLandmarker LEGO prototype with:
+- 16x16 stud grid,
+- hand pinch pick-up / drag / drop,
+- selection visual hierarchy,
+- **infinite red side supply**:
+  - one supply spawn spot on the left,
+  - a polling loop checks every 1s,
+  - if spot is empty, it spawns a new red 2x3 brick.
 
----
-
-## 2) Main runtime state (`state` object)
-
-Core fields:
-- AI/camera:
-  - `handLandmarker`, `lastVideoTime`, `hasHand`, `handLabel`
-- pinch:
-  - `pinchDown`, `pinchStrength`
-- editor selection:
-  - `hovered`, `selected`, `dragging`
-- pointer/raycast:
-  - `pointerNDC`, `pointerWorld`, `pointerVisible`
-- placement:
-  - `brickCornerI/J` (committed placement)
-  - `targetCornerI/J` (candidate while dragging)
-  - `validPlacement`
+This allows repeatedly grabbing bricks and placing them on the board.
 
 ---
 
-## 3) Scene objects (Three.js)
+## 1) Core UI elements
 
-Created once at startup:
-- base scene: renderer, scene, camera, fog, lights
-- floor/baseplate + instanced studs + grid helper
-- `brick` (actual 2x3 brick)
-- `ghostBrick` (transparent preview during drag)
-- `pointer` (small sphere at hand cursor projected onto plane)
-- selection visuals attached to `brick`:
-  - `hoverOutline`
-  - `selectedOutline`
-  - `gizmo` (AxesHelper)
+- `#three`: main Three.js canvas
+- `#overlay`: 2D debug overlay (hand landmarks + cursor ring)
+- `#webcam`: mirrored camera preview
+- `#hud`: runtime debug cards
+- `#controls/#btn-main`: load/start camera gate
 
 ---
 
-## 4) Coordinate + placement helpers
+## 2) Important constants
 
-Key helpers:
-- `cornerToWorld(i, j)`
-  - grid corner index → world X/Z brick center position
-- `worldToCornerRaw(x, z)`
-  - world X/Z → nearest grid corner index (unclamped)
-- `isValidCorner(i, j)`
-  - checks footprint bounds for 2x3 brick
-- `worldToCornerClamped(x, z)`
-  - safe in-bounds fallback for preview
-- `setGhostColor(valid)`
-  - cyan when valid, red when invalid
+Grid/brick:
+- `GRID_COLS`, `GRID_ROWS`, `BRICK_W`, `BRICK_D`
 
----
+Side supply:
+- `PILE_SPAWN`: world position of supply spot
+- `PILE_OCCUPY_RADIUS`: radius used to decide if spawn spot is occupied
+- `PILE_SPAWN_POLL_MS`: poll interval (1000 ms)
 
-## 5) Selection visuals behavior
-
-`updateSelectionVisuals()` controls hierarchy:
-- hover only: show faint outline
-- selected: show strong outline + gizmo
-- both states also drive subtle emissive tint on brick materials
-
-Design intent: outline is the primary cue; tint is secondary support.
+Pinch tuning:
+- base thresholds: `0.43 / 0.58`
+- scale: `PINCH_RING_SCALE = 1.09`
+- effective thresholds:
+  - on: `0.43 * 1.09`
+  - off: `0.58 * 1.09`
+- debounce frames:
+  - pinch-on requires 2 frames
+  - pinch-off requires 3 frames
 
 ---
 
-## 6) Hand input pipeline
+## 3) Brick model (multi-brick)
 
-Main loop in `updateFromHand()`:
-1. skip if no new video frame (`video.currentTime` guard)
-2. run `detectForVideo(...)`
-3. if no hand:
-   - clear hand state
-   - stop dragging if needed
-   - hide pointer/ghost
-4. if hand exists:
-   - compute pinch metric: `dist(thumbTip,indexTip) / dist(indexMCP,pinkyMCP)`
-   - hysteresis thresholds (scaled ring):
-     - pinch on: `< 0.43 * 1.09` (~`0.469`)
-     - pinch off: `> 0.58 * 1.09` (~`0.632`)
-   - edge debounce (reduce accidental drop from jitter):
-     - pinch-on requires `2` consecutive frames
-     - pinch-off requires `3` consecutive frames
-   - cursor = midpoint(thumbTip, indexTip)
-   - convert cursor to NDC (mirrored x)
-   - raycast to ground plane
-   - update hover from raycast against brick pickable meshes
+Bricks are no longer single-instance.
 
-Pinch edge events:
+- `bricks[]`: array of brick data objects
+- each brick data has:
+  - `id`
+  - `group` (Three.js group)
+  - placement mode:
+    - `onGrid` with `cornerI/cornerJ`
+    - or side/world placement with `worldX/worldZ`
+
+Key functions:
+- `createBrickInstance(...)`
+- `getBrickCenterXZ(brickData)`
+- `syncBrickPose(brickData, lift)`
+- `syncAllBrickPoses()`
+
+---
+
+## 4) Infinite side supply behavior
+
+Supply spawn loop:
+- `isPileSpotEmpty()` checks if any brick center is within `PILE_OCCUPY_RADIUS` of `PILE_SPAWN`.
+- `maybeSpawnSupplyBrick()` spawns one red brick at the supply spot if empty.
+- called at startup once, then via:
+  - `setInterval(maybeSpawnSupplyBrick, PILE_SPAWN_POLL_MS)`
+
+Effect:
+- move a supply brick away,
+- spot becomes empty,
+- next poll (~1s) creates another brick.
+
+---
+
+## 5) Selection / drag visual hierarchy
+
+Shared decorators move between brick groups:
+- `hoverOutline` (faint)
+- `selectedOutline` (strong)
+- `gizmo` (axes)
+
+`updateSelectionVisuals()`:
+- binds decorators to hovered/selected brick,
+- applies subtle emissive tint per brick:
+  - selected > hovered > none.
+
+Ghost preview:
+- `ghostBrick` shown only while dragging,
+- cyan when valid, red when invalid (`setGhostColor`).
+
+---
+
+## 6) Hand input state machine
+
+Main loop: `updateFromHand()`
+
+Per frame with new video time:
+1. detect landmarks with `detectForVideo`
+2. compute pinch metric = thumb-index distance / palm width
+3. apply hysteresis + debounce to update `pinchDown`
+4. compute cursor midpoint and raycast onto ground plane
+5. update hovered brick from:
+   - pickable mesh raycast first,
+   - then footprint tolerance fallback
+
+Transitions:
 - pinch start:
-  - if hovered or already selected → select + start dragging
-  - else deselect
-- while dragging + plane hit:
-  - update target corner, preview ghost, validity color
+  - if hovering a brick → start dragging that brick
+- while pinching + dragging:
+  - update ghost target corner and move held brick above target
 - pinch end:
-  - if dragging and valid → commit placement
-  - always clear selection (selected = false)
-  - stop dragging + hide ghost
+  - if valid target → commit to grid corner
+  - else restore from drag start state
+  - always clear selection
+
+No-hand fallback:
+- clears hover/pinch states,
+- cancels active drag (restores start pose),
+- hides pointer + ghost.
 
 ---
 
-## 7) Rendering loop
+## 7) Drag placement logic
 
-`tick()` runs continuously:
-- `updateFromHand()`
-- `applyBrickTransform()` (uses committed corner)
-- pointer emissive pulse when visible
-- `renderHud()`
-- `renderer.render(scene, camera)`
+- target corner from `worldToCornerRaw(world.x, world.z)`
+- validity from `isValidCorner(i, j)`
+- invalid preview uses clamped corner (`worldToCornerClamped`) and red ghost
+- commit sets dragged brick to `onGrid=true` + target corner
 
 ---
 
-## 8) HUD contents
+## 8) Hover detection details
 
-Two cards:
-1. Hand + Selection
-   - hand label, pinch state/strength, hover/selected/dragging
-2. Placement
-   - committed corner, world coords, target corner, validity
+`updateHoverFromPointer()`:
+1. raycast all brick pickables (precise)
+2. fallback: footprint tolerance (`pointInsideBrickXZ(..., 0.28)`) for forgiving selection
 
 ---
 
-## 9) Function map (quick navigation)
+## 9) High-value functions for future edits
 
-Use these names when patching:
-- scene/material creation: `makeBrick(...)`
-- visual hierarchy: `updateSelectionVisuals()`
-- pointer projection: `updatePointerAndPlaneHit()`
-- hover detection (raycast + tolerance): `updateHoverFromPointer()`, `pointInsideBrickXZ()`
-- drag targeting: `updateDragTarget(world)`
-- hand pipeline/state machine: `updateFromHand()`
-- HUD text: `renderHud()`
-
----
-
-## 10) Common edits you’ll likely do next
-
-- Reduce jitter:
-  - add smoothing for cursor world pos
-  - require pinch hold N ms before drag start
-- Better placement rules:
-  - add collision system once multi-brick exists
-- Better affordances:
-  - add rotation gesture/button
-  - add multi-select color/group box
-- Performance pass:
-  - lower detect cadence (e.g., every Nth frame)
-  - decouple hand detect FPS from render FPS
+- Supply logic:
+  - `isPileSpotEmpty()`
+  - `maybeSpawnSupplyBrick()`
+- Brick creation/pose:
+  - `makeBrick(...)`
+  - `createBrickInstance(...)`
+  - `syncBrickPose(...)`
+- Selection visuals:
+  - `updateSelectionVisuals()`
+- Hand flow:
+  - `updateFromHand()`
+  - `startDraggingBrick(...)`
+  - `finishDragging(...)`
+- Drag target:
+  - `updateDragTarget(world)`
 
 ---
 
-## 11) Important constants to tune
+## 10) Known simplifications (v0)
 
-- Pinch hysteresis base: `0.43 / 0.58`
-- Pinch ring scale: `1.09` (9% larger effective pinch radius)
-- Effective thresholds: on~`0.469`, off~`0.632`
-- Pinch debounce frames: on=`2`, off=`3`
-- Hover footprint tolerance: `0.28` (increase a bit if grabbing feels too strict)
-- Grid size: `GRID_COLS`, `GRID_ROWS`
-- Brick footprint: `BRICK_W`, `BRICK_D`
-- Outline opacity/colors for hover/selected
-- Ghost colors for valid/invalid placement
+- No collision checks between placed bricks yet (stack/overlap prevention missing).
+- Only one hand is used (`numHands: 1`).
+- Drag validity checks only board bounds (not occupancy).
+- Supply spawn uses polling (`setInterval`) by design.
 
 ---
 
-## 12) Editing rule for future models
+## 11) Good next tuning knobs
 
-When changing behavior, prefer **targeted edits by function** instead of rewriting the entire HTML file.
+- Increase/decrease `PILE_OCCUPY_RADIUS` if supply re-spawns too eagerly/slowly.
+- Adjust pinch debounce for responsiveness vs stability.
+- Add occupancy rules if overlapping bricks becomes an issue.
+- Add brick rotation controls (gesture/button).
