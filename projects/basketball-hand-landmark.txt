@@ -1,0 +1,263 @@
+BASKETBALL HAND LANDMARK — EDITING GUIDE
+File: projects/basketball-hand-landmark.html
+
+Purpose
+- This is a quick map so you can edit the HTML in small pieces without hunting through everything.
+- Each section below includes:
+  1) what it controls
+  2) exact search anchor(s)
+  3) common edits
+
+----------------------------------------------------------------------
+0) PAGE TITLE + HIGH-LEVEL TEXT
+----------------------------------------------------------------------
+Search anchors:
+- <title>Hand Basketball (Three.js + MediaPipe)</title>
+- <div id="hint">...
+- <div id="start-instructions">...
+
+Use this for:
+- Rename page title
+- Change start instructions
+- Change on-screen hint text
+
+----------------------------------------------------------------------
+1) CSS: LAYOUT + HUD STYLING
+----------------------------------------------------------------------
+Search anchors:
+- :root {
+- #three,
+- #overlay {
+- #webcam {
+- #hud {
+- .card {
+- #controls {
+- #start-instructions {
+
+Use this for:
+- Theme/colors
+- Webcam preview size/location
+- HUD card sizes/fonts
+- Start overlay visual style
+
+----------------------------------------------------------------------
+2) DOM STRUCTURE (HTML BODY)
+----------------------------------------------------------------------
+Search anchors:
+- <div id="app">
+- <canvas id="three"></canvas>
+- <canvas id="overlay"></canvas>
+- <video id="webcam" ...></video>
+- <div id="hud"></div>
+- <div id="controls">
+
+Use this for:
+- Add/remove UI blocks
+- Add buttons/sliders later
+
+----------------------------------------------------------------------
+3) IMPORTS
+----------------------------------------------------------------------
+Search anchors:
+- import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.183.2/build/three.module.js";
+- import { HandLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0";
+
+Use this for:
+- Upgrade/downgrade library versions
+
+----------------------------------------------------------------------
+4) TUNABLE GAME CONSTANTS (BEST FIRST PLACE TO TWEAK FEEL)
+----------------------------------------------------------------------
+Search anchors:
+- const BALL_R = 0.34;
+- const HOOP = { ... }
+- const BACKBOARD = { ... }
+- const HAND_PLANE_Z = 6.5;
+
+Use this for:
+- Ball size
+- Rim position/size
+- Backboard dimensions
+- Hand interaction depth plane
+
+----------------------------------------------------------------------
+5) STATE MODEL
+----------------------------------------------------------------------
+Search anchor:
+- const state = {
+
+Use this for:
+- Add flags/counters
+- Add new gameplay modes
+- Add debug fields
+
+----------------------------------------------------------------------
+6) 3D SCENE SETUP (COURT, HOOP, BALL)
+----------------------------------------------------------------------
+Search anchors:
+- // --- Three.js ---
+- const floor = new THREE.Mesh(
+- const hoopGroup = new THREE.Group();
+- const rim = new THREE.Mesh(
+- const ball = new THREE.Group();
+
+Use this for:
+- Redesign court/hoop visuals
+- Move camera
+- Lighting changes
+- Ball material changes
+
+----------------------------------------------------------------------
+7) HAND DEBUG DRAWING (2D OVERLAY)
+----------------------------------------------------------------------
+Search anchor:
+- function drawHandDebug(pts, w, h, cursor) {
+
+Use this for:
+- Landmark colors/sizes
+- Cursor ring style
+- Power bar style
+
+----------------------------------------------------------------------
+8) POWER ESTIMATION FROM CV
+----------------------------------------------------------------------
+Search anchors:
+- function pushHandHistory(point, t) {
+- function estimateReleaseVelocity() {
+
+Most important knobs (inside estimateReleaseVelocity):
+- time window (look for ~95ms sample interval)
+- flickPower scaling (speed / 9.5)
+- pullPower scaling ((grabStartY - end.y + 1.2) / 3.4)
+- blend weights (0.78 and 0.22)
+
+Use this for:
+- Make throws stronger/weaker
+- Bias toward flick vs pull-up motion
+- Stabilize noisy power
+
+----------------------------------------------------------------------
+9) SHOOT LOGIC
+----------------------------------------------------------------------
+Search anchor:
+- function shootBall() {
+
+Important knobs:
+- forwardSpeed = 8 + est.power * 12
+- ballVel.y = 4.8 + est.power * 8.5 + est.vy * 0.62
+
+Use this for:
+- Arc height
+- Travel speed
+- More/less forgiveness on aiming
+
+----------------------------------------------------------------------
+10) PHYSICS + COLLISIONS + SCORING
+----------------------------------------------------------------------
+Search anchor:
+- function applyBallPhysics(dt) {
+
+Sub-blocks inside:
+- gravity
+- floor bounce
+- side walls
+- backboard collision
+- rim collision
+- score detect
+- reset conditions
+
+Fast tweak list:
+- gravity: look for -18
+- bounce damping: 0.56, 0.9, etc.
+- rim collision response: -1.72 * vn
+- reset timeout: 8.5 seconds
+
+----------------------------------------------------------------------
+11) MEDIAPIPE INIT + CAMERA
+----------------------------------------------------------------------
+Search anchors:
+- async function initAI() {
+- async function startCamera() {
+
+Use this for:
+- numHands
+- model path
+- camera constraints
+- error UX text
+
+----------------------------------------------------------------------
+12) HAND INPUT -> GAME CONTROL MAPPING
+----------------------------------------------------------------------
+Search anchor:
+- function updateFromHand() {
+
+This function handles:
+- Detect hand landmarks
+- Pinch hysteresis
+- Cursor mapping (screen -> world)
+- Grab start near ball
+- Follow hand while grabbed
+- Release to shoot
+
+Important knobs:
+- pinchOn threshold: pinchNorm < 0.43
+- pinchOff threshold: pinchNorm > 0.58
+- grab distance: nearBall threshold 1.25
+- smoothing: state.handAnchor.lerp(world, 0.35)
+
+----------------------------------------------------------------------
+13) HUD RENDER
+----------------------------------------------------------------------
+Search anchor:
+- function renderHud() {
+
+Use this for:
+- HUD content
+- Score display
+- Accuracy formulas
+
+----------------------------------------------------------------------
+14) MAIN LOOP + RESIZE
+----------------------------------------------------------------------
+Search anchors:
+- function tick() {
+- function resize() {
+- initAI();
+- tick();
+
+Use this for:
+- Frame pacing
+- Render/update order
+- Future performance work (decouple CV from render)
+
+----------------------------------------------------------------------
+QUICK “GOOD FEEL” TUNING CHEAT SHEET
+----------------------------------------------------------------------
+If shots feel too weak:
+- Increase forwardSpeed multiplier (12 -> 14/15)
+- Increase Y impulse multiplier (8.5 -> 9.5)
+
+If shots feel too wild:
+- Reduce est.vx / est.vy influence in shootBall()
+- Increase hand anchor smoothing (lerp 0.35 -> 0.45)
+
+If grabs are hard:
+- Increase nearBall threshold (1.25 -> 1.5)
+- Relax pinchOn (0.43 -> 0.46)
+
+If accidental grabs happen:
+- Tighten pinchOn (0.43 -> 0.40)
+- Lower nearBall threshold (1.25 -> 1.1)
+
+----------------------------------------------------------------------
+SUGGESTED NEXT REFACTOR (OPTIONAL)
+----------------------------------------------------------------------
+When you want cleaner code, split script into sections/modules:
+- config
+- scene
+- hand-tracking
+- gameplay-physics
+- ui
+- main-loop
+
+For now this guide should make piece-by-piece editing easy without restructuring.
