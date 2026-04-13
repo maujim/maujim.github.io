@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Multi Inspector (Hand + Pose + Face)</title>
+    <style>
+        :root {
+            --bg: #050505;
+            --panel: rgba(20, 20, 20, 0.9);
+            --hand: #ffd400;
+            --pose: #00e5ff;
+            --face: #ff5cd6;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg);
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #viewport {
+            position: relative;
+            flex-grow: 1;
+            width: 100%;
+            background: #000;
+        }
+
+        video,
+        canvas {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        video {
+            transform: scaleX(-1);
+        }
+
+        #hud {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 290px;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .card {
+            background: var(--panel);
+            border-left: 4px solid #fff;
+            padding: 8px;
+            border-radius: 0 8px 8px 0;
+            backdrop-filter: blur(4px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+        }
+
+        .title {
+            color: #fff;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            border-bottom: 1px solid #444;
+            padding-bottom: 2px;
+            letter-spacing: 1px;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #ddd;
+            font-size: 11px;
+            margin: 2px 0;
+        }
+
+        .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+        #controls {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 50;
+            width: 100%;
+            text-align: center;
+        }
+
+        button {
+            padding: 18px 36px;
+            font-size: 16px;
+            font-weight: 800;
+            background: #fff;
+            color: #000;
+            border: none;
+            cursor: pointer;
+            border-radius: 50px;
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: opacity 0.3s;
+        }
+
+        button:disabled {
+            background: #444;
+            color: #888;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+    </style>
+</head>
+<body>
+<div id="viewport">
+    <video id="webcam" playsinline muted autoplay></video>
+    <canvas id="output_canvas"></canvas>
+
+    <div id="hud"></div>
+
+    <div id="controls">
+        <button id="btn-main" disabled>Loading Models...</button>
+    </div>
+</div>
+
+<script type="module">
+    import {
+        FilesetResolver,
+        HandLandmarker,
+        PoseLandmarker,
+        FaceLandmarker
+    } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0";
+
+    const video = document.getElementById("webcam");
+    const canvas = document.getElementById("output_canvas");
+    const ctx = canvas.getContext("2d");
+    const hud = document.getElementById("hud");
+    const btnMain = document.getElementById("btn-main");
+
+    let handLandmarker;
+    let poseLandmarker;
+    let faceLandmarker;
+    let lastVideoTime = -1;
+
+    const POSE_CONNECTIONS = [
+        [0, 1], [1, 2], [2, 3], [3, 7], [0, 4], [4, 5], [5, 6], [6, 8],
+        [9, 10], [11, 12], [11, 13], [13, 15], [12, 14], [14, 16], [11, 23],
+        [12, 24], [23, 24], [23, 25], [25, 27], [24, 26], [26, 28]
+    ];
+
+    const HAND_CHAINS = [
+        [0, 1, 2, 3, 4],
+        [0, 5, 6, 7, 8],
+        [0, 9, 10, 11, 12],
+        [0, 13, 14, 15, 16],
+        [0, 17, 18, 19, 20],
+        [5, 9, 13, 17]
+    ];
+
+    const FACE_OUTLINE = [
+        10, 338, 297, 332, 284, 251, 389, 356, 454, 323, 361, 288, 397,
+        365, 379, 378, 400, 377, 152, 148, 176, 149, 150, 136, 172, 58,
+        132, 93, 234, 127, 162, 21, 54, 103, 67, 109, 10
+    ];
+
+    async function initAI() {
+        try {
+            const vision = await FilesetResolver.forVisionTasks(
+                "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm"
+            );
+
+            const [hand, pose, face] = await Promise.all([
+                HandLandmarker.createFromOptions(vision, {
+                    baseOptions: {
+                        modelAssetPath: "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task",
+                        delegate: "GPU"
+                    },
+                    runningMode: "VIDEO",
+                    numHands: 2
+                }),
+                PoseLandmarker.createFromOptions(vision, {
+                    baseOptions: {
+                        modelAssetPath: "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_full/float16/1/pose_landmarker_full.task",
+                        delegate: "GPU"
+                    },
+                    runningMode: "VIDEO",
+                    numPoses: 2,
+                    minPoseDetectionConfidence: 0.5,
+                    minPosePresenceConfidence: 0.5,
+                    minTrackingConfidence: 0.5
+                }),
+                FaceLandmarker.createFromOptions(vision, {
+                    baseOptions: {
+                        modelAssetPath: "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",
+                        delegate: "GPU"
+                    },
+                    runningMode: "VIDEO",
+                    numFaces: 2,
+                    outputFaceBlendshapes: false,
+                    outputFacialTransformationMatrixes: false
+                })
+            ]);
+
+            handLandmarker = hand;
+            poseLandmarker = pose;
+            faceLandmarker = face;
+
+            btnMain.innerText = "START CAMERA";
+            btnMain.removeAttribute("disabled");
+            btnMain.addEventListener("click", startCamera);
+        } catch (err) {
+            console.error(err);
+            btnMain.innerText = "ERROR LOADING MODELS";
+        }
+    }
+
+    function startCamera() {
+        btnMain.style.opacity = "0";
+
+        navigator.mediaDevices.getUserMedia({
+            video: {
+                facingMode: "user",
+                width: { ideal: 1280 },
+                height: { ideal: 720 }
+            }
+        }).then((stream) => {
+            video.srcObject = stream;
+            video.addEventListener("loadeddata", () => {
+                document.getElementById("controls").style.display = "none";
+                renderLoop();
+            });
+        }).catch((err) => {
+            console.error(err);
+            btnMain.style.opacity = "1";
+            btnMain.innerText = "CAMERA DENIED";
+        });
+    }
+
+    const toScreen = (p, w, h) => ({ x: (1 - p.x) * w, y: p.y * h });
+
+    function drawPolyline(pts, indices, color, width, w, h, close = false) {
+        if (!indices.length) return;
+        ctx.strokeStyle = color;
+        ctx.lineWidth = width;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        ctx.beginPath();
+
+        const first = toScreen(pts[indices[0]], w, h);
+        ctx.moveTo(first.x, first.y);
+
+        for (let i = 1; i < indices.length; i++) {
+            const p = toScreen(pts[indices[i]], w, h);
+            ctx.lineTo(p.x, p.y);
+        }
+
+        if (close) ctx.closePath();
+        ctx.stroke();
+    }
+
+    function renderLoop() {
+        if (canvas.width !== video.videoWidth) {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+        }
+
+        if (video.currentTime !== lastVideoTime) {
+            lastVideoTime = video.currentTime;
+            const timestamp = performance.now();
+
+            const handResults = handLandmarker.detectForVideo(video, timestamp);
+            const poseResults = poseLandmarker.detectForVideo(video, timestamp);
+            const faceResults = faceLandmarker.detectForVideo(video, timestamp);
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const w = canvas.width;
+            const h = canvas.height;
+
+            // Pose overlay
+            poseResults.landmarks?.forEach((pts) => {
+                POSE_CONNECTIONS.forEach(([a, b]) => {
+                    const s1 = toScreen(pts[a], w, h);
+                    const s2 = toScreen(pts[b], w, h);
+                    ctx.strokeStyle = "rgba(0,229,255,0.6)";
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.moveTo(s1.x, s1.y);
+                    ctx.lineTo(s2.x, s2.y);
+                    ctx.stroke();
+                });
+            });
+
+            // Hand overlay
+            handResults.landmarks?.forEach((pts) => {
+                HAND_CHAINS.forEach((chain) => {
+                    drawPolyline(pts, chain, "rgba(255,212,0,0.85)", 4, w, h);
+                });
+            });
+
+            // Face overlay
+            faceResults.faceLandmarks?.forEach((pts) => {
+                drawPolyline(pts, FACE_OUTLINE, "rgba(255,92,214,0.9)", 3, w, h);
+                drawPolyline(pts, [33, 133, 159, 145, 33], "rgba(255,92,214,0.8)", 2, w, h, true);
+                drawPolyline(pts, [362, 263, 386, 374, 362], "rgba(255,92,214,0.8)", 2, w, h, true);
+                drawPolyline(pts, [78, 95, 88, 178, 87, 14, 317, 402, 318, 324, 308, 78], "rgba(255,92,214,0.8)", 2, w, h, true);
+            });
+
+            // HUD
+            const hands = handResults.landmarks?.length || 0;
+            const poses = poseResults.landmarks?.length || 0;
+            const faces = faceResults.faceLandmarks?.length || 0;
+
+            hud.innerHTML = `
+                <div class="card" style="border-left-color: var(--hand)">
+                    <div class="title" style="color: var(--hand)">Hands</div>
+                    <div class="row"><span>Detected</span><span class="mono">${hands}</span></div>
+                    <div class="row"><span>Landmarks / hand</span><span class="mono">21</span></div>
+                </div>
+                <div class="card" style="border-left-color: var(--pose)">
+                    <div class="title" style="color: var(--pose)">Poses</div>
+                    <div class="row"><span>Detected</span><span class="mono">${poses}</span></div>
+                    <div class="row"><span>Landmarks / pose</span><span class="mono">33</span></div>
+                </div>
+                <div class="card" style="border-left-color: var(--face)">
+                    <div class="title" style="color: var(--face)">Faces</div>
+                    <div class="row"><span>Detected</span><span class="mono">${faces}</span></div>
+                    <div class="row"><span>Landmarks / face</span><span class="mono">478</span></div>
+                </div>
+            `;
+        }
+
+        requestAnimationFrame(renderLoop);
+    }
+
+    initAI();
+</script>
+</body>
+</html>
