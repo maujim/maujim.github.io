@@ -46,15 +46,18 @@
         padding: 0;
       }
 
-      .item {
+      .item-link {
         display: grid;
         grid-template-columns: minmax(0, 1fr) auto;
         column-gap: 18px;
         padding: 12px 12px;
         border-radius: 12px;
+        color: inherit;
+        text-decoration: none;
+        cursor: pointer;
       }
 
-      .item:hover {
+      .item-link:hover {
         background: #e9e9e9;
       }
 
@@ -68,16 +71,6 @@
         line-height: 1.25;
         font-weight: 520;
         letter-spacing: -0.01em;
-      }
-
-      .item-title a {
-        color: inherit;
-        text-decoration: none;
-      }
-
-      .item-title a:hover {
-        text-decoration: underline;
-        text-underline-offset: 2px;
       }
 
       .item-subtitle {
@@ -108,27 +101,33 @@
       <h2 class="section-label">personal projects</h2>
       <ul class="list">
         <li class="item">
-          <div class="item-main">
-            <h3 class="item-title"><a href="/projects/hand-inspector.html">Hand Metric Inspector</a></h3>
-            <p class="item-subtitle">Measure and inspect landmarks</p>
-          </div>
-          <span class="item-meta">2026</span>
+          <a class="item-link" href="/projects/hand-inspector.html">
+            <div class="item-main">
+              <h3 class="item-title">Hand Metric Inspector</h3>
+              <p class="item-subtitle">Measure and inspect landmarks</p>
+            </div>
+            <span class="item-meta">2026</span>
+          </a>
         </li>
 
         <li class="item">
-          <div class="item-main">
-            <h3 class="item-title"><a href="/projects/clinical-trials-viewer.html">Clinical Trials Viewer</a></h3>
-            <p class="item-subtitle">Search and explore studies</p>
-          </div>
-          <span class="item-meta">2025</span>
+          <a class="item-link" href="/projects/clinical-trials-viewer.html">
+            <div class="item-main">
+              <h3 class="item-title">Clinical Trials Viewer</h3>
+              <p class="item-subtitle">Search and explore studies</p>
+            </div>
+            <span class="item-meta">2025</span>
+          </a>
         </li>
 
         <li class="item">
-          <div class="item-main">
-            <h3 class="item-title"><a href="/projects/torus.html">Torus</a></h3>
-            <p class="item-subtitle">Experimental graphics page</p>
-          </div>
-          <span class="item-meta">2024</span>
+          <a class="item-link" href="/projects/torus.html">
+            <div class="item-main">
+              <h3 class="item-title">Torus</h3>
+              <p class="item-subtitle">Experimental graphics page</p>
+            </div>
+            <span class="item-meta">2024</span>
+          </a>
         </li>
       </ul>
     </main>
