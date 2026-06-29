@@ -192,6 +192,8 @@
   const STUD = 1;
   const BRICK_W = 2;
   const BRICK_D = 3;
+  const BRICK_STACK_STEP = 0.68;
+  const BRICK_DRAG_LIFT = 0.82;
 
   // Side supply pile behavior
   const PILE_SPAWN = { x: -GRID_COLS * 0.5 - 1.9, z: 0 };
@@ -235,7 +237,8 @@
 
     targetCornerI: 6,
     targetCornerJ: 6,
-    validPlacement: true
+    validPlacement: true,
+    targetStackLevel: 0
   };
 
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
@@ -388,7 +391,8 @@
 
   function syncBrickPose(brickData, lift = false) {
     const p = getBrickCenterXZ(brickData);
-    brickData.group.position.set(p.x, lift ? 0.82 : 0, p.z);
+    const baseY = brickData.onGrid ? (brickData.stackLevel || 0) * BRICK_STACK_STEP : 0;
+    brickData.group.position.set(p.x, baseY + (lift ? BRICK_DRAG_LIFT : 0), p.z);
   }
 
   function syncAllBrickPoses() {
@@ -404,6 +408,21 @@
            Math.abs(worldPoint.z - c.z) <= BRICK_D * 0.5 + tolerance;
   }
 
+  function footprintsOverlap(aI, aJ, bI, bJ) {
+    return aI < bI + BRICK_W && aI + BRICK_W > bI &&
+           aJ < bJ + BRICK_D && aJ + BRICK_D > bJ;
+  }
+
+  function getDropStackLevel(dropBrick, cornerI, cornerJ) {
+    let level = 0;
+    for (const b of bricks) {
+      if (b === dropBrick || !b.onGrid) continue;
+      if (!footprintsOverlap(cornerI, cornerJ, b.cornerI, b.cornerJ)) continue;
+      level = Math.max(level, (b.stackLevel || 0) + 1);
+    }
+    return level;
+  }
+
   function setGhostColor(valid) {
     const bodyMat = ghostBrick.userData.bodyMat;
     const studMat = ghostBrick.userData.studTopMat;
@@ -416,7 +435,7 @@
     }
   }
 
-  function createBrickInstance({ onGrid = false, cornerI = 0, cornerJ = 0, worldX = 0, worldZ = 0 } = {}) {
+  function createBrickInstance({ onGrid = false, cornerI = 0, cornerJ = 0, worldX = 0, worldZ = 0, stackLevel = 0 } = {}) {
     const group = makeBrick(0xd22f2f, false);
     const data = {
       id: brickIdSeq++,
@@ -425,7 +444,8 @@
       cornerI,
       cornerJ,
       worldX,
-      worldZ
+      worldZ,
+      stackLevel
     };
 
     group.userData.brickData = data;
@@ -573,12 +593,17 @@
     state.targetCornerJ = corner.j;
 
     const p = cornerToWorld(corner.i, corner.j);
-    ghostBrick.position.set(p.x, 0.01, p.z);
+    const stackLevel = state.validPlacement && state.draggingBrick
+      ? getDropStackLevel(state.draggingBrick, corner.i, corner.j)
+      : 0;
+    state.targetStackLevel = stackLevel;
+    const y = stackLevel * BRICK_STACK_STEP;
+    ghostBrick.position.set(p.x, y + 0.01, p.z);
     ghostBrick.visible = true;
     setGhostColor(state.validPlacement);
 
     if (state.draggingBrick) {
-      state.draggingBrick.group.position.set(p.x, 0.82, p.z);
+      state.draggingBrick.group.position.set(p.x, y + BRICK_DRAG_LIFT, p.z);
     }
   }
 
@@ -590,7 +615,8 @@
       cornerI: brickData.cornerI,
       cornerJ: brickData.cornerJ,
       worldX: brickData.worldX,
-      worldZ: brickData.worldZ
+      worldZ: brickData.worldZ,
+      stackLevel: brickData.stackLevel
     };
     canvas.classList.add("dragging");
   }
@@ -603,12 +629,14 @@
       b.onGrid = true;
       b.cornerI = state.targetCornerI;
       b.cornerJ = state.targetCornerJ;
+      b.stackLevel = getDropStackLevel(b, b.cornerI, b.cornerJ);
     } else if (state.dragStart) {
       b.onGrid = state.dragStart.onGrid;
       b.cornerI = state.dragStart.cornerI;
       b.cornerJ = state.dragStart.cornerJ;
       b.worldX = state.dragStart.worldX;
       b.worldZ = state.dragStart.worldZ;
+      b.stackLevel = state.dragStart.stackLevel;
     }
 
     syncBrickPose(b, false);
@@ -617,6 +645,7 @@
     state.dragStart = null;
     state.selectedBrick = null; // always clear selection after unpinch
     state.validPlacement = true;
+    state.targetStackLevel = 0;
     ghostBrick.visible = false;
     canvas.classList.remove("dragging");
   }
@@ -681,6 +710,10 @@
   async function startCamera() {
     btnMain.style.opacity = "0";
     try {
+      if (!navigator.mediaDevices?.getUserMedia) {
+        throw new Error("Camera access requires a secure local origin. Open this page from http://localhost or http://127.0.0.1, not a LAN IP or 0.0.0.0.");
+      }
+
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: "user",
@@ -694,9 +727,12 @@
         document.getElementById("controls").style.display = "none";
       }, { once: true });
     } catch (err) {
-      console.error(err);
+      const needsSecureOrigin = err?.message?.includes("secure local origin");
       btnMain.style.opacity = "1";
-      btnMain.textContent = "Camera Denied";
+      btnMain.textContent = needsSecureOrigin ? "Use localhost" : "Camera Denied";
+      if (needsSecureOrigin) {
+        document.getElementById("hint").textContent = "Camera access works from http://localhost:8000 or http://127.0.0.1:8000. Browser security blocks camera APIs on 0.0.0.0, LAN IPs, and file://.";
+      }
     }
   }
 
