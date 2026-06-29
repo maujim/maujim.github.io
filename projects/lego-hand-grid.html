@@ -127,6 +127,12 @@
       max-width: min(62vw, 780px);
     }
 
+    #hint.error {
+      color: #ffd8d5;
+      background: rgba(120, 24, 20, 0.72);
+      border-color: rgba(255, 97, 89, 0.78);
+    }
+
     #controls {
       position: absolute;
       left: 50%;
@@ -186,6 +192,9 @@
   const video = document.getElementById("webcam");
   const hud = document.getElementById("hud");
   const btnMain = document.getElementById("btn-main");
+  const hint = document.getElementById("hint");
+  const DEFAULT_HINT_TEXT = hint.textContent;
+  let hintResetTimer = null;
 
   const GRID_COLS = 16;
   const GRID_ROWS = 16;
@@ -423,6 +432,31 @@
     return level;
   }
 
+  function hasBrickAbove(brickData) {
+    if (!brickData.onGrid) return false;
+    const level = brickData.stackLevel || 0;
+    return bricks.some((b) =>
+      b !== brickData &&
+      b.onGrid &&
+      (b.stackLevel || 0) > level &&
+      footprintsOverlap(brickData.cornerI, brickData.cornerJ, b.cornerI, b.cornerJ)
+    );
+  }
+
+  function clearPickupFeedback() {
+    clearTimeout(hintResetTimer);
+    hint.textContent = DEFAULT_HINT_TEXT;
+    hint.classList.remove("error");
+  }
+
+  function showPickupBlocked(brickData) {
+    state.selectedBrick = brickData;
+    hint.textContent = `Brick ${brickData.id} is locked. Remove the bricks above it first.`;
+    hint.classList.add("error");
+    clearTimeout(hintResetTimer);
+    hintResetTimer = setTimeout(clearPickupFeedback, 1800);
+  }
+
   function setGhostColor(valid) {
     const bodyMat = ghostBrick.userData.bodyMat;
     const studMat = ghostBrick.userData.studTopMat;
@@ -571,13 +605,16 @@
 
     let best = null;
     let bestDist = Infinity;
+    let bestLevel = -1;
     for (const b of bricks) {
       if (!pointInsideBrickXZ(state.pointerWorld, b, 0.28)) continue;
       const c = getBrickCenterXZ(b);
       const d = Math.hypot(state.pointerWorld.x - c.x, state.pointerWorld.z - c.z);
-      if (d < bestDist) {
+      const level = b.onGrid ? (b.stackLevel || 0) : 0;
+      if (level > bestLevel || (level === bestLevel && d < bestDist)) {
         best = b;
         bestDist = d;
+        bestLevel = level;
       }
     }
 
@@ -608,6 +645,7 @@
   }
 
   function startDraggingBrick(brickData) {
+    clearPickupFeedback();
     state.selectedBrick = brickData;
     state.draggingBrick = brickData;
     state.dragStart = {
@@ -809,7 +847,11 @@
 
     if (pinchStarted) {
       if (state.hoveredBrick) {
-        startDraggingBrick(state.hoveredBrick);
+        if (hasBrickAbove(state.hoveredBrick)) {
+          showPickupBlocked(state.hoveredBrick);
+        } else {
+          startDraggingBrick(state.hoveredBrick);
+        }
       } else {
         state.selectedBrick = null;
       }
