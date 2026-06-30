@@ -127,6 +127,33 @@
       max-width: min(62vw, 780px);
     }
 
+    #hint.error {
+      color: #ffd8d5;
+      background: rgba(120, 24, 20, 0.72);
+      border-color: rgba(255, 97, 89, 0.78);
+    }
+
+    #cursor-error {
+      position: absolute;
+      z-index: 12;
+      max-width: 240px;
+      padding: 6px 8px;
+      border: 1px solid rgba(255, 97, 89, 0.78);
+      border-radius: 8px;
+      color: #ffd8d5;
+      background: rgba(120, 24, 20, 0.82);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
+      font-size: 12px;
+      pointer-events: none;
+      opacity: 0;
+      transform: translate(14px, -50%);
+      transition: opacity 0.12s ease;
+    }
+
+    #cursor-error.visible {
+      opacity: 1;
+    }
+
     #controls {
       position: absolute;
       left: 50%;
@@ -170,6 +197,7 @@
 
   <div id="hud"></div>
   <div id="hint">Pinch on a brick to pick it up. Unpinch to drop. Left side is an infinite supply spot: if empty, a new red brick spawns every second.</div>
+  <div id="cursor-error"></div>
 
   <div id="controls">
     <button id="btn-main" disabled>Loading Hand AI...</button>
@@ -186,6 +214,10 @@
   const video = document.getElementById("webcam");
   const hud = document.getElementById("hud");
   const btnMain = document.getElementById("btn-main");
+  const hint = document.getElementById("hint");
+  const cursorError = document.getElementById("cursor-error");
+  const DEFAULT_HINT_TEXT = hint.textContent;
+  let hintResetTimer = null;
 
   const GRID_COLS = 16;
   const GRID_ROWS = 16;
@@ -423,6 +455,43 @@
     return level;
   }
 
+  function hasBrickAbove(brickData) {
+    if (!brickData.onGrid) return false;
+    const level = brickData.stackLevel || 0;
+    return bricks.some((b) =>
+      b !== brickData &&
+      b.onGrid &&
+      (b.stackLevel || 0) > level &&
+      footprintsOverlap(brickData.cornerI, brickData.cornerJ, b.cornerI, b.cornerJ)
+    );
+  }
+
+  function clearPickupFeedback() {
+    clearTimeout(hintResetTimer);
+    hint.textContent = DEFAULT_HINT_TEXT;
+    hint.classList.remove("error");
+    cursorError.classList.remove("visible");
+  }
+
+  function positionCursorError() {
+    const x = (state.pointerNDC.x * 0.5 + 0.5) * window.innerWidth;
+    const y = (-state.pointerNDC.y * 0.5 + 0.5) * window.innerHeight;
+    cursorError.style.left = `${clamp(x + 18, 8, window.innerWidth - 260)}px`;
+    cursorError.style.top = `${clamp(y, 20, window.innerHeight - 20)}px`;
+  }
+
+  function showPickupBlocked(brickData) {
+    const message = `Brick ${brickData.id} is locked. Remove the bricks above it first.`;
+    state.selectedBrick = brickData;
+    hint.textContent = message;
+    hint.classList.add("error");
+    cursorError.textContent = message;
+    positionCursorError();
+    cursorError.classList.add("visible");
+    clearTimeout(hintResetTimer);
+    hintResetTimer = setTimeout(clearPickupFeedback, 1800);
+  }
+
   function setGhostColor(valid) {
     const bodyMat = ghostBrick.userData.bodyMat;
     const studMat = ghostBrick.userData.studTopMat;
@@ -571,13 +640,16 @@
 
     let best = null;
     let bestDist = Infinity;
+    let bestLevel = -1;
     for (const b of bricks) {
       if (!pointInsideBrickXZ(state.pointerWorld, b, 0.28)) continue;
       const c = getBrickCenterXZ(b);
       const d = Math.hypot(state.pointerWorld.x - c.x, state.pointerWorld.z - c.z);
-      if (d < bestDist) {
+      const level = b.onGrid ? (b.stackLevel || 0) : 0;
+      if (level > bestLevel || (level === bestLevel && d < bestDist)) {
         best = b;
         bestDist = d;
+        bestLevel = level;
       }
     }
 
@@ -608,6 +680,7 @@
   }
 
   function startDraggingBrick(brickData) {
+    clearPickupFeedback();
     state.selectedBrick = brickData;
     state.draggingBrick = brickData;
     state.dragStart = {
@@ -648,6 +721,8 @@
     state.targetStackLevel = 0;
     ghostBrick.visible = false;
     canvas.classList.remove("dragging");
+
+    maybeSpawnSupplyBrick();
   }
 
   function drawHandDebug(pts, w, h, cursor) {
@@ -809,7 +884,11 @@
 
     if (pinchStarted) {
       if (state.hoveredBrick) {
-        startDraggingBrick(state.hoveredBrick);
+        if (hasBrickAbove(state.hoveredBrick)) {
+          showPickupBlocked(state.hoveredBrick);
+        } else {
+          startDraggingBrick(state.hoveredBrick);
+        }
       } else {
         state.selectedBrick = null;
       }
