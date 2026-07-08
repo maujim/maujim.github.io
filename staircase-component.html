@@ -27,9 +27,68 @@
           linear-gradient(135deg, #eef0ed 0%, #dde3dc 52%, #cfd7cf 100%);
       }
 
+      [x-cloak] {
+        display: none !important;
+      }
+
+      .app-shell,
       .scene {
         position: fixed;
         inset: 0;
+      }
+
+      .scene-panel {
+        position: absolute;
+        inset: 0;
+      }
+
+      .ribbon {
+        position: fixed;
+        left: 0;
+        top: 132px;
+        z-index: 20;
+        display: grid;
+        gap: 6px;
+        padding: 8px 0;
+      }
+
+      .tab-button {
+        width: 132px;
+        height: 42px;
+        border: 1px solid rgba(20, 24, 20, 0.82);
+        border-left: 0;
+        border-radius: 0 13px 13px 0;
+        background: rgba(232, 234, 230, 0.86);
+        color: #111;
+        cursor: pointer;
+        clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 50%, calc(100% - 18px) 100%, 0 100%);
+        font: 700 12px/1 ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        letter-spacing: 0.08em;
+        text-align: left;
+        text-transform: uppercase;
+        padding: 0 28px 0 16px;
+        box-shadow: 0 2px 0 rgba(20, 24, 20, 0.18);
+        transition:
+          background 160ms ease,
+          color 160ms ease,
+          transform 160ms ease;
+      }
+
+      .tab-button:nth-child(2) {
+        margin-left: 18px;
+      }
+
+      .tab-button:hover,
+      .tab-button:focus-visible {
+        background: #f9faf6;
+        outline: none;
+        transform: translateX(4px);
+      }
+
+      .tab-button.is-active {
+        background: #030403;
+        color: #fff;
+        transform: translateX(8px);
       }
 
       canvas {
@@ -40,23 +99,8 @@
     </style>
   </head>
   <body>
-    <main class="scene" aria-label="Interactive Three.js floating staircase">
-      <div id="staircase-scene"></div>
-    </main>
-
-    <script type="importmap">
-      {
-        "imports": {
-          "three": "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js"
-        }
-      }
-    </script>
-    <script type="module">
-      import * as THREE from "three";
-      import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/controls/OrbitControls.js";
-      import GUI from "https://cdn.jsdelivr.net/npm/lil-gui@0.19/+esm";
-
-      const settings = {
+    <script>
+      window.staircaseSharedSettings = {
         stepCount: 13,
         stairWidth: 3.85,
         stairHeight: 0.34,
@@ -71,50 +115,167 @@
         keyIntensity: 3.2,
         warmIntensity: 18,
         underglowMode: "Hover only",
-        underglowOpacity: 0.34,
-        underglowScale: 1.75,
-        underglowColor: "#ffa04a",
+        singleLightMode: "Circular lights",
+        singleCircularCount: 5,
+        singleCircularSpacing: 0.62,
+        singleCircularRadius: 0.34,
+        singleBarLength: 2.85,
+        singleBarThickness: 0.34,
+        singleLightOffset: 0,
+        singleGlowOpacity: 0.48,
+        singleGlowColor: "#ffa04a",
       };
 
-      const host = document.getElementById("staircase-scene");
-      const scene = new THREE.Scene();
-      scene.background = new THREE.Color(0xe4e8e3);
-      scene.fog = new THREE.Fog(0xe4e8e3, 20, 42);
+      window.staircaseTabs = function () {
+        return {
+          activeTab: "full",
+          settings: window.staircaseSharedSettings,
+          setTab(tab) {
+            this.activeTab = tab;
+            this.$dispatch("staircase-tab-changed", { tab });
+          },
+        };
+      };
+    </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
 
-      const camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 80);
-      camera.position.set(7.7, 5.6, 13.2);
-      camera.lookAt(0.8, 2.4, -1.6);
+    <main class="app-shell" x-data="staircaseTabs()" x-cloak>
+      <nav class="ribbon" aria-label="Staircase views">
+        <button
+          type="button"
+          class="tab-button"
+          :class="{ 'is-active': activeTab === 'full' }"
+          :aria-selected="activeTab === 'full'"
+          aria-controls="full-staircase-panel"
+          role="tab"
+          @click="setTab('full')"
+        >
+          Full
+        </button>
+        <button
+          type="button"
+          class="tab-button"
+          :class="{ 'is-active': activeTab === 'single' }"
+          :aria-selected="activeTab === 'single'"
+          aria-controls="single-stair-panel"
+          role="tab"
+          @click="setTab('single')"
+        >
+          Light
+        </button>
+      </nav>
 
-      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.outputColorSpace = THREE.SRGBColorSpace;
-      renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.08;
-      host.appendChild(renderer.domElement);
+      <section
+        id="full-staircase-panel"
+        class="scene scene-panel"
+        aria-label="Interactive Three.js floating staircase"
+        role="tabpanel"
+        x-show="activeTab === 'full'"
+      >
+        <div id="staircase-scene"></div>
+      </section>
 
-      const controls = new OrbitControls(camera, renderer.domElement);
-      controls.target.set(0.8, 2.4, -1.6);
-      controls.enableDamping = false;
-      controls.minDistance = 6;
-      controls.maxDistance = 26;
-      controls.addEventListener("change", renderStaticScene);
-      controls.update();
+      <section
+        id="single-stair-panel"
+        class="scene scene-panel"
+        aria-label="Single stair underside light editor"
+        role="tabpanel"
+        x-show="activeTab === 'single'"
+      >
+        <div id="single-step-scene"></div>
+      </section>
+    </main>
+
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js"
+        }
+      }
+    </script>
+    <script type="module">
+      import * as THREE from "three";
+      import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/controls/OrbitControls.js";
+      import GUI from "https://cdn.jsdelivr.net/npm/lil-gui@0.19/+esm";
+
+      const settings = window.staircaseSharedSettings;
+      let activeTab = "full";
+
+      const fullHost = document.getElementById("staircase-scene");
+      const singleHost = document.getElementById("single-step-scene");
+
+      const fullScene = new THREE.Scene();
+      fullScene.background = new THREE.Color(0xe4e8e3);
+      fullScene.fog = new THREE.Fog(0xe4e8e3, 20, 42);
+
+      const fullCamera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 80);
+      fullCamera.position.set(7.7, 5.6, 13.2);
+      fullCamera.lookAt(0.8, 2.4, -1.6);
+
+      const fullRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+      fullRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      fullRenderer.setSize(window.innerWidth, window.innerHeight);
+      fullRenderer.outputColorSpace = THREE.SRGBColorSpace;
+      fullRenderer.toneMapping = THREE.ACESFilmicToneMapping;
+      fullRenderer.toneMappingExposure = 1.08;
+      fullHost.appendChild(fullRenderer.domElement);
+
+      const fullControls = new OrbitControls(fullCamera, fullRenderer.domElement);
+      fullControls.target.set(0.8, 2.4, -1.6);
+      fullControls.enableDamping = false;
+      fullControls.minDistance = 6;
+      fullControls.maxDistance = 26;
+      fullControls.addEventListener("change", renderFullScene);
+      fullControls.update();
 
       const ambientLight = new THREE.HemisphereLight(0xffffff, 0xb5beb4, settings.ambientIntensity);
-      scene.add(ambientLight);
+      fullScene.add(ambientLight);
 
       const keyLight = new THREE.DirectionalLight(0xffffff, settings.keyIntensity);
       keyLight.position.set(-5, 9, 8);
-      scene.add(keyLight);
+      fullScene.add(keyLight);
 
       const warmFill = new THREE.PointLight(0xffb06a, settings.warmIntensity, 24, 2.1);
       warmFill.position.set(-4.8, 2.1, 6.5);
-      scene.add(warmFill);
+      fullScene.add(warmFill);
 
       const steps = [];
       const stepGroup = new THREE.Group();
-      scene.add(stepGroup);
+      fullScene.add(stepGroup);
+
+      const singleScene = new THREE.Scene();
+      singleScene.background = new THREE.Color(0xe4e8e3);
+      singleScene.fog = new THREE.Fog(0xe4e8e3, 12, 26);
+
+      const singleCamera = new THREE.PerspectiveCamera(36, window.innerWidth / window.innerHeight, 0.1, 50);
+      singleCamera.position.set(4.8, 2.55, 5.2);
+      singleCamera.lookAt(0, -0.06, 0);
+
+      const singleRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+      singleRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      singleRenderer.setSize(window.innerWidth, window.innerHeight);
+      singleRenderer.outputColorSpace = THREE.SRGBColorSpace;
+      singleRenderer.toneMapping = THREE.ACESFilmicToneMapping;
+      singleRenderer.toneMappingExposure = 1.04;
+      singleHost.appendChild(singleRenderer.domElement);
+
+      const singleControls = new OrbitControls(singleCamera, singleRenderer.domElement);
+      singleControls.target.set(0, -0.06, 0);
+      singleControls.enableDamping = false;
+      singleControls.minDistance = 3.2;
+      singleControls.maxDistance = 14;
+      singleControls.addEventListener("change", renderSingleScene);
+      singleControls.update();
+
+      const singleAmbientLight = new THREE.HemisphereLight(0xffffff, 0xb8c0b7, 2.05);
+      singleScene.add(singleAmbientLight);
+
+      const singleKeyLight = new THREE.DirectionalLight(0xffffff, 3.1);
+      singleKeyLight.position.set(-3.2, 4.8, 4.2);
+      singleScene.add(singleKeyLight);
+
+      const singleGroup = new THREE.Group();
+      singleScene.add(singleGroup);
 
       const baseMaterialOptions = {
         color: 0xf7f7f2,
@@ -125,6 +286,10 @@
       const raycaster = new THREE.Raycaster();
       const pointer = new THREE.Vector2();
       let hoveredStep = null;
+      let fullGui;
+      let singleGui;
+      let singleCircularFolder;
+      let singleBarFolder;
 
       function createGlowTexture() {
         const size = 256;
@@ -144,7 +309,28 @@
         return texture;
       }
 
+      function createBarGlowTexture() {
+        const width = 512;
+        const height = 128;
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const context = canvas.getContext("2d");
+        const gradient = context.createLinearGradient(0, 0, 0, height);
+        gradient.addColorStop(0, "rgba(255, 106, 22, 0)");
+        gradient.addColorStop(0.28, "rgba(255, 137, 46, 0.2)");
+        gradient.addColorStop(0.5, "rgba(255, 166, 86, 0.58)");
+        gradient.addColorStop(0.72, "rgba(255, 137, 46, 0.2)");
+        gradient.addColorStop(1, "rgba(255, 106, 22, 0)");
+        context.fillStyle = gradient;
+        context.fillRect(0, 0, width, height);
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.colorSpace = THREE.SRGBColorSpace;
+        return texture;
+      }
+
       const glowTexture = createGlowTexture();
+      const barGlowTexture = createBarGlowTexture();
 
       function getStepPosition(index) {
         return new THREE.Vector3(
@@ -154,7 +340,7 @@
         );
       }
 
-      function makeStep(index, slabGeometry, underglowGeometry) {
+      function makeStep(index, slabGeometry) {
         const slab = new THREE.Mesh(slabGeometry, new THREE.MeshStandardMaterial(baseMaterialOptions));
         slab.position.copy(getStepPosition(index));
         slab.userData.title = `Floating step ${index + 1}`;
@@ -165,35 +351,36 @@
         );
         bevelLine.position.copy(slab.position);
 
-        const underglow = new THREE.Mesh(
-          underglowGeometry,
-          new THREE.MeshBasicMaterial({
-            map: glowTexture,
-            color: settings.underglowColor,
-            transparent: true,
-            opacity: 0,
-            blending: THREE.AdditiveBlending,
-            depthWrite: false,
-            side: THREE.DoubleSide,
-          }),
-        );
-        underglow.rotation.x = -Math.PI / 2;
-        underglow.position.set(slab.position.x, slab.position.y - settings.stairHeight * 0.72, slab.position.z + settings.stairDepth * 0.08);
+        const underglow = new THREE.Group();
+        underglow.position.copy(slab.position);
         underglow.visible = false;
 
         slab.userData.underglow = underglow;
         stepGroup.add(slab, bevelLine, underglow);
         steps.push(slab);
+        populateStepUnderglow(underglow);
+      }
+
+      function disposeMaterial(material) {
+        if (Array.isArray(material)) {
+          material.forEach(disposeMaterial);
+          return;
+        }
+        material?.dispose();
       }
 
       function disposeObject(object) {
         object.geometry?.dispose();
-        object.material?.dispose();
+        disposeMaterial(object.material);
+      }
+
+      function clearGroup(group) {
+        group.traverse(disposeObject);
+        group.clear();
       }
 
       function clearSteps() {
-        stepGroup.traverse(disposeObject);
-        stepGroup.clear();
+        clearGroup(stepGroup);
         steps.length = 0;
         hoveredStep = null;
       }
@@ -201,16 +388,13 @@
       function buildSteps() {
         clearSteps();
         const slabGeometry = new THREE.BoxGeometry(settings.stairWidth, settings.stairHeight, settings.stairDepth);
-        const glowWidth = settings.stairWidth * settings.underglowScale;
-        const glowDepth = settings.stairDepth * settings.underglowScale * 1.2;
-        const underglowGeometry = new THREE.PlaneGeometry(glowWidth, glowDepth);
 
         for (let index = 0; index < settings.stepCount; index += 1) {
-          makeStep(index, slabGeometry, underglowGeometry);
+          makeStep(index, slabGeometry);
         }
 
         updateUnderglowVisuals();
-        renderStaticScene();
+        renderFullScene();
       }
 
       function updateLights() {
@@ -218,7 +402,12 @@
         keyLight.intensity = settings.keyIntensity;
         warmFill.intensity = settings.warmIntensity;
         updateUnderglowVisuals();
-        renderStaticScene();
+        renderFullScene();
+      }
+
+      function buildAllStairGeometry() {
+        buildSteps();
+        buildSingleStep();
       }
 
       function shouldShowUnderglow(isHovered) {
@@ -228,10 +417,14 @@
       }
 
       function setUnderglowVisuals(step, isHovered) {
+        const underglow = step.userData.underglow;
         const isVisible = shouldShowUnderglow(isHovered);
-        step.userData.underglow.visible = isVisible;
-        step.userData.underglow.material.opacity = isVisible ? settings.underglowOpacity : 0;
-        step.userData.underglow.material.color.set(settings.underglowColor);
+        underglow.visible = isVisible;
+        underglow.traverse((child) => {
+          if (child.material) {
+            child.material.opacity = isVisible ? child.userData.baseOpacity : 0;
+          }
+        });
       }
 
       function updateUnderglowVisuals() {
@@ -242,33 +435,172 @@
         if (hoveredStep === step) return;
         hoveredStep = step;
         updateUnderglowVisuals();
-        renderStaticScene();
+        renderFullScene();
       }
 
       function updatePointer(event) {
+        if (activeTab !== "full") return;
         pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
         pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
-        raycaster.setFromCamera(pointer, camera);
+        raycaster.setFromCamera(pointer, fullCamera);
         const [hit] = raycaster.intersectObjects(steps, false);
         setHover(hit?.object ?? null);
       }
 
-      function renderStaticScene() {
-        renderer.render(scene, camera);
+      function clamp(value, min, max) {
+        return Math.min(Math.max(value, min), max);
       }
 
-      function createGui() {
-        const gui = new GUI({ title: "Staircase Settings", width: 300 });
+      function makeSingleGlowMaterial(texture = glowTexture) {
+        return new THREE.MeshBasicMaterial({
+          map: texture,
+          color: settings.singleGlowColor,
+          transparent: true,
+          opacity: settings.singleGlowOpacity,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+          side: THREE.DoubleSide,
+        });
+      }
+
+      function addCircularGlow(group, origin = new THREE.Vector3()) {
+        const count = Math.max(1, Math.round(settings.singleCircularCount));
+        const maxSpan = settings.stairWidth * 0.82;
+        const requestedSpan = settings.singleCircularSpacing * (count - 1);
+        const spacing = count === 1 ? 0 : Math.min(settings.singleCircularSpacing, maxSpan / (count - 1));
+        const startX = -spacing * (count - 1) * 0.5;
+        const radius = clamp(settings.singleCircularRadius, 0.12, Math.max(0.14, settings.stairDepth * 0.95));
+
+        for (let index = 0; index < count; index += 1) {
+          const glow = new THREE.Mesh(new THREE.PlaneGeometry(radius * 2.6, radius * 2.6), makeSingleGlowMaterial());
+          glow.rotation.x = -Math.PI / 2;
+          glow.position.set(
+            origin.x + startX + spacing * index,
+            origin.y - settings.stairHeight * 0.72,
+            origin.z + settings.singleLightOffset,
+          );
+          glow.userData.baseOpacity = settings.singleGlowOpacity;
+          group.add(glow);
+        }
+
+        if (requestedSpan > maxSpan) {
+          settings.singleCircularSpacing = spacing;
+        }
+      }
+
+      function addBarGlow(group, origin = new THREE.Vector3()) {
+        const length = clamp(settings.singleBarLength, 0.25, settings.stairWidth * 1.08);
+        const thickness = clamp(settings.singleBarThickness, 0.08, settings.stairDepth * 1.15);
+
+        const glow = new THREE.Mesh(
+          new THREE.PlaneGeometry(length, thickness * 3.6),
+          makeSingleGlowMaterial(barGlowTexture),
+        );
+        glow.rotation.x = -Math.PI / 2;
+        glow.position.set(origin.x, origin.y - settings.stairHeight * 0.72, origin.z + settings.singleLightOffset);
+        glow.userData.baseOpacity = settings.singleGlowOpacity;
+        group.add(glow);
+
+        const coreOpacity = Math.min(1, settings.singleGlowOpacity * 2);
+        const core = new THREE.Mesh(
+          new THREE.PlaneGeometry(length, Math.max(0.035, thickness * 0.18)),
+          new THREE.MeshBasicMaterial({
+            color: settings.singleGlowColor,
+            transparent: true,
+            opacity: coreOpacity,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false,
+            side: THREE.DoubleSide,
+          }),
+        );
+        core.rotation.x = -Math.PI / 2;
+        core.position.set(origin.x, origin.y - settings.stairHeight * 0.735, origin.z + settings.singleLightOffset);
+        core.userData.baseOpacity = coreOpacity;
+        group.add(core);
+      }
+
+      function populateStepUnderglow(group) {
+        if (settings.singleLightMode === "Bar light") {
+          addBarGlow(group);
+        } else {
+          addCircularGlow(group);
+        }
+      }
+
+      function buildSingleStep() {
+        clearGroup(singleGroup);
+
+        const slabGeometry = new THREE.BoxGeometry(settings.stairWidth, settings.stairHeight, settings.stairDepth);
+        const slab = new THREE.Mesh(slabGeometry, new THREE.MeshStandardMaterial(baseMaterialOptions));
+        singleGroup.add(slab);
+
+        const bevelLine = new THREE.LineSegments(
+          new THREE.EdgesGeometry(slabGeometry, 38),
+          new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.34 }),
+        );
+        singleGroup.add(bevelLine);
+
+        const shadowGlow = new THREE.Mesh(
+          new THREE.PlaneGeometry(settings.stairWidth * 1.08, settings.stairDepth * 1.42),
+          new THREE.MeshBasicMaterial({
+            color: settings.singleGlowColor,
+            transparent: true,
+            opacity: settings.singleGlowOpacity * 0.16,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false,
+            side: THREE.DoubleSide,
+          }),
+        );
+        shadowGlow.rotation.x = -Math.PI / 2;
+        shadowGlow.position.y = -settings.stairHeight * 0.76;
+        singleGroup.add(shadowGlow);
+
+        populateStepUnderglow(singleGroup);
+
+        renderSingleScene();
+      }
+
+      function updateSingleLighting() {
+        buildSingleStep();
+        buildSteps();
+        updateSingleFolderVisibility();
+      }
+
+      function renderFullScene() {
+        fullRenderer.render(fullScene, fullCamera);
+      }
+
+      function renderSingleScene() {
+        singleRenderer.render(singleScene, singleCamera);
+      }
+
+      function setGuiVisibility() {
+        if (fullGui) fullGui.domElement.style.display = activeTab === "full" ? "block" : "none";
+        if (singleGui) singleGui.domElement.style.display = activeTab === "single" ? "block" : "none";
+      }
+
+      function updateSingleFolderVisibility() {
+        if (!singleCircularFolder || !singleBarFolder) return;
+        singleCircularFolder.domElement.style.display = settings.singleLightMode === "Circular lights" ? "block" : "none";
+        singleBarFolder.domElement.style.display = settings.singleLightMode === "Bar light" ? "block" : "none";
+      }
+
+      function positionGui(gui) {
         gui.domElement.style.position = "fixed";
         gui.domElement.style.right = "16px";
         gui.domElement.style.bottom = "16px";
         gui.domElement.style.top = "auto";
         gui.domElement.style.zIndex = "10";
+      }
 
-        const geometry = gui.addFolder("Geometry");
-        geometry.add(settings, "stairWidth", 2.4, 5.8, 0.05).name("Stair width").onChange(buildSteps);
-        geometry.add(settings, "stairHeight", 0.12, 0.8, 0.01).name("Stair height").onChange(buildSteps);
-        geometry.add(settings, "stairDepth", 0.55, 2.2, 0.05).name("Stair depth").onChange(buildSteps);
+      function createFullGui() {
+        fullGui = new GUI({ title: "Staircase Settings", width: 300 });
+        positionGui(fullGui);
+
+        const geometry = fullGui.addFolder("Geometry");
+        geometry.add(settings, "stairWidth", 2.4, 5.8, 0.05).name("Stair width").onChange(buildAllStairGeometry);
+        geometry.add(settings, "stairHeight", 0.12, 0.8, 0.01).name("Stair height").onChange(buildAllStairGeometry);
+        geometry.add(settings, "stairDepth", 0.55, 2.2, 0.05).name("Stair depth").onChange(buildAllStairGeometry);
         geometry.add(settings, "verticalSpacing", 0.18, 0.9, 0.01).name("Vertical spacing").onChange(buildSteps);
         geometry.add(settings, "depthSpacing", 0.25, 1.45, 0.01).name("Depth spacing").onChange(buildSteps);
         geometry.add(settings, "lateralSpacing", -0.55, 0.55, 0.01).name("Lateral spacing").onChange(buildSteps);
@@ -277,27 +609,77 @@
         geometry.add(settings, "offsetZ", -1, 5, 0.05).name("Offset Z").onChange(buildSteps);
         geometry.open();
 
-        const lighting = gui.addFolder("Lighting");
+        const lighting = fullGui.addFolder("Lighting");
         lighting.add(settings, "ambientIntensity", 0, 4, 0.05).name("Ambient").onChange(updateLights);
         lighting.add(settings, "keyIntensity", 0, 7, 0.05).name("Key").onChange(updateLights);
         lighting.add(settings, "warmIntensity", 0, 60, 0.5).name("Warm fill").onChange(updateLights);
         lighting.add(settings, "underglowMode", ["Always on", "Always off", "Hover only"]).name("Underglow mode").onChange(updateLights);
-        lighting.add(settings, "underglowOpacity", 0, 0.8, 0.01).name("Glow opacity").onChange(updateLights);
-        lighting.add(settings, "underglowScale", 0.7, 3.5, 0.05).name("Glow spread").onChange(buildSteps);
-        lighting.addColor(settings, "underglowColor").name("Glow color").onChange(updateLights);
         lighting.open();
+
+        const placement = fullGui.addFolder("Light placement");
+        placement.add(settings, "singleLightMode", ["Circular lights", "Bar light"]).name("Mode").onChange(updateSingleLighting);
+        placement.add(settings, "singleGlowOpacity", 0.08, 0.9, 0.01).name("Glow intensity").onChange(updateSingleLighting);
+        placement.addColor(settings, "singleGlowColor").name("Glow color").onChange(updateSingleLighting);
+        placement.add(settings, "singleLightOffset", -0.8, 0.8, 0.01).name("Depth offset").onChange(updateSingleLighting);
+        placement.add(settings, "singleCircularCount", 1, 9, 1).name("Circular count").onChange(updateSingleLighting);
+        placement.add(settings, "singleCircularSpacing", 0.18, 1.25, 0.01).name("Circular spacing").onChange(updateSingleLighting);
+        placement.add(settings, "singleCircularRadius", 0.12, 0.8, 0.01).name("Circular radius").onChange(updateSingleLighting);
+        placement.add(settings, "singleBarLength", 0.5, 5.8, 0.05).name("Bar length").onChange(updateSingleLighting);
+        placement.add(settings, "singleBarThickness", 0.08, 0.9, 0.01).name("Bar thickness").onChange(updateSingleLighting);
+        placement.open();
+      }
+
+      function createSingleGui() {
+        singleGui = new GUI({ title: "Single-Step Lights", width: 300 });
+        positionGui(singleGui);
+
+        const placement = singleGui.addFolder("Underside placement");
+        placement.add(settings, "singleLightMode", ["Circular lights", "Bar light"]).name("Mode").onChange(updateSingleLighting);
+        placement.add(settings, "singleGlowOpacity", 0.08, 0.9, 0.01).name("Glow intensity").onChange(updateSingleLighting);
+        placement.addColor(settings, "singleGlowColor").name("Glow color").onChange(updateSingleLighting);
+        placement.add(settings, "singleLightOffset", -0.8, 0.8, 0.01).name("Depth offset").onChange(updateSingleLighting);
+        placement.open();
+
+        singleCircularFolder = singleGui.addFolder("Circular lights");
+        singleCircularFolder.add(settings, "singleCircularCount", 1, 9, 1).name("Count").onChange(updateSingleLighting);
+        singleCircularFolder.add(settings, "singleCircularSpacing", 0.18, 1.25, 0.01).name("Spacing").onChange(updateSingleLighting);
+        singleCircularFolder.add(settings, "singleCircularRadius", 0.12, 0.8, 0.01).name("Radius").onChange(updateSingleLighting);
+        singleCircularFolder.open();
+
+        singleBarFolder = singleGui.addFolder("Bar light");
+        singleBarFolder.add(settings, "singleBarLength", 0.5, 5.8, 0.05).name("Length").onChange(updateSingleLighting);
+        singleBarFolder.add(settings, "singleBarThickness", 0.08, 0.9, 0.01).name("Thickness").onChange(updateSingleLighting);
+        singleBarFolder.add(settings, "singleLightOffset", -0.8, 0.8, 0.01).name("Offset").onChange(updateSingleLighting);
+        singleBarFolder.open();
+        updateSingleFolderVisibility();
+      }
+
+      function resizeScenes() {
+        fullCamera.aspect = window.innerWidth / window.innerHeight;
+        fullCamera.updateProjectionMatrix();
+        fullRenderer.setSize(window.innerWidth, window.innerHeight);
+
+        singleCamera.aspect = window.innerWidth / window.innerHeight;
+        singleCamera.updateProjectionMatrix();
+        singleRenderer.setSize(window.innerWidth, window.innerHeight);
+
+        renderFullScene();
+        renderSingleScene();
       }
 
       buildSteps();
-      createGui();
+      buildSingleStep();
+      createFullGui();
+      createSingleGui();
+      setGuiVisibility();
 
       window.addEventListener("pointermove", updatePointer);
       window.addEventListener("pointerleave", () => setHover(null));
-      window.addEventListener("resize", () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderStaticScene();
+      window.addEventListener("resize", resizeScenes);
+      window.addEventListener("staircase-tab-changed", (event) => {
+        activeTab = event.detail.tab;
+        setGuiVisibility();
+        resizeScenes();
       });
     </script>
   </body>
