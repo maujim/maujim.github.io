@@ -1,0 +1,644 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A step-by-step roadmap for learning LFM2.5 inference by building liquid.cpp.">
+  <title>liquid.cpp / inference field guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..900&family=Atkinson+Hyperlegible+Next:ital,wght@0,400..800;1,400..800&family=Martian+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: light;
+      --black: oklch(17% 0.025 255);
+      --black-2: oklch(22% 0.035 255);
+      --white: oklch(98.5% 0.003 255);
+      --gray-1: oklch(94% 0.008 255);
+      --gray-2: oklch(84% 0.012 255);
+      --gray-3: oklch(48% 0.025 255);
+      --blue: oklch(54% 0.23 260);
+      --blue-dark: oklch(35% 0.18 260);
+      --acid: oklch(88% 0.23 126);
+      --orange: oklch(72% 0.19 53);
+      --pink: oklch(75% 0.17 349);
+      --cyan: oklch(79% 0.13 205);
+      --font-display: "Archivo", ui-sans-serif, system-ui, sans-serif;
+      --font-body: "Atkinson Hyperlegible Next", ui-sans-serif, system-ui, sans-serif;
+      --font-mono: "Martian Mono", ui-monospace, monospace;
+      --page: min(1480px, calc(100% - 40px));
+      --ease: cubic-bezier(.16, 1, .3, 1);
+      --z-sticky: 20;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--black);
+      background: var(--white);
+      font-family: var(--font-body);
+      font-size: 17px;
+      line-height: 1.62;
+      text-rendering: optimizeLegibility;
+    }
+
+    button, input { font: inherit; }
+    a { color: inherit; text-underline-offset: .2em; }
+    code, pre, .mono { font-family: var(--font-mono); }
+    p { max-width: 70ch; margin: 0 0 1em; text-wrap: pretty; }
+    h1, h2, h3 { margin: 0; font-family: var(--font-display); text-wrap: balance; }
+    h2 { max-width: 17ch; font-size: clamp(2.5rem, 5vw, 5.3rem); line-height: .94; letter-spacing: -.035em; font-variation-settings: "wdth" 85; }
+    h3 { font-size: 1.35rem; line-height: 1.12; letter-spacing: -.015em; }
+
+    .skip-link {
+      position: fixed;
+      left: 16px;
+      top: 12px;
+      z-index: 100;
+      padding: 9px 12px;
+      color: var(--black);
+      background: var(--acid);
+      transform: translateY(-160%);
+    }
+    .skip-link:focus { transform: translateY(0); }
+
+    .site-head {
+      min-height: 92svh;
+      color: var(--white);
+      background: var(--black);
+      overflow: hidden;
+      position: relative;
+    }
+    .site-head::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 62%;
+      width: 1px;
+      background: color-mix(in oklch, var(--acid) 35%, transparent);
+    }
+
+    .nav {
+      width: var(--page);
+      margin: 0 auto;
+      min-height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      border-bottom: 1px solid oklch(100% 0 0 / .16);
+      position: relative;
+      z-index: 1;
+    }
+    .brand { display: flex; align-items: center; gap: 11px; font: 800 1rem var(--font-display); letter-spacing: -.02em; }
+    .brand-mark { width: 13px; height: 20px; border-radius: 60% 40% 62% 38%; background: var(--acid); transform: rotate(35deg); }
+    .nav-actions { display: flex; align-items: center; gap: 16px; }
+    .nav-note { color: var(--gray-2); font: 600 .67rem var(--font-mono); }
+    .print {
+      border: 0;
+      padding: 9px 14px;
+      color: var(--black);
+      background: var(--acid);
+      cursor: pointer;
+      font: 700 .72rem var(--font-mono);
+      transition: transform .35s var(--ease), background .2s ease;
+    }
+    .print:hover { transform: translateY(-2px); background: var(--orange); }
+    .print:focus-visible, .step-node:focus-visible, .check:focus-visible, a:focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }
+
+    .hero {
+      width: var(--page);
+      margin: 0 auto;
+      padding: clamp(70px, 11vh, 130px) 0 60px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.65fr) minmax(280px, .75fr);
+      gap: clamp(40px, 7vw, 110px);
+      align-items: end;
+      position: relative;
+      z-index: 1;
+    }
+    .hero h1 {
+      max-width: 10ch;
+      font-size: clamp(4rem, 8.5vw, 6rem);
+      line-height: .86;
+      letter-spacing: -.04em;
+      font-weight: 900;
+      font-variation-settings: "wdth" 78;
+      animation: enter-title .9s var(--ease) both;
+    }
+    .hero h1 em { color: var(--acid); font-style: normal; }
+    .hero-side { padding-bottom: 5px; animation: enter-copy .8s .14s var(--ease) both; }
+    .hero-side p { color: oklch(88% 0.015 255); font-size: 1.15rem; }
+    .hero-side strong { color: var(--white); }
+    .stamp {
+      width: fit-content;
+      margin-bottom: 18px;
+      padding: 7px 10px;
+      color: var(--acid);
+      border: 1px solid currentColor;
+      font: 700 .67rem var(--font-mono);
+    }
+
+    .signal {
+      width: var(--page);
+      margin: 0 auto;
+      padding: 22px 0 30px;
+      display: flex;
+      align-items: center;
+      gap: 0;
+      overflow-x: auto;
+      border-top: 1px solid oklch(100% 0 0 / .16);
+      position: relative;
+      z-index: 1;
+      scrollbar-color: var(--acid) var(--black-2);
+    }
+    .signal span { flex: 0 0 auto; font: 600 .68rem var(--font-mono); }
+    .signal .word { padding: 6px 9px; color: var(--white); border: 1px solid oklch(100% 0 0 / .28); }
+    .signal .arrow { padding: 0 10px; color: var(--acid); }
+    .signal .hot { color: var(--black); background: var(--acid); border-color: var(--acid); }
+
+    .shell {
+      width: var(--page);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 230px minmax(0, 1fr);
+      gap: clamp(36px, 6vw, 100px);
+      padding: 64px 0 130px;
+    }
+    .rail {
+      position: sticky;
+      top: 24px;
+      z-index: var(--z-sticky);
+      align-self: start;
+      max-height: calc(100svh - 48px);
+      overflow-y: auto;
+      padding: 18px 0;
+      border-top: 5px solid var(--black);
+      border-bottom: 1px solid var(--gray-2);
+      background: var(--white);
+    }
+    .rail-label { margin-bottom: 12px; color: var(--gray-3); font: 700 .66rem var(--font-mono); }
+    .rail a { display: block; padding: 5px 0; color: var(--gray-3); text-decoration: none; font-size: .9rem; }
+    .rail a:hover { color: var(--blue); }
+    .progress { margin-top: 21px; padding-top: 17px; border-top: 1px solid var(--gray-2); }
+    .progress-head { display: flex; justify-content: space-between; font: 700 .65rem var(--font-mono); }
+    .track { height: 6px; margin-top: 9px; background: var(--gray-1); }
+    .fill { width: 100%; height: 100%; background: var(--blue); transform: scaleX(0); transform-origin: left; transition: transform .5s var(--ease); }
+    .reset { margin-top: 10px; padding: 0; border: 0; color: var(--blue-dark); background: transparent; cursor: pointer; font: 700 .65rem var(--font-mono); text-decoration: underline; text-underline-offset: 3px; }
+
+    main { min-width: 0; }
+    section { margin-bottom: clamp(100px, 14vw, 190px); scroll-margin-top: 34px; }
+    .section-intro { margin: 22px 0 42px; color: oklch(37% 0.03 255); font-size: 1.2rem; }
+    .chapter { margin-bottom: 18px; color: var(--blue-dark); font: 700 .72rem var(--font-mono); }
+
+    .answer {
+      padding: clamp(28px, 5vw, 60px);
+      color: var(--white);
+      background: var(--blue-dark);
+      position: relative;
+    }
+    .answer h2 { max-width: 12ch; }
+    .answer p { margin-top: 28px; color: oklch(90% 0.02 255); font-size: 1.18rem; }
+    .answer strong { color: var(--acid); }
+    .answer::after { content: "YES"; position: absolute; right: 24px; top: 12px; color: oklch(100% 0 0 / .09); font: 900 clamp(5rem, 14vw, 11rem)/1 var(--font-display); }
+
+    .repo-list { margin-top: 42px; border-top: 5px solid var(--black); }
+    .repo-row {
+      display: grid;
+      grid-template-columns: minmax(210px, .8fr) minmax(0, 1.5fr);
+      gap: 28px;
+      padding: 24px 0;
+      border-bottom: 1px solid var(--gray-2);
+    }
+    .repo-row code { color: var(--blue-dark); font-size: .72rem; overflow-wrap: anywhere; }
+    .repo-row h3 { margin-bottom: 6px; }
+    .repo-row p { margin: 0; color: oklch(38% 0.025 255); }
+    .truth-note { margin-top: 28px; padding: 20px; background: var(--acid); font-weight: 700; }
+
+    .pipeline-board { margin-top: 40px; color: var(--white); background: var(--black); }
+    .nodes { display: flex; overflow-x: auto; scrollbar-color: var(--acid) var(--black-2); }
+    .step-node {
+      flex: 1 0 145px;
+      min-height: 145px;
+      padding: 18px 14px;
+      border: 0;
+      border-right: 1px solid oklch(100% 0 0 / .14);
+      color: oklch(80% 0.015 255);
+      background: transparent;
+      text-align: left;
+      cursor: pointer;
+      transition: color .2s ease, background .25s ease;
+    }
+    .step-node:hover { color: var(--white); background: var(--black-2); }
+    .step-node.active { color: var(--black); background: var(--acid); }
+    .step-node b { display: block; margin-bottom: 32px; font: 700 .66rem var(--font-mono); }
+    .step-node span { font: 800 1rem/1.08 var(--font-display); }
+    .node-detail { min-height: 120px; padding: 25px; border-top: 1px solid oklch(100% 0 0 / .14); color: oklch(91% 0.012 255); }
+    .node-detail code { color: var(--acid); }
+
+    .roadmap { margin-top: 52px; counter-reset: stage -1; }
+    .stage {
+      counter-increment: stage;
+      display: grid;
+      grid-template-columns: 54px minmax(0, 1fr) minmax(220px, .52fr);
+      gap: clamp(18px, 4vw, 50px);
+      padding: 34px 0;
+      border-top: 1px solid var(--gray-2);
+    }
+    .stage:last-child { border-bottom: 1px solid var(--gray-2); }
+    .check {
+      appearance: none;
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-content: center;
+      border: 2px solid var(--black);
+      background: transparent;
+      cursor: pointer;
+    }
+    .check::before { content: "✓"; color: var(--black); font-weight: 900; transform: scale(0); transition: transform .25s var(--ease); }
+    .check:checked { background: var(--acid); }
+    .check:checked::before { transform: scale(1); }
+    .stage-copy h3::before { content: counter(stage, decimal-leading-zero) " / "; color: var(--blue); font-family: var(--font-mono); font-size: .72rem; }
+    .stage-copy p { margin: 12px 0 0; color: oklch(38% 0.025 255); }
+    .done { align-self: start; padding-top: 4px; color: var(--gray-3); font-size: .9rem; }
+    .done b { display: block; margin-bottom: 6px; color: var(--black); font: 700 .65rem var(--font-mono); }
+
+    pre {
+      margin: 28px 0;
+      padding: 24px;
+      overflow: auto;
+      color: var(--white);
+      background: var(--black);
+      font-size: .78rem;
+      line-height: 1.75;
+      tab-size: 2;
+    }
+    .concept-split { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(260px, .72fr); gap: clamp(32px, 6vw, 80px); align-items: start; margin-top: 44px; }
+    .concept-list { border-top: 4px solid var(--black); }
+    .concept { padding: 19px 0; border-bottom: 1px solid var(--gray-2); }
+    .concept b { display: block; margin-bottom: 5px; font-family: var(--font-display); }
+    .concept p { margin: 0; color: oklch(38% 0.025 255); }
+    .fact-block { padding: 26px; color: var(--black); background: var(--cyan); }
+    .fact-block b { display: block; margin-bottom: 12px; font: 800 1.1rem var(--font-display); }
+
+    .shape-table { width: 100%; margin-top: 36px; border-collapse: collapse; }
+    .shape-table th, .shape-table td { padding: 13px 10px; border-bottom: 1px solid var(--gray-2); text-align: left; vertical-align: top; }
+    .shape-table th { border-bottom: 3px solid var(--black); font: 700 .65rem var(--font-mono); }
+    .shape-table td:first-child { font-weight: 700; }
+    .shape-table code { color: var(--blue-dark); font-size: .72rem; }
+
+    .layer-rack { margin-top: 46px; padding: 22px; color: var(--white); background: var(--black); }
+    .layers { display: grid; grid-template-columns: repeat(16, minmax(38px, 1fr)); gap: 5px; }
+    .layer { min-height: 100px; display: flex; flex-direction: column; justify-content: space-between; padding: 8px 5px; color: var(--black); font: 700 .58rem var(--font-mono); }
+    .layer b { font-size: 1rem; }
+    .layer.conv { background: var(--cyan); }
+    .layer.attn { background: var(--pink); }
+    .legend { display: flex; gap: 20px; margin-top: 15px; color: var(--gray-2); font: 600 .65rem var(--font-mono); }
+    .legend i { width: 10px; height: 10px; display: inline-block; margin-right: 6px; background: var(--cyan); }
+    .legend .attn-key i { background: var(--pink); }
+
+    .operators { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; margin-top: 34px; background: var(--black); border: 1px solid var(--black); }
+    .operator { padding: clamp(24px, 4vw, 44px); background: var(--white); }
+    .operator:first-child { background: color-mix(in oklch, var(--cyan) 35%, var(--white)); }
+    .operator:last-child { background: color-mix(in oklch, var(--pink) 27%, var(--white)); }
+    .operator .quantity { margin-bottom: 35px; font: 700 .67rem var(--font-mono); }
+    .operator p { color: oklch(36% 0.03 255); }
+
+    .loop { margin-top: 42px; border-top: 5px solid var(--black); }
+    .loop-row { display: grid; grid-template-columns: 90px minmax(0, 1fr); gap: 24px; padding: 23px 0; border-bottom: 1px solid var(--gray-2); }
+    .loop-row .num { color: var(--blue); font: 800 2rem/1 var(--font-display); }
+    .loop-row p { margin: 4px 0 0; color: oklch(38% 0.025 255); }
+
+    .validation { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, .72fr); gap: 1px; margin-top: 42px; color: var(--white); background: oklch(100% 0 0 / .22); }
+    .validation-main { padding: clamp(26px, 5vw, 55px); background: var(--blue-dark); }
+    .validation-main p { color: oklch(90% 0.02 255); }
+    .validation-side { padding: clamp(26px, 4vw, 42px); color: var(--black); background: var(--acid); }
+    .validation-side ol { margin: 16px 0 0; padding-left: 1.3em; }
+
+    .scope { display: grid; grid-template-columns: 1fr 1fr; margin-top: 40px; border-top: 5px solid var(--black); }
+    .scope > div { padding: 25px 24px 30px 0; }
+    .scope > div + div { padding-left: 24px; border-left: 1px solid var(--gray-2); }
+    .scope h3 { margin-bottom: 18px; }
+    .scope ul { margin: 0; padding-left: 1.2em; }
+    .scope li { margin: 9px 0; }
+
+    .finish { margin-top: 46px; padding: clamp(28px, 5vw, 58px); color: var(--black); background: var(--orange); }
+    .finish h3 { max-width: 18ch; font-size: clamp(2rem, 4vw, 4rem); }
+    .finish p { margin-top: 24px; font-size: 1.12rem; }
+    .sources { padding-left: 1.2em; }
+    .sources li { margin: 12px 0; max-width: 75ch; }
+
+    footer { padding: 52px 20px; color: var(--white); background: var(--black); text-align: center; }
+    footer strong { color: var(--acid); }
+
+    @keyframes enter-title { from { transform: translateY(26px); clip-path: inset(0 0 100% 0); } to { transform: translateY(0); clip-path: inset(0); } }
+    @keyframes enter-copy { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+
+    @media (max-width: 1080px) {
+      .shell { grid-template-columns: 1fr; }
+      .rail { position: relative; top: 0; max-height: none; }
+      .rail nav { columns: 2; }
+      .stage { grid-template-columns: 44px minmax(0, 1fr); }
+      .done { grid-column: 2; }
+      .layers { grid-template-columns: repeat(8, 1fr); }
+    }
+    @media (max-width: 760px) {
+      :root { --page: min(100% - 28px, 1480px); }
+      body { font-size: 16px; }
+      .site-head::before, .nav-note { display: none; }
+      .hero { grid-template-columns: 1fr; padding-top: 70px; }
+      .hero h1 { font-size: clamp(3.55rem, 16vw, 5.3rem); }
+      .hero-side { max-width: 32rem; }
+      .shell { padding-top: 34px; }
+      .rail nav { columns: 1; }
+      .repo-row, .concept-split, .operators, .validation, .scope { grid-template-columns: 1fr; }
+      .repo-row { gap: 8px; }
+      .operator + .operator { border-top: 1px solid var(--black); }
+      .scope > div + div { padding-left: 0; border-left: 0; border-top: 1px solid var(--gray-2); }
+      .stage { padding: 28px 0; }
+      .done { grid-column: 1 / -1; padding-left: 62px; }
+      .layers { grid-template-columns: repeat(4, 1fr); }
+      .shape-table { display: block; overflow-x: auto; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+    @media print {
+      .site-head { min-height: auto; color: var(--black); background: white; }
+      .hero-side p, .signal { color: var(--black); }
+      .site-head::before, .print, .rail, .signal { display: none; }
+      .shell { display: block; width: 100%; padding: 30px; }
+      section { margin-bottom: 60px; break-inside: avoid; }
+      .answer, .pipeline-board, .layer-rack, .validation-main { color: var(--black); background: white; border: 2px solid var(--black); }
+      .answer p, .node-detail, .validation-main p { color: var(--black); }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#content">Skip to guide</a>
+  <header class="site-head">
+    <nav class="nav" aria-label="Guide controls">
+      <div class="brand"><span class="brand-mark" aria-hidden="true"></span> liquid.cpp</div>
+      <div class="nav-actions"><span class="nav-note">FIELD GUIDE / REV. 01</span><button class="print" type="button" onclick="window.print()">PRINT</button></div>
+    </nav>
+    <div class="hero">
+      <h1>Build the machine that predicts <em>one token.</em></h1>
+      <div class="hero-side">
+        <div class="stamp">LFM2.5–350M / BF16 / CPU FIRST</div>
+        <p>A practical route through <strong>tokenization, tensors, embeddings, 16 hybrid layers, logits, and generation</strong>—in the order that makes each idea testable.</p>
+      </div>
+    </div>
+    <div class="signal" aria-label="Inference signal path">
+      <span class="word">PROMPT</span><span class="arrow">→</span><span class="word">TOKEN IDS</span><span class="arrow">→</span><span class="word">VECTORS</span><span class="arrow">→</span><span class="word">10× CONV</span><span class="arrow">+</span><span class="word">6× ATTN</span><span class="arrow">→</span><span class="word">LOGITS</span><span class="arrow">→</span><span class="word hot">NEXT TOKEN</span>
+    </div>
+  </header>
+
+  <div class="shell">
+    <aside class="rail" aria-label="Page navigation">
+      <div class="rail-label">CONTENTS</div>
+      <nav>
+        <a href="#answer">The whole answer</a>
+        <a href="#repo">Repository today</a>
+        <a href="#pipeline">Signal path</a>
+        <a href="#roadmap">Build order</a>
+        <a href="#tokenizer">Tokenizer</a>
+        <a href="#embeddings">Embeddings</a>
+        <a href="#layers">Sixteen layers</a>
+        <a href="#output">Output loop</a>
+        <a href="#validation">Validation</a>
+        <a href="#scope">Minimal scope</a>
+      </nav>
+      <div class="progress">
+        <div class="progress-head"><span>PROGRESS</span><span id="progressText">0 / 11</span></div>
+        <div class="track" aria-hidden="true"><div class="fill" id="progressFill"></div></div>
+        <button class="reset" id="resetProgress" type="button">Reset stages</button>
+      </div>
+    </aside>
+
+    <main id="content">
+      <section id="answer" class="answer">
+        <h2>Yes. That is basically it.</h2>
+        <p>Text becomes IDs. IDs become vectors. Sixteen layers repeatedly rewrite those vectors. A final norm and tied output projection produce one score for every vocabulary token. You select one, append it, and repeat. <strong>The work is getting every shape, axis, operation, and cache exactly right.</strong></p>
+      </section>
+
+      <section id="repo">
+        <div class="chapter">Before the model</div>
+        <h2>What exists right now</h2>
+        <p class="section-intro">The repository is a healthy C++ shell around a checkpoint. The actual inference engine is still almost entirely yours to discover and build.</p>
+        <div class="repo-list">
+          <div class="repo-row"><code>src/main.cpp</code><div><h3>CLI and checkpoint discovery</h3><p>Finds the fixed Hugging Face snapshot, prints the sidecar index, and allocates bytes. It does not parse the safetensors binary or load tensor values. Prompt mode only echoes.</p></div></div>
+          <div class="repo-row"><code>src/tokenizer.cpp</code><div><h3>The first real milestone</h3><p>The tokenizer is a placeholder: every string becomes token ID 0.</p></div></div>
+          <div class="repo-row"><code>greeting.* + test_greeting.cpp</code><div><h3>Disposable scaffolding</h3><p>The greeting proves the library links. The test also confirms the placeholder tokenizer. Replace these with concept-sized inference tests.</p></div></div>
+          <div class="repo-row"><code>CMakeLists.txt + presets</code><div><h3>Keep this foundation</h3><p>C++20, Ninja, CTest, warnings, and JSON parsing already work. Preserve the library/executable split.</p></div></div>
+          <div class="repo-row"><code>local model snapshot</code><div><h3>Your executable specification</h3><p>148 BF16 tensors, 354,483,968 parameters, tokenizer, config, template, and generation settings. The checkpoint's names and shapes tell you which math must exist.</p></div></div>
+        </div>
+        <div class="truth-note">When implementation starts: keep <span class="mono">main.cpp</span> thin. Move discovery, model format, tokenizer, tensors, operators, and generation into small units only as you reach them.</div>
+      </section>
+
+      <section id="pipeline">
+        <div class="chapter">The complete signal path</div>
+        <h2>There are no secret steps.</h2>
+        <p class="section-intro">Click through the full system. Performance changes how this graph runs; it does not change what the model computes.</p>
+        <div class="pipeline-board">
+          <div class="nodes" id="pipelineSteps">
+            <button class="step-node active" data-detail="Format chat roles into one exact string with chat_template.jinja. Learn with raw text first; introduce the template before end-to-end chat generation."><b>01</b><span>Template</span></button>
+            <button class="step-node" data-detail="Regex splitting, byte-level mapping, and BPE merging convert the string into vocabulary IDs."><b>02</b><span>Tokenize</span></button>
+            <button class="step-node" data-detail="Each ID selects one row from model.embed_tokens.weight. S tokens become an [S, 1,024] activation."><b>03</b><span>Embed</span></button>
+            <button class="step-node" data-detail="Ten short-convolution operators and six grouped-query attention operators are interleaved. Every layer also has two RMSNorms, residual paths, and a SwiGLU feed-forward network."><b>04</b><span>16 layers</span></button>
+            <button class="step-node" data-detail="model.embedding_norm.weight applies the final RMSNorm after layer 15. Its name is misleading: it is not directly after input embedding."><b>05</b><span>Final norm</span></button>
+            <button class="step-node" data-detail="Multiply the last hidden vector by the transposed embedding table. Weight tying turns [1,024] into 65,536 logits."><b>06</b><span>LM head</span></button>
+            <button class="step-node" data-detail="Start with argmax. Sampling policy can wait until the forward pass is correct."><b>07</b><span>Select</span></button>
+            <button class="step-node" data-detail="Append the chosen ID, update attention and convolution caches, and process the next position. Stop on EOS ID 7 or the token limit."><b>08</b><span>Repeat</span></button>
+            <button class="step-node" data-detail="The tokenizer's byte-level decoder turns IDs back into bytes and readable text. This is different from a neural decoder layer."><b>09</b><span>Decode text</span></button>
+          </div>
+          <div class="node-detail" id="pipelineDetail">Format chat roles into one exact string with <code>chat_template.jinja</code>. Learn with raw text first; introduce the template before end-to-end chat generation.</div>
+        </div>
+      </section>
+
+      <section id="roadmap">
+        <div class="chapter">Your working syllabus</div>
+        <h2>Build in dependency order.</h2>
+        <p class="section-intro">Each stage ends at a boundary you can compare with a trusted MLX or Transformers run. Checkboxes persist locally.</p>
+        <div class="roadmap">
+          <article class="stage"><input class="check" type="checkbox" aria-label="Complete stage 0" data-stage="0"><div class="stage-copy"><h3>Freeze a reference</h3><p>Record the checkpoint revision. Inspect config, tokenizer, safetensors metadata, names, and shapes. Save reference token IDs, intermediate activations, logits, and one greedy output.</p></div><div class="done"><b>DONE WHEN</b>You can explain every model file and reproduce a known run outside your engine.</div></article>
+          <article class="stage"><input class="check" type="checkbox" aria-label="Complete stage 1" data-stage="1"><div class="stage-copy"><h3>Implement byte-level BPE</h3><p>Replace ID 0 with special-token handling, regex pre-tokenization, UTF-8 byte mapping, BPE merging, vocabulary lookup, and reverse decoding.</p></div><div class="done"><b>DONE WHEN</b>Exact IDs match for ASCII, whitespace, punctuation, Unicode, and special tokens; decoding round-trips.</div></article>
+          <article class="stage"><input class="check" type="checkbox" aria-label="Complete stage 2" data-stage="2"><div class="stage-copy"><h3>Read tensors for real</h3><p>Parse the 8-byte safetensors header length, JSON metadata, and raw ranges. Create a non-owning tensor view. Implement exact BF16→FP32 conversion. Map the file or read ranges instead of copying 709 MB.</p></div><div class="done"><b>DONE WHEN</b>You can request any tensor by name and match several values with a reference.</div></article>
+          <article class="stage"><input class="check" type="checkbox" aria-label="Complete stage 3" data-stage="3"><div class="stage-copy"><h3>Make tiny FP32 math</h3><p>Write transparent loops for matmul, add, multiply, gather, RMSNorm, SiLU, softmax, reshape/view, and causal depthwise convolution.</p></div><div class="done"><b>DONE WHEN</b>Every primitive passes a hand-computed test and randomized reference comparison.</div></article>
+          <article class="stage"><input class="check" type="checkbox" aria-label="Complete stage 4" data-stage="4"><div class="stage-copy"><h3>Gather input embeddings</h3><p>For each token ID, read one 1,024-value BF16 row from <span class="mono">model.embed_tokens.weight</span> and convert it for computation.</p></div><div class="done"><b>DONE WHEN</b>Known IDs produce the reference [S, 1,024] activation.</div></article>
+          <article class="stage"><input class="check" type="checkbox" aria-label="Complete stage 5" data-stage="5"><div class="stage-copy"><h3>Build the shared SwiGLU branch</h3><p>All 16 layers use <span class="mono">w2(silu(w1(x)) × w3(x))</span> with an effective intermediate width of 4,608, preceded by RMSNorm and followed by a residual add.</p></div><div class="done"><b>DONE WHEN</b>One normalized FFN branch matches the reference.</div></article>
+          <article class="stage"><input class="check" type="checkbox" aria-label="Complete stage 6" data-stage="6"><div class="stage-copy"><h3>Finish convolution layer 0</h3><p>Normalize; project 1,024→3,072; split B, C, x; form B×x; causal depthwise-convolve width 3; gate with C; output-project; add residual; run FFN.</p></div><div class="done"><b>DONE WHEN</b>Layer 0 matches for a short sequence without caching.</div></article>
+          <article class="stage"><input class="check" type="checkbox" aria-label="Complete stage 7" data-stage="7"><div class="stage-copy"><h3>Finish attention layer 2</h3><p>Build 16 Q heads and 8 K/V heads of width 64. Apply Q/K RMSNorm, RoPE, a causal mask, scaled dot products, softmax, 2:1 grouped-query sharing, output projection, residual, and FFN.</p></div><div class="done"><b>DONE WHEN</b>Q, K, probabilities, operator output, and layer output all match.</div></article>
+          <article class="stage"><input class="check" type="checkbox" aria-label="Complete stage 8" data-stage="8"><div class="stage-copy"><h3>Run the 16-layer stack</h3><p>Construct operators from <span class="mono">layer_types</span>. Keep batch 1, short contexts, and no cache. Feed each [S, 1,024] output directly to the next layer.</p></div><div class="done"><b>DONE WHEN</b>Activations match after layers 0 through 15.</div></article>
+          <article class="stage"><input class="check" type="checkbox" aria-label="Complete stage 9" data-stage="9"><div class="stage-copy"><h3>Predict one correct token</h3><p>Apply final RMSNorm. Multiply the last hidden vector by the tied embedding matrix transpose. Compare 65,536 logits and choose argmax.</p></div><div class="done"><b>DONE WHEN</b>Your top logits and greedy next token match exactly enough to explain any numerical difference.</div></article>
+          <article class="stage"><input class="check" type="checkbox" aria-label="Complete stage 10" data-stage="10"><div class="stage-copy"><h3>Cache, template, stream</h3><p>Separate prefill from decode. Cache attention K/V and the last three convolution states. Add the chat template, EOS handling, greedy repetition, and incremental text decoding.</p></div><div class="done"><b>DONE WHEN</b>A formatted prompt generates matching greedy text without recomputing its prefix.</div></article>
+        </div>
+      </section>
+
+      <section id="tokenizer">
+        <div class="chapter">First component</div>
+        <h2>Text becomes integers.</h2>
+        <p class="section-intro">The model never sees words or characters. The checkpoint's tokenizer is byte-level BPE: a reversible byte representation compressed into frequently learned pieces.</p>
+        <div class="concept-split">
+          <div class="concept-list">
+            <div class="concept"><b>1. Protect special tokens</b><p>Recognize control strings before ordinary splitting.</p></div>
+            <div class="concept"><b>2. Regex pre-tokenize</b><p>Isolate contractions, letters, short number runs, punctuation, and whitespace patterns.</p></div>
+            <div class="concept"><b>3. Map UTF-8 bytes</b><p>Use the reversible byte-level alphabet, ensuring arbitrary input is representable.</p></div>
+            <div class="concept"><b>4. Apply BPE ranks</b><p>Repeatedly merge the best-ranked adjacent pair until no merge remains.</p></div>
+            <div class="concept"><b>5. Lookup and reverse</b><p>Map pieces to IDs; reverse the process to decode generated IDs.</p></div>
+          </div>
+          <aside class="fact-block"><b>Checkpoint facts</b><p>65,536 vocabulary entries<br>Pad ID 0<br>BOS ID 1<br>EOS ID 7<br>509 added tokens</p></aside>
+        </div>
+        <pre>messages → chat template → string → tokenizer → token IDs
+token IDs → byte-level decoder → generated text</pre>
+      </section>
+
+      <section id="embeddings">
+        <div class="chapter">Second component</div>
+        <h2>Integers become vectors.</h2>
+        <p class="section-intro">Embedding is a table lookup. Token ID <em>t</em> selects row <em>t</em>; a sequence preserves its order as a matrix.</p>
+        <pre>IDs                              [S]
+model.embed_tokens.weight        [65,536, 1,024]
+gather rows                 →     [S, 1,024]</pre>
+        <table class="shape-table">
+          <thead><tr><th>Object</th><th>Shape</th><th>Meaning</th></tr></thead>
+          <tbody>
+            <tr><td>Token sequence</td><td><code>[S]</code></td><td>Integer output from the tokenizer</td></tr>
+            <tr><td>Embedding table</td><td><code>[65,536, 1,024]</code></td><td>One learned BF16 vector per vocabulary token</td></tr>
+            <tr><td>Hidden state</td><td><code>[S, 1,024]</code></td><td>One contextual vector per position</td></tr>
+            <tr><td>Vocabulary logits</td><td><code>[65,536]</code></td><td>Final position × the same embedding table transposed</td></tr>
+          </tbody>
+        </table>
+        <div class="truth-note"><span class="mono">model.embedding_norm.weight</span> is the final RMSNorm after layer 15—not a normalization directly after embedding lookup.</div>
+      </section>
+
+      <section id="layers">
+        <div class="chapter">The model core</div>
+        <h2>Ten local mixers. Six global mixers.</h2>
+        <p class="section-intro">LFM2.5 is hybrid. Convolution cheaply mixes nearby history; attention reaches across the full causal context. Every layer wraps its mixer with normalization, residuals, and the same SwiGLU feed-forward branch.</p>
+        <div class="layer-rack">
+          <div class="layers" aria-label="Sixteen layer types">
+            <div class="layer conv"><b>00</b>CONV</div><div class="layer conv"><b>01</b>CONV</div><div class="layer attn"><b>02</b>ATTN</div><div class="layer conv"><b>03</b>CONV</div>
+            <div class="layer conv"><b>04</b>CONV</div><div class="layer attn"><b>05</b>ATTN</div><div class="layer conv"><b>06</b>CONV</div><div class="layer conv"><b>07</b>CONV</div>
+            <div class="layer attn"><b>08</b>ATTN</div><div class="layer conv"><b>09</b>CONV</div><div class="layer attn"><b>10</b>ATTN</div><div class="layer conv"><b>11</b>CONV</div>
+            <div class="layer attn"><b>12</b>ATTN</div><div class="layer conv"><b>13</b>CONV</div><div class="layer attn"><b>14</b>ATTN</div><div class="layer conv"><b>15</b>CONV</div>
+          </div>
+          <div class="legend"><span><i></i>short convolution</span><span class="attn-key"><i></i>full attention</span></div>
+        </div>
+        <pre>residual = x                     residual = x
+x = operator_norm(x)             x = ffn_norm(x)
+x = attention(x) OR short_conv(x) x = w2(silu(w1(x)) * w3(x))
+x = residual + x                 x = residual + x</pre>
+        <div class="operators">
+          <article class="operator"><div class="quantity">10 × SHORT CONV</div><h3>Local, gated, width three</h3><p><span class="mono">in_proj</span> makes B, C, and x. B gates x before a causal depthwise convolution; C gates the result. <span class="mono">out_proj</span> returns to width 1,024.</p><pre>[S,1024] → [S,3072]
+split B,C,x → B*x
+depthwise conv width 3
+C*result → [S,1024]</pre></article>
+          <article class="operator"><div class="quantity">6 × FULL ATTENTION</div><h3>Global, causal, grouped-query</h3><p>Sixteen query heads share eight key/value heads. Head width is 64. Q/K RMSNorm and RoPE happen before causal scaled dot-product attention.</p><pre>Q [S,16,64]
+K [S, 8,64] → repeat ×2
+V [S, 8,64] → repeat ×2
+scores [16,S,S]</pre></article>
+        </div>
+        <table class="shape-table">
+          <thead><tr><th>Weights</th><th>Shape</th><th>What that reveals</th></tr></thead>
+          <tbody>
+            <tr><td>FFN w1 / w3</td><td><code>[4,608, 1,024]</code></td><td>Parallel SwiGLU up-projections</td></tr>
+            <tr><td>FFN w2</td><td><code>[1,024, 4,608]</code></td><td>Projection back to hidden width</td></tr>
+            <tr><td>Attention Q</td><td><code>[1,024, 1,024]</code></td><td>16 heads × 64</td></tr>
+            <tr><td>Attention K / V</td><td><code>[512, 1,024]</code></td><td>8 heads × 64</td></tr>
+            <tr><td>Conv input projection</td><td><code>[3,072, 1,024]</code></td><td>Three streams: B, C, x</td></tr>
+            <tr><td>Depthwise conv</td><td><code>[1,024, 3, 1]</code></td><td>Three history values per channel in MLX layout</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="output">
+        <div class="chapter">Close the loop</div>
+        <h2>One vector votes on every token.</h2>
+        <p class="section-intro">After layer 15, normalize the last position and score every vocabulary entry. You do not need softmax for greedy argmax because it preserves ranking.</p>
+        <pre>last hidden state [1,024]
+  → final RMSNorm
+  → × embed_tokens.weightᵀ [1,024 × 65,536]
+  → logits [65,536]
+  → argmax token ID
+  → append, cache, decode, repeat</pre>
+        <div class="loop">
+          <div class="loop-row"><span class="num">01</span><div><h3>Prefill</h3><p>Process the full prompt and populate attention K/V and convolution history caches.</p></div></div>
+          <div class="loop-row"><span class="num">02</span><div><h3>Select</h3><p>Use the final position's logits to choose one next token. Begin with greedy argmax.</p></div></div>
+          <div class="loop-row"><span class="num">03</span><div><h3>Decode step</h3><p>Process only the newly selected token using cached history instead of recomputing the prefix.</p></div></div>
+          <div class="loop-row"><span class="num">04</span><div><h3>Stream and stop</h3><p>Decode newly formed bytes to text; repeat until EOS ID 7 or the requested limit.</p></div></div>
+        </div>
+      </section>
+
+      <section id="validation">
+        <div class="chapter">The learning method</div>
+        <h2>Find the first wrong number.</h2>
+        <p class="section-intro">Never debug 354 million parameters at once. Compare boundaries from the front; the first mismatch points to the operation that caused it.</p>
+        <div class="validation">
+          <div class="validation-main"><h3>Use the reference as a microscope.</h3><p>Batch 1. Two to five tokens. No sampling. Compare token IDs → embeddings → operator branch → FFN branch → each layer → final norm → top logits. Track maximum absolute and relative error rather than assuming fused BF16/FP32 paths will be bit-identical.</p></div>
+          <div class="validation-side"><h3>Debug in this order</h3><ol><li>Shape</li><li>Axis</li><li>Transpose</li><li>Operation order</li><li>Dtype</li><li>Numerical tolerance</li></ol></div>
+        </div>
+      </section>
+
+      <section id="scope">
+        <div class="chapter">Guard the curriculum</div>
+        <h2>Minimal means correct before fast.</h2>
+        <div class="scope">
+          <div><h3>Build now</h3><ul><li>Batch size 1</li><li>BF16 weight reading</li><li>FP32 activation math</li><li>Simple, obvious loops</li><li>Greedy argmax</li><li>Short prompts</li><li>Exact LFM2.5 architecture</li><li>Caches after uncached correctness</li></ul></div>
+          <div><h3>Build later</h3><ul><li>Batch scheduling</li><li>SIMD, threads, Metal, GPU</li><li>Quantized formats</li><li>Top-k, top-p, penalties</li><li>Huge contexts</li><li>Generic model abstractions</li><li>Flash attention and fused kernels</li></ul></div>
+        </div>
+        <div class="finish"><h3>The finish line is surprisingly small.</h3><p>Read the checkpoint. Format and tokenize a prompt. Run the exact 16-layer forward pass. Apply final normalization and the tied output head. Select, cache, stop on EOS, and decode readable text. Everything after that is speed, flexibility, or generation policy.</p></div>
+      </section>
+
+      <section id="sources">
+        <div class="chapter">Keep these open</div>
+        <h2>Ground truth</h2>
+        <ul class="sources">
+          <li><a href="https://huggingface.co/LiquidAI/LFM2.5-350M-MLX-bf16" target="_blank" rel="noreferrer">Exact MLX/BF16 checkpoint</a>: config, tokenizer, template, weights, and generation settings.</li>
+          <li><a href="https://huggingface.co/LiquidAI/LFM2.5-350M" target="_blank" rel="noreferrer">Liquid AI model card</a>: architecture overview and inference setup.</li>
+          <li><a href="https://github.com/huggingface/transformers/blob/main/src/transformers/models/lfm2/modeling_lfm2.py" target="_blank" rel="noreferrer">Hugging Face LFM2 implementation</a>: executable specification for operator order, attention, convolution, caching, and output.</li>
+          <li>Your local <span class="mono">config.json</span>, <span class="mono">tokenizer.json</span>, and safetensors header. When assumptions conflict with tensor shapes, the checkpoint wins.</li>
+        </ul>
+      </section>
+    </main>
+  </div>
+
+  <footer><strong>One boundary. One reference. One correct token.</strong></footer>
+
+  <script>
+    const detail = document.getElementById('pipelineDetail');
+    document.querySelectorAll('.step-node').forEach((node) => {
+      node.addEventListener('click', () => {
+        document.querySelectorAll('.step-node').forEach((item) => item.classList.remove('active'));
+        node.classList.add('active');
+        detail.textContent = node.dataset.detail;
+      });
+    });
+
+    const checks = [...document.querySelectorAll('.check')];
+    const fill = document.getElementById('progressFill');
+    const progressText = document.getElementById('progressText');
+    const updateProgress = () => {
+      const complete = checks.filter((check) => check.checked).length;
+      progressText.textContent = `${complete} / ${checks.length}`;
+      fill.style.transform = `scaleX(${complete / checks.length})`;
+    };
+    checks.forEach((check) => {
+      check.checked = localStorage.getItem(`liquid-roadmap-${check.dataset.stage}`) === 'true';
+      check.addEventListener('change', () => {
+        localStorage.setItem(`liquid-roadmap-${check.dataset.stage}`, String(check.checked));
+        updateProgress();
+      });
+    });
+    document.getElementById('resetProgress').addEventListener('click', () => {
+      checks.forEach((check) => {
+        check.checked = false;
+        localStorage.removeItem(`liquid-roadmap-${check.dataset.stage}`);
+      });
+      updateProgress();
+    });
+    updateProgress();
+  </script>
+</body>
+</html>
