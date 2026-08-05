@@ -1,0 +1,721 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <title>Mukund vs. The Giraffe</title>
+  <style>
+    :root {
+      --ink: #17130d;
+      --paper: #f8ebc7;
+      --red: #e63b2e;
+      --gold: #f1b84b;
+      --green: #80c46a;
+      --panel: rgba(20, 16, 10, .78);
+    }
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #9fd0dc; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: white; }
+    canvas { display: block; width: 100%; height: 100%; }
+    #hud { position: fixed; inset: 0; pointer-events: none; user-select: none; }
+    .panel { background: var(--panel); border: 1px solid rgba(255,255,255,.16); box-shadow: 0 8px 30px rgba(0,0,0,.25); backdrop-filter: blur(8px); }
+    #bars { position: absolute; left: 18px; top: 18px; width: min(440px, calc(100vw - 36px)); padding: 14px; border-radius: 14px; }
+    .row { display: grid; grid-template-columns: 112px 1fr 70px; gap: 10px; align-items: center; margin: 7px 0; }
+    .name { font-size: 12px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+    .value { text-align: right; font-variant-numeric: tabular-nums; font-size: 12px; color: rgba(255,255,255,.84); }
+    .bar { height: 14px; background: rgba(255,255,255,.11); border-radius: 999px; overflow: hidden; border: 1px solid rgba(255,255,255,.10); }
+    .fill { height: 100%; width: 100%; transform-origin: left; transition: transform .09s linear; }
+    #player-fill { background: linear-gradient(90deg,#6fd06f,#b8f879); }
+    #stamina-fill { background: linear-gradient(90deg,#58a8ff,#82e6ff); }
+    #giraffe-fill { background: linear-gradient(90deg,#f5c04d,#f06437); }
+    #focus-fill { background: linear-gradient(90deg,#a886ff,#ff87d1); }
+    #meta { display: flex; justify-content: space-between; gap: 12px; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,.12); color: rgba(255,255,255,.72); font-size: 11px; letter-spacing: .04em; }
+    #info { position: absolute; right: 18px; top: 18px; width: 265px; padding: 14px 16px; border-radius: 14px; font-size: 12px; line-height: 1.55; color: rgba(255,255,255,.82); }
+    #info strong { color: white; }
+    .rig-pill { display: inline-block; margin-top: 8px; padding: 4px 8px; border-radius: 999px; background: rgba(241,184,75,.17); border: 1px solid rgba(241,184,75,.45); color: #ffd985; font-weight: 800; letter-spacing: .08em; font-size: 10px; }
+    #crosshair { position: absolute; left: 50%; top: 50%; width: 18px; height: 18px; transform: translate(-50%,-50%); opacity: .65; }
+    #crosshair:before, #crosshair:after { content: ""; position: absolute; background: white; border-radius: 2px; box-shadow: 0 1px 5px rgba(0,0,0,.8); }
+    #crosshair:before { left: 8px; top: 2px; width: 2px; height: 14px; }
+    #crosshair:after { top: 8px; left: 2px; height: 2px; width: 14px; }
+    #announce { position: absolute; left: 50%; top: 22%; transform: translate(-50%,-50%); padding: 10px 18px; border-radius: 999px; background: rgba(17,12,7,.74); border: 1px solid rgba(255,255,255,.2); font-size: clamp(13px,2vw,18px); font-weight: 900; letter-spacing: .06em; text-transform: uppercase; opacity: 0; transition: opacity .18s, transform .18s; white-space: nowrap; }
+    #announce.show { opacity: 1; transform: translate(-50%,-55%); }
+    #damage-layer { position: absolute; inset: 0; overflow: hidden; }
+    .damage-number { position: absolute; transform: translate(-50%,-50%); font-weight: 1000; font-size: 22px; color: white; text-shadow: 0 2px 0 #2b1608, 0 0 10px rgba(255,187,70,.9); will-change: transform, opacity; }
+    .damage-number.crit { color: #fff07a; font-size: 34px; text-shadow: 0 3px 0 #7b2900, 0 0 22px #ff8a00; }
+    .damage-number.hurt { color: #ff6c62; text-shadow: 0 2px 0 #4c0600, 0 0 18px #ff2d1f; }
+    #vignette { position: absolute; inset: 0; background: radial-gradient(circle at center, transparent 45%, rgba(45,0,0,.74) 100%); opacity: 0; transition: opacity .12s; }
+    #flash { position: absolute; inset: 0; background: white; opacity: 0; }
+    #boss-tag { position: absolute; left: 50%; bottom: 25px; transform: translateX(-50%); background: rgba(21,13,6,.72); border: 1px solid rgba(255,220,140,.35); border-radius: 999px; padding: 7px 12px; font-size: 11px; letter-spacing: .11em; text-transform: uppercase; color: #ffe2a0; }
+    .overlay { position: fixed; inset: 0; display: grid; place-items: center; background: radial-gradient(circle at 50% 42%, rgba(40,29,13,.20), rgba(10,9,7,.82)); z-index: 10; transition: opacity .2s; }
+    .overlay.hidden { opacity: 0; pointer-events: none; }
+    .card { width: min(720px, calc(100vw - 34px)); padding: clamp(22px,5vw,48px); border-radius: 26px; background: rgba(17,13,8,.88); border: 1px solid rgba(255,255,255,.18); box-shadow: 0 30px 90px rgba(0,0,0,.46); text-align: center; backdrop-filter: blur(14px); }
+    .eyebrow { color: #ffd77f; letter-spacing: .18em; font-size: 11px; text-transform: uppercase; font-weight: 900; }
+    h1 { margin: 8px 0 12px; font-size: clamp(38px,8vw,84px); line-height: .92; letter-spacing: -.06em; }
+    h1 span { color: #f2b64b; }
+    .lede { margin: 0 auto 22px; max-width: 570px; color: rgba(255,255,255,.73); line-height: 1.55; font-size: 15px; }
+    .stat-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin: 22px 0; }
+    .stat { padding: 12px 8px; border-radius: 12px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.09); }
+    .stat b { display: block; font-size: 20px; color: #fff1bd; }
+    .stat small { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,.55); }
+    button { pointer-events: auto; border: 0; border-radius: 999px; padding: 14px 26px; background: #f2b64b; color: #201507; font: inherit; font-weight: 1000; letter-spacing: .08em; text-transform: uppercase; cursor: pointer; box-shadow: 0 9px 28px rgba(242,182,75,.24); }
+    button:hover { transform: translateY(-1px); filter: brightness(1.05); }
+    .controls { margin-top: 18px; color: rgba(255,255,255,.58); font-size: 11px; line-height: 1.8; }
+    kbd { display: inline-block; min-width: 24px; padding: 1px 6px; border-radius: 5px; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.16); color: white; font: inherit; font-weight: 800; }
+    #end-overlay { display: none; }
+    #end-overlay.show { display: grid; }
+    #end-title { font-size: clamp(48px,9vw,100px); }
+    #fatal { display: none; position: fixed; inset: 12px; z-index: 99; padding: 18px; background: #350808; color: #ffd8d5; white-space: pre-wrap; overflow: auto; font: 13px/1.5 ui-monospace,monospace; }
+    @media (max-width: 760px) {
+      #info { display: none; }
+      #bars { width: calc(100vw - 24px); left: 12px; top: 12px; }
+      .row { grid-template-columns: 88px 1fr 58px; }
+      #boss-tag { bottom: 14px; width: calc(100vw - 24px); text-align: center; }
+      .stat-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div id="fatal"></div>
+  <div id="hud">
+    <div id="bars" class="panel">
+      <div class="row"><div class="name">Mukund</div><div class="bar"><div id="player-fill" class="fill"></div></div><div id="player-value" class="value">100 / 100</div></div>
+      <div class="row"><div class="name">Stamina</div><div class="bar"><div id="stamina-fill" class="fill"></div></div><div id="stamina-value" class="value">100</div></div>
+      <div class="row"><div class="name">Focus</div><div class="bar"><div id="focus-fill" class="fill"></div></div><div id="focus-value" class="value">0×</div></div>
+      <div class="row"><div class="name">Giraffe</div><div class="bar"><div id="giraffe-fill" class="fill"></div></div><div id="giraffe-value" class="value">9,999</div></div>
+      <div id="meta"><span id="timer">00:00.0</span><span id="hits">0 human-scale hits</span><span>1 unit = 1 metre</span></div>
+    </div>
+    <div id="info" class="panel">
+      <strong>Controls</strong><br>
+      WASD move · Shift sprint<br>
+      Left click jab · Right click haymaker<br>
+      Space dodge · R show skeleton<br>
+      <span class="rig-pill">24-BONE PROCEDURAL RIG</span>
+    </div>
+    <div id="crosshair"></div>
+    <div id="announce"></div>
+    <div id="damage-layer"></div>
+    <div id="vignette"></div>
+    <div id="flash"></div>
+    <div id="boss-tag">Adult giraffe · 5.6 m tall · 9,999 HP · deeply unreasonable</div>
+  </div>
+
+  <div id="start-overlay" class="overlay">
+    <div class="card">
+      <div class="eyebrow">A scientifically unfair Three.js encounter</div>
+      <h1>MUKUND <span>VS.</span><br>THE GIRAFFE</h1>
+      <p class="lede">You are 1.68 m tall. It is 5.6 m tall, faster than you, and capable of kicking with the emotional force of a tax audit. Winning is technically implemented.</p>
+      <div class="stat-grid">
+        <div class="stat"><b>1.68 m</b><small>you</small></div>
+        <div class="stat"><b>5.6 m</b><small>giraffe</small></div>
+        <div class="stat"><b>1 / 777</b><small>mythic bonk odds</small></div>
+      </div>
+      <button id="start-button">Enter the bad idea</button>
+      <div class="controls"><kbd>WASD</kbd> move &nbsp; <kbd>Shift</kbd> sprint &nbsp; <kbd>Space</kbd> dodge &nbsp; <kbd>Mouse</kbd> look / attack &nbsp; <kbd>R</kbd> rig view</div>
+    </div>
+  </div>
+
+  <div id="end-overlay" class="overlay">
+    <div class="card">
+      <div id="end-eyebrow" class="eyebrow"></div>
+      <h1 id="end-title"></h1>
+      <p id="end-copy" class="lede"></p>
+      <button id="restart-button">Run it back</button>
+    </div>
+  </div>
+
+  <script>
+    window.addEventListener('error', (event) => {
+      const fatal = document.getElementById('fatal');
+      fatal.style.display = 'block';
+      fatal.textContent = 'The game hit a JavaScript error:\n\n' + (event.error?.stack || event.message || String(event));
+    });
+    window.addEventListener('unhandledrejection', (event) => {
+      const fatal = document.getElementById('fatal');
+      fatal.style.display = 'block';
+      fatal.textContent = 'The game hit an unhandled promise rejection:\n\n' + (event.reason?.stack || String(event.reason));
+    });
+  </script>
+
+  <script type="module">
+    import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.js';
+
+    const CONFIG = Object.freeze({
+      playerHeight: 1.68,
+      giraffeHeight: 5.6,
+      playerMaxHP: 100,
+      giraffeMaxHP: 9999,
+      arenaRadius: 31,
+      walkSpeed: 5.1,
+      sprintSpeed: 7.5,
+      giraffeSpeed: 5.4,
+    });
+
+    const $ = (id) => document.getElementById(id);
+    const ui = {
+      startOverlay: $('start-overlay'), startButton: $('start-button'),
+      endOverlay: $('end-overlay'), endTitle: $('end-title'), endCopy: $('end-copy'), endEyebrow: $('end-eyebrow'), restart: $('restart-button'),
+      playerFill: $('player-fill'), playerValue: $('player-value'), staminaFill: $('stamina-fill'), staminaValue: $('stamina-value'),
+      focusFill: $('focus-fill'), focusValue: $('focus-value'), giraffeFill: $('giraffe-fill'), giraffeValue: $('giraffe-value'),
+      timer: $('timer'), hits: $('hits'), announce: $('announce'), damageLayer: $('damage-layer'), vignette: $('vignette'), flash: $('flash'), bossTag: $('boss-tag')
+    };
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xa9d7e1);
+    scene.fog = new THREE.FogExp2(0xa9d7e1, 0.0125);
+
+    const camera = new THREE.PerspectiveCamera(58, innerWidth / innerHeight, 0.05, 180);
+    camera.position.set(0, 4, 14);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.05;
+    document.body.insertBefore(renderer.domElement, document.body.firstChild);
+
+    const hemi = new THREE.HemisphereLight(0xc9efff, 0x8f6b34, 2.15);
+    scene.add(hemi);
+    const sun = new THREE.DirectionalLight(0xfff2ce, 4.1);
+    sun.position.set(-14, 23, 10);
+    sun.castShadow = true;
+    sun.shadow.mapSize.set(2048, 2048);
+    sun.shadow.camera.left = -32; sun.shadow.camera.right = 32; sun.shadow.camera.top = 32; sun.shadow.camera.bottom = -32;
+    sun.shadow.camera.near = 2; sun.shadow.camera.far = 70;
+    sun.shadow.bias = -0.0004;
+    scene.add(sun);
+
+    const shadowify = (mesh) => { mesh.castShadow = true; mesh.receiveShadow = true; return mesh; };
+    const clamp01 = (v) => Math.max(0, Math.min(1, v));
+    const easeOut = (t) => 1 - Math.pow(1 - clamp01(t), 3);
+    const smoothstep = (a,b,x) => { const t = clamp01((x-a)/(b-a)); return t*t*(3-2*t); };
+    const damp = (a,b,lambda,dt) => THREE.MathUtils.lerp(a,b,1-Math.exp(-lambda*dt));
+    const angleDelta = (a,b) => Math.atan2(Math.sin(b-a), Math.cos(b-a));
+    const dampAngle = (a,b,lambda,dt) => a + angleDelta(a,b) * (1-Math.exp(-lambda*dt));
+    const forwardFromYaw = (yaw, out = new THREE.Vector3()) => out.set(Math.sin(yaw),0,Math.cos(yaw));
+
+    let seed = 0xA11CE;
+    const rand = () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+    const randRange = (a,b) => a + (b-a)*rand();
+
+    function makeCanvasTexture(text, bg = 'rgba(22,16,8,.82)', fg = '#fff4c6', border = '#f2bd54') {
+      const canvas = document.createElement('canvas'); canvas.width = 512; canvas.height = 128;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0,0,512,128);
+      ctx.fillStyle = bg; ctx.strokeStyle = border; ctx.lineWidth = 5;
+      const r = 26, x=4, y=4, w=504, h=120;
+      ctx.beginPath(); ctx.roundRect(x,y,w,h,r); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = fg; ctx.font = '900 48px system-ui, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(text, 256, 66);
+      const tex = new THREE.CanvasTexture(canvas); tex.colorSpace = THREE.SRGBColorSpace;
+      return tex;
+    }
+
+    function makeLabel(text, width=2.5, height=.63) {
+      const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: makeCanvasTexture(text), transparent: true, depthTest: false }));
+      sprite.scale.set(width,height,1);
+      sprite.renderOrder = 20;
+      return sprite;
+    }
+
+    function addWorld() {
+      const ground = new THREE.Mesh(
+        new THREE.CircleGeometry(72, 128),
+        new THREE.MeshStandardMaterial({ color: 0xb79a56, roughness: 1, metalness: 0 })
+      );
+      ground.rotation.x = -Math.PI/2; ground.receiveShadow = true; scene.add(ground);
+
+      const inner = new THREE.Mesh(
+        new THREE.CircleGeometry(CONFIG.arenaRadius, 128),
+        new THREE.MeshStandardMaterial({ color: 0xc9ad68, roughness: 1 })
+      );
+      inner.rotation.x = -Math.PI/2; inner.position.y = .006; inner.receiveShadow = true; scene.add(inner);
+
+      const boundary = new THREE.Mesh(
+        new THREE.TorusGeometry(CONFIG.arenaRadius,.085,8,160),
+        new THREE.MeshStandardMaterial({ color: 0xf3dc94, emissive: 0x6b3c00, emissiveIntensity: .25, roughness: .8 })
+      );
+      boundary.rotation.x = Math.PI/2; boundary.position.y=.05; scene.add(boundary);
+
+      const lineMat = new THREE.LineBasicMaterial({ color: 0x8e7741, transparent:true, opacity:.38 });
+      for (let r=5; r<CONFIG.arenaRadius; r+=5) {
+        const pts=[]; for(let i=0;i<=96;i++){ const a=i/96*Math.PI*2; pts.push(new THREE.Vector3(Math.cos(a)*r,.025,Math.sin(a)*r)); }
+        scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),lineMat));
+      }
+
+      const bladeGeom = new THREE.ConeGeometry(.035,.28,3);
+      const bladeMat = new THREE.MeshStandardMaterial({ color:0x8a8c3b, roughness:1, flatShading:true });
+      const grass = new THREE.InstancedMesh(bladeGeom,bladeMat,950);
+      grass.castShadow = false; grass.receiveShadow = true;
+      const dummy = new THREE.Object3D();
+      for(let i=0;i<950;i++){
+        const a=rand()*Math.PI*2, r=Math.sqrt(rand())*58;
+        dummy.position.set(Math.cos(a)*r,.12,Math.sin(a)*r);
+        dummy.rotation.set(randRange(-.12,.12),rand()*Math.PI*2,randRange(-.12,.12));
+        const s=randRange(.55,1.45); dummy.scale.set(s,s,s); dummy.updateMatrix(); grass.setMatrixAt(i,dummy.matrix);
+      }
+      scene.add(grass);
+
+      const trunkMat = new THREE.MeshStandardMaterial({color:0x66452c,roughness:1,flatShading:true});
+      const leafMat = new THREE.MeshStandardMaterial({color:0x536f32,roughness:1,flatShading:true});
+      function tree(x,z,s){
+        const g=new THREE.Group(); g.position.set(x,0,z); g.scale.setScalar(s);
+        const trunk=shadowify(new THREE.Mesh(new THREE.CylinderGeometry(.18,.3,3.2,7),trunkMat)); trunk.position.y=1.6; g.add(trunk);
+        const branch1=shadowify(new THREE.Mesh(new THREE.CylinderGeometry(.10,.15,1.8,6),trunkMat)); branch1.position.set(.48,2.75,0); branch1.rotation.z=-.62; g.add(branch1);
+        const branch2=branch1.clone(); branch2.position.x=-.5; branch2.rotation.z=.67; g.add(branch2);
+        for(let i=0;i<7;i++){
+          const crown=shadowify(new THREE.Mesh(new THREE.IcosahedronGeometry(randRange(.75,1.15),1),leafMat));
+          crown.scale.set(randRange(1.2,1.9),randRange(.32,.55),randRange(.9,1.4));
+          crown.position.set(randRange(-1.45,1.45),randRange(3.0,3.55),randRange(-.75,.75)); g.add(crown);
+        }
+        scene.add(g);
+      }
+      for(let i=0;i<17;i++){ const a=rand()*Math.PI*2,r=randRange(38,58); tree(Math.cos(a)*r,Math.sin(a)*r,randRange(.85,1.35)); }
+
+      const rockMat = new THREE.MeshStandardMaterial({color:0x766b57,roughness:1,flatShading:true});
+      for(let i=0;i<42;i++){
+        const a=rand()*Math.PI*2,r=randRange(18,60);
+        const rock=shadowify(new THREE.Mesh(new THREE.DodecahedronGeometry(randRange(.15,.55),0),rockMat));
+        rock.position.set(Math.cos(a)*r,rock.geometry.parameters.radius*.55,Math.sin(a)*r);
+        rock.scale.set(randRange(.7,1.7),randRange(.5,1.0),randRange(.7,1.5)); rock.rotation.set(rand(),rand(),rand()); scene.add(rock);
+      }
+
+      // A literal metre ruler so the scale is not merely decorative.
+      const ruler = new THREE.Group(); ruler.position.set(-6,0,-3.5);
+      const white = new THREE.MeshStandardMaterial({color:0xf5e8c7,roughness:.8});
+      const black = new THREE.MeshStandardMaterial({color:0x272117,roughness:.8});
+      for(let i=0;i<12;i++){
+        const seg=shadowify(new THREE.Mesh(new THREE.BoxGeometry(.13,.5,.13),i%2?black:white)); seg.position.y=i*.5+.25; ruler.add(seg);
+      }
+      for(let m=0;m<=5;m++){
+        const tick=new THREE.Mesh(new THREE.BoxGeometry(.45,.035,.08),white); tick.position.set(.18,m,.02); ruler.add(tick);
+        const label=makeLabel(`${m} m`,.72,.18); label.position.set(.7,m+.08,0); ruler.add(label);
+      }
+      scene.add(ruler);
+    }
+    addWorld();
+
+    function cylinderBetweenY(length, topR, bottomR, material, radial=8) {
+      const m = shadowify(new THREE.Mesh(new THREE.CylinderGeometry(topR,bottomR,length,radial,1,false),material));
+      m.position.y = -length/2;
+      return m;
+    }
+
+    function createPlayer() {
+      const root = new THREE.Group(); root.position.set(0,0,8); scene.add(root);
+      const skin = new THREE.MeshStandardMaterial({color:0xa96f48,roughness:.88,flatShading:true});
+      const shirt = new THREE.MeshStandardMaterial({color:0x204c7d,roughness:.9,flatShading:true});
+      const pants = new THREE.MeshStandardMaterial({color:0x15171d,roughness:.95,flatShading:true});
+      const shoe = new THREE.MeshStandardMaterial({color:0x090a0c,roughness:.8});
+      const glove = new THREE.MeshStandardMaterial({color:0xe24935,roughness:.68,flatShading:true});
+      const hair = new THREE.MeshStandardMaterial({color:0x17110e,roughness:1,flatShading:true});
+
+      const hips = new THREE.Group(); hips.position.y=.82; root.add(hips);
+      const torso = shadowify(new THREE.Mesh(new THREE.CapsuleGeometry(.23,.45,4,8),shirt)); torso.position.y=.36; torso.scale.set(1.05,1,0.78); hips.add(torso);
+      const head = shadowify(new THREE.Mesh(new THREE.IcosahedronGeometry(.155,2),skin)); head.position.y=.705; hips.add(head);
+      const hairCap = shadowify(new THREE.Mesh(new THREE.SphereGeometry(.158,12,8,0,Math.PI*2,0,Math.PI*.48),hair)); hairCap.position.set(0,.734,0); hips.add(hairCap);
+
+      const badge = new THREE.Mesh(new THREE.PlaneGeometry(.18,.18), new THREE.MeshBasicMaterial({map:makeCanvasTexture('M','#204c7d','#fff','#fff'),transparent:true,side:THREE.DoubleSide}));
+      badge.position.set(0,.39,.201); badge.scale.set(1,.45,1); hips.add(badge);
+
+      const arms=[];
+      for(const side of [-1,1]){
+        const shoulder=new THREE.Group(); shoulder.position.set(side*.29,.55,0); hips.add(shoulder);
+        const upper=cylinderBetweenY(.34,.075,.085,skin,7); shoulder.add(upper);
+        const elbow=new THREE.Group(); elbow.position.y=-.33; shoulder.add(elbow);
+        const lower=cylinderBetweenY(.31,.064,.073,skin,7); elbow.add(lower);
+        const fist=shadowify(new THREE.Mesh(new THREE.IcosahedronGeometry(.105,1),glove)); fist.position.y=-.34; fist.scale.set(1.1,.9,1.15); elbow.add(fist);
+        arms.push({shoulder,elbow,fist,side});
+      }
+
+      const legs=[];
+      for(const side of [-1,1]){
+        const hip=new THREE.Group(); hip.position.set(side*.13,.02,0); hips.add(hip);
+        const upper=cylinderBetweenY(.39,.085,.095,pants,7); hip.add(upper);
+        const knee=new THREE.Group(); knee.position.y=-.38; hip.add(knee);
+        const lower=cylinderBetweenY(.36,.065,.075,pants,7); knee.add(lower);
+        const foot=shadowify(new THREE.Mesh(new THREE.BoxGeometry(.15,.10,.27),shoe)); foot.position.set(0,-.39,.07); knee.add(foot);
+        legs.push({hip,knee,foot,side});
+      }
+
+      const label=makeLabel('YOU · 1.68 m',1.65,.42); label.position.set(0,2.0,0); root.add(label);
+      return {root,hips,torso,head,arms,legs,label,hp:CONFIG.playerMaxHP,stamina:100,focus:0,velocity:new THREE.Vector3(),move:new THREE.Vector3(),yaw:Math.PI,invuln:0,dodgeTimer:0,dodgeCooldown:0,attackType:null,attackTime:0,attackLanded:false,hurtTime:0,dead:false};
+    }
+
+    function addEllipsoidSpots(parent,count,rx,ry,rz,mat,centerY=0) {
+      const geo = new THREE.SphereGeometry(1,8,6);
+      for(let i=0;i<count;i++){
+        const theta=rand()*Math.PI*2, u=randRange(-.78,.78), phi=Math.acos(u);
+        const normal=new THREE.Vector3(Math.sin(phi)*Math.cos(theta)/rx,Math.cos(phi)/ry,Math.sin(phi)*Math.sin(theta)/rz).normalize();
+        const p=new THREE.Vector3(rx*Math.sin(phi)*Math.cos(theta),centerY+ry*Math.cos(phi),rz*Math.sin(phi)*Math.sin(theta));
+        const spot=new THREE.Mesh(geo,mat); const s=randRange(.10,.25);
+        spot.position.copy(p).addScaledVector(normal,.018); spot.scale.set(s,s*.72,.025); spot.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),normal); parent.add(spot);
+      }
+    }
+
+    function createSkinnedNeck(height, segments, material) {
+      const geometry = new THREE.CylinderGeometry(.18,.34,height,12,segments*4,false);
+      const pos=geometry.attributes.position, indices=[],weights=[];
+      const segH=height/segments;
+      for(let i=0;i<pos.count;i++){
+        const y=THREE.MathUtils.clamp(pos.getY(i)+height/2,0,height);
+        const f=y/segH, a=Math.min(segments,Math.floor(f)), b=Math.min(segments,a+1), w=THREE.MathUtils.clamp(f-a,0,1);
+        indices.push(a,b,0,0); weights.push(1-w,w,0,0);
+      }
+      geometry.setAttribute('skinIndex',new THREE.Uint16BufferAttribute(indices,4));
+      geometry.setAttribute('skinWeight',new THREE.Float32BufferAttribute(weights,4));
+      geometry.computeVertexNormals();
+      const bones=[]; const rootBone=new THREE.Bone(); rootBone.name='neck_0'; rootBone.position.y=-height/2; bones.push(rootBone);
+      let prev=rootBone;
+      for(let i=1;i<=segments;i++){ const b=new THREE.Bone(); b.name=`neck_${i}`; b.position.y=segH; prev.add(b); bones.push(b); prev=b; }
+      const mesh=shadowify(new THREE.SkinnedMesh(geometry,material)); mesh.frustumCulled=false; mesh.add(rootBone); mesh.bind(new THREE.Skeleton(bones)); mesh.normalizeSkinWeights();
+      return {mesh,bones};
+    }
+
+    function createGiraffe() {
+      const root=new THREE.Group(); root.position.set(0,0,-5.5); scene.add(root);
+      const tan=new THREE.MeshStandardMaterial({color:0xd69c3f,roughness:.92,flatShading:true});
+      const lightTan=new THREE.MeshStandardMaterial({color:0xe5b65a,roughness:.92,flatShading:true});
+      const brown=new THREE.MeshStandardMaterial({color:0x5c3117,roughness:.95,flatShading:true});
+      const dark=new THREE.MeshStandardMaterial({color:0x21150e,roughness:.8,flatShading:true});
+      const hoofMat=new THREE.MeshStandardMaterial({color:0x282018,roughness:.75});
+
+      const pelvis=new THREE.Bone(); pelvis.name='pelvis'; pelvis.position.y=2.85; root.add(pelvis);
+      const chest=new THREE.Bone(); chest.name='chest'; chest.position.set(0,.12,.58); pelvis.add(chest);
+      const body=shadowify(new THREE.Mesh(new THREE.SphereGeometry(1,18,12),tan)); body.scale.set(.72,.58,1.23); body.position.y=.04; pelvis.add(body);
+      addEllipsoidSpots(body,34,1,1,1,brown,0);
+
+      const shoulderHump=shadowify(new THREE.Mesh(new THREE.SphereGeometry(1,12,8),lightTan)); shoulderHump.scale.set(.62,.49,.62); shoulderHump.position.set(0,.18,.78); pelvis.add(shoulderHump);
+      addEllipsoidSpots(shoulderHump,9,1,1,1,brown,0);
+
+      const legBones=[]; const legs=[];
+      const legDefs=[[-.48,.78,0], [.48,.78,Math.PI], [-.48,-.82,Math.PI], [.48,-.82,0]];
+      for(let i=0;i<legDefs.length;i++){
+        const [x,z,phase]=legDefs[i];
+        const upper=new THREE.Bone(); upper.name=`leg_${i}_upper`; upper.position.set(x,-.34,z); pelvis.add(upper);
+        const upperMesh=cylinderBetweenY(1.12,.105,.145,tan,8); upper.add(upperMesh);
+        addEllipsoidSpots(upperMesh,3,.12,.48,.12,brown,-.45);
+        const lower=new THREE.Bone(); lower.name=`leg_${i}_lower`; lower.position.y=-1.1; upper.add(lower);
+        const lowerMesh=cylinderBetweenY(1.16,.072,.097,lightTan,8); lower.add(lowerMesh);
+        const hoofBone=new THREE.Bone(); hoofBone.name=`leg_${i}_hoof`; hoofBone.position.y=-1.13; lower.add(hoofBone);
+        const hoof=shadowify(new THREE.Mesh(new THREE.BoxGeometry(.22,.16,.34),hoofMat)); hoof.position.set(0,-.09,.08); hoof.rotation.x=.08; hoofBone.add(hoof);
+        legBones.push(upper,lower,hoofBone); legs.push({upper,lower,hoofBone,hoof,phase,index:i});
+      }
+
+      const neck=createSkinnedNeck(1.9,5,tan); neck.mesh.position.set(0,1.25,.77); neck.mesh.rotation.x=.10; pelvis.add(neck.mesh);
+      // Bone-following spot clusters make the spots deform with the neck instead of hovering in space.
+      for(let i=0;i<neck.bones.length-1;i++){
+        for(let j=0;j<2;j++){
+          const spot=shadowify(new THREE.Mesh(new THREE.SphereGeometry(1,7,5),brown));
+          const a=j*Math.PI+randRange(-.5,.5); spot.position.set(Math.cos(a)*randRange(.19,.27),.12+randRange(0,.18),Math.sin(a)*randRange(.19,.27));
+          spot.scale.set(randRange(.09,.16),randRange(.10,.20),.035); neck.bones[i].add(spot);
+        }
+      }
+
+      const head=new THREE.Group(); head.name='head'; head.position.set(0,.08,.30); neck.bones.at(-1).add(head);
+      const skull=shadowify(new THREE.Mesh(new THREE.SphereGeometry(1,14,10),tan)); skull.scale.set(.34,.27,.50); head.add(skull);
+      const snout=shadowify(new THREE.Mesh(new THREE.SphereGeometry(1,12,8),lightTan)); snout.scale.set(.28,.18,.39); snout.position.set(0,-.055,.47); head.add(snout);
+      const nose=shadowify(new THREE.Mesh(new THREE.SphereGeometry(1,10,7),brown)); nose.scale.set(.23,.11,.13); nose.position.set(0,-.07,.77); head.add(nose);
+      for(const side of [-1,1]){
+        const eyeWhite=shadowify(new THREE.Mesh(new THREE.SphereGeometry(.075,10,7),new THREE.MeshStandardMaterial({color:0xf5e5c8,roughness:.7}))); eyeWhite.position.set(side*.27,.08,.27); head.add(eyeWhite);
+        const pupil=shadowify(new THREE.Mesh(new THREE.SphereGeometry(.041,8,6),dark)); pupil.position.set(side*.302,.08,.30); head.add(pupil);
+        const earPivot=new THREE.Bone(); earPivot.name=`ear_${side<0?'L':'R'}`; earPivot.position.set(side*.31,.16,.04); head.add(earPivot);
+        const ear=shadowify(new THREE.Mesh(new THREE.SphereGeometry(1,9,6),tan)); ear.scale.set(.22,.08,.13); ear.position.x=side*.14; earPivot.add(ear);
+        const horn=shadowify(new THREE.Mesh(new THREE.CylinderGeometry(.045,.065,.28,8),brown)); horn.position.set(side*.15,.31,-.05); head.add(horn);
+        const hornTip=shadowify(new THREE.Mesh(new THREE.SphereGeometry(.07,8,6),dark)); hornTip.position.set(side*.15,.47,-.05); head.add(hornTip);
+      }
+      addEllipsoidSpots(skull,6,1,1,1,brown,0);
+
+      const tailBones=[]; let tailParent=pelvis;
+      for(let i=0;i<4;i++){
+        const b=new THREE.Bone(); b.name=`tail_${i}`; b.position.set(0,i===0?.08:0,-(i===0?1.20:.38)); tailParent.add(b); tailBones.push(b); tailParent=b;
+        const seg=shadowify(new THREE.Mesh(new THREE.CylinderGeometry(.045+(3-i)*.012,.055+(3-i)*.014,.40,7),i<2?tan:brown)); seg.rotation.x=Math.PI/2; seg.position.z=-.19; b.add(seg);
+      }
+      const tuft=shadowify(new THREE.Mesh(new THREE.ConeGeometry(.14,.38,8),dark)); tuft.rotation.x=-Math.PI/2; tuft.position.z=-.39; tailBones.at(-1).add(tuft);
+
+      const label=makeLabel('GIRAFFE · 5.6 m',2.15,.54); label.position.set(0,6.05,0); root.add(label);
+      const allBones=[pelvis,chest,...legBones,...tailBones,...neck.bones]; // exactly 24 bones.
+      const helper=new THREE.SkeletonHelper(root); helper.visible=false; helper.material.depthTest=false; helper.material.transparent=true; helper.material.opacity=.9; helper.renderOrder=30; scene.add(helper);
+
+      const attackMat=new THREE.MeshBasicMaterial({color:0xff3b24,transparent:true,opacity:0,side:THREE.DoubleSide,depthWrite:false});
+      const attackMarker=new THREE.Mesh(new THREE.RingGeometry(.7,1,64),attackMat); attackMarker.rotation.x=-Math.PI/2; attackMarker.position.y=.035; scene.add(attackMarker);
+
+      return {root,pelvis,chest,body,legs,neck,head,tailBones,label,helper,allBones,attackMarker,hp:CONFIG.giraffeMaxHP,maxHP:CONFIG.giraffeMaxHP,state:'chase',stateTime:0,attackDone:false,attackCooldown:1.2,gait:0,gaitStrength:0,lastHit:0,stagger:0,dead:false,yaw:0,enrage:0,headWorld:new THREE.Vector3()};
+    }
+
+    const player=createPlayer();
+    const giraffe=createGiraffe();
+
+    const keys=new Set();
+    const clock=new THREE.Clock();
+    let started=false, paused=true, gameOver=false, elapsed=0, hitCount=0, cameraYaw=0, cameraPitch=.13, cameraShake=0, announceTimer=0, audioCtx=null, rigVisible=false;
+    const particles=[]; const floaters=[];
+
+    function initAudio(){ if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)(); if(audioCtx.state==='suspended') audioCtx.resume(); }
+    function tone(type='hit',strength=1){
+      if(!audioCtx) return;
+      const now=audioCtx.currentTime, osc=audioCtx.createOscillator(), gain=audioCtx.createGain();
+      const freqs={hit:[170,62],hurt:[115,42],dodge:[480,130],crit:[720,90],win:[330,660],stomp:[70,35]};
+      const [f0,f1]=freqs[type]||freqs.hit; osc.type=type==='crit'?'sawtooth':type==='dodge'?'sine':'triangle';
+      osc.frequency.setValueAtTime(f0,now); osc.frequency.exponentialRampToValueAtTime(Math.max(20,f1),now+.16);
+      gain.gain.setValueAtTime(.0001,now); gain.gain.exponentialRampToValueAtTime(.10*strength,now+.008); gain.gain.exponentialRampToValueAtTime(.0001,now+.20);
+      osc.connect(gain).connect(audioCtx.destination); osc.start(now); osc.stop(now+.22);
+    }
+
+    function announce(text,duration=1.25){ ui.announce.textContent=text; ui.announce.classList.add('show'); announceTimer=duration; }
+
+    function spawnParticle(position, color=0xd9ba74, count=8, speed=2.5, size=.07){
+      for(let i=0;i<count;i++){
+        const mat=new THREE.MeshBasicMaterial({color,transparent:true,opacity:.85,depthWrite:false});
+        const mesh=new THREE.Mesh(new THREE.IcosahedronGeometry(size*randRange(.65,1.35),0),mat); mesh.position.copy(position);
+        const v=new THREE.Vector3(randRange(-1,1),randRange(.25,1.3),randRange(-1,1)).normalize().multiplyScalar(randRange(.5,speed));
+        scene.add(mesh); particles.push({mesh,v,life:randRange(.28,.65),maxLife:.65,gravity:randRange(2,5)});
+      }
+    }
+
+    function addFloater(text,worldPos,kind=''){
+      const el=document.createElement('div'); el.className=`damage-number ${kind}`; el.textContent=text; ui.damageLayer.appendChild(el);
+      floaters.push({el,world:worldPos.clone(),life:1,maxLife:1,drift:randRange(-.25,.25)});
+    }
+
+    function updateEffects(dt){
+      for(let i=particles.length-1;i>=0;i--){ const p=particles[i]; p.life-=dt; p.v.y-=p.gravity*dt; p.mesh.position.addScaledVector(p.v,dt); p.mesh.material.opacity=clamp01(p.life/p.maxLife); p.mesh.scale.multiplyScalar(1+dt*1.5); if(p.life<=0){scene.remove(p.mesh);p.mesh.geometry.dispose();p.mesh.material.dispose();particles.splice(i,1);} }
+      for(let i=floaters.length-1;i>=0;i--){ const f=floaters[i]; f.life-=dt; f.world.y+=dt*.8; f.world.x+=f.drift*dt; const p=f.world.clone().project(camera); const visible=p.z>-1&&p.z<1; f.el.style.left=`${(p.x*.5+.5)*innerWidth}px`; f.el.style.top=`${(-p.y*.5+.5)*innerHeight}px`; f.el.style.opacity=visible?String(clamp01(f.life/.65)):'0'; f.el.style.transform=`translate(-50%,-50%) scale(${1+(1-f.life)*.35})`; if(f.life<=0){f.el.remove();floaters.splice(i,1);} }
+      if(announceTimer>0){announceTimer-=dt;if(announceTimer<=0)ui.announce.classList.remove('show');}
+      ui.flash.style.opacity=String(damp(parseFloat(ui.flash.style.opacity)||0,0,9,dt));
+    }
+
+    function tryDodge(){
+      if(paused||gameOver||player.dead||player.dodgeCooldown>0||player.stamina<24) return;
+      player.stamina-=24; player.dodgeTimer=.34; player.dodgeCooldown=.58; player.invuln=Math.max(player.invuln,.46); player.attackType=null;
+      const dir=player.move.lengthSq()>.05?player.move.clone().normalize():new THREE.Vector3().subVectors(player.root.position,giraffe.root.position).setY(0).normalize();
+      if(dir.lengthSq()<.01) forwardFromYaw(player.yaw,dir);
+      player.velocity.copy(dir).multiplyScalar(12.3); tone('dodge',.45); spawnParticle(player.root.position.clone().add(new THREE.Vector3(0,.1,0)),0xd7c18a,9,2,.055);
+    }
+
+    function startAttack(type){
+      if(paused||gameOver||player.dead||player.dodgeTimer>0||player.attackType||player.hurtTime>.12) return;
+      player.attackType=type; player.attackTime=0; player.attackLanded=false;
+      const toward=new THREE.Vector3().subVectors(giraffe.root.position,player.root.position).setY(0); if(toward.lengthSq()>.001) player.yaw=Math.atan2(toward.x,toward.z);
+    }
+
+    function hitGiraffe(type){
+      const dist=player.root.position.distanceTo(giraffe.root.position);
+      const reach=type==='heavy'?2.55:2.20;
+      if(dist>reach||giraffe.dead) { tone('hit',.22); return; }
+      const base=type==='heavy'?Math.floor(randRange(7,12)):Math.floor(randRange(2,5));
+      const focusMult=1+player.focus*.34;
+      const mythic=Math.random()<1/777;
+      let damage=mythic?777:Math.max(1,Math.round(base*focusMult));
+      if(giraffe.state==='stunned') damage=Math.round(damage*1.6);
+      giraffe.hp=Math.max(0,giraffe.hp-damage); giraffe.lastHit=0; giraffe.stagger+=damage; hitCount++;
+      giraffe.head.getWorldPosition(giraffe.headWorld);
+      const hitPos=giraffe.root.position.clone().add(new THREE.Vector3(randRange(-.6,.6),randRange(.8,3.2),randRange(-.6,.6)));
+      addFloater(mythic?`MYTHIC BONK ${damage}`:`-${damage}`,hitPos,mythic?'crit':'');
+      spawnParticle(hitPos,mythic?0xffe66d:0xf7c85d,mythic?24:8,mythic?6:3,mythic?.1:.06);
+      cameraShake=Math.max(cameraShake,mythic?.55:type==='heavy'?.22:.10); ui.flash.style.opacity=mythic?'.55':'.12'; tone(mythic?'crit':'hit',mythic?1:.55);
+      if(hitCount===1) announce(`You removed ${(damage/CONFIG.giraffeMaxHP*100).toFixed(2)}%`,1.6);
+      if(mythic) announce('THE PROPHECY BONKED',2.0);
+      if(giraffe.stagger>=270&&!mythic){ giraffe.stagger=0; setGiraffeState('stunned'); announce('Giraffe mildly inconvenienced',1.5); }
+      if(giraffe.hp<=0) winGame();
+    }
+
+    function hurtPlayer(amount,sourcePos){
+      if(player.invuln>0||player.dead) return false;
+      player.hp=Math.max(0,player.hp-amount); player.invuln=.72; player.hurtTime=.48; cameraShake=Math.max(cameraShake,.65); ui.flash.style.opacity='.34'; tone('hurt',.8);
+      const away=new THREE.Vector3().subVectors(player.root.position,sourcePos).setY(0).normalize(); player.velocity.copy(away).multiplyScalar(9.5);
+      addFloater(`-${amount}`,player.root.position.clone().add(new THREE.Vector3(0,1.5,0)),'hurt'); spawnParticle(player.root.position.clone().add(new THREE.Vector3(0,1,0)),0xff5548,14,4,.07);
+      if(player.hp<=0) loseGame();
+      return true;
+    }
+
+    function perfectDodge(){ player.focus=Math.min(10,player.focus+1); announce(`Perfect dodge · focus ${player.focus}×`,1.2); tone('dodge',.75); addFloater('PERFECT',player.root.position.clone().add(new THREE.Vector3(0,1.8,0)),'crit'); }
+
+    function setGiraffeState(state){ giraffe.state=state; giraffe.stateTime=0; giraffe.attackDone=false; if(state==='stunned'){giraffe.attackMarker.material.opacity=0;} }
+
+    function chooseGiraffeAttack(){
+      const local=new THREE.Vector3().subVectors(player.root.position,giraffe.root.position).applyAxisAngle(new THREE.Vector3(0,1,0),-giraffe.root.rotation.y);
+      if(local.z<-.2) setGiraffeState('kick');
+      else if(local.length()<2.35&&Math.random()<.55) setGiraffeState('stomp');
+      else setGiraffeState('neck');
+    }
+
+    function resolveGiraffeAttack(type){
+      let valid=false, damage=0;
+      const rel=new THREE.Vector3().subVectors(player.root.position,giraffe.root.position).setY(0);
+      const dist=rel.length(); const local=rel.clone().applyAxisAngle(new THREE.Vector3(0,1,0),-giraffe.root.rotation.y);
+      if(type==='neck'){ valid=dist<4.55&&local.z>-.4; damage=58; }
+      if(type==='stomp'){ valid=dist<2.65; damage=72; }
+      if(type==='kick'){ valid=dist<3.15&&local.z<.9; damage=96; }
+      if(!valid) return;
+      if(player.invuln>0&&player.dodgeTimer>0){ perfectDodge(); return; }
+      hurtPlayer(damage,giraffe.root.position);
+    }
+
+    function updatePlayer(dt){
+      player.invuln=Math.max(0,player.invuln-dt); player.dodgeTimer=Math.max(0,player.dodgeTimer-dt); player.dodgeCooldown=Math.max(0,player.dodgeCooldown-dt); player.hurtTime=Math.max(0,player.hurtTime-dt);
+      const camForward=new THREE.Vector3(-Math.sin(cameraYaw),0,-Math.cos(cameraYaw));
+      const camRight=new THREE.Vector3(Math.cos(cameraYaw),0,-Math.sin(cameraYaw));
+      player.move.set(0,0,0);
+      if(keys.has('KeyW'))player.move.add(camForward); if(keys.has('KeyS'))player.move.sub(camForward); if(keys.has('KeyD'))player.move.add(camRight); if(keys.has('KeyA'))player.move.sub(camRight);
+      if(player.move.lengthSq()>1)player.move.normalize();
+      const sprinting=(keys.has('ShiftLeft')||keys.has('ShiftRight'))&&player.stamina>0&&player.move.lengthSq()>.01&&player.dodgeTimer<=0;
+      const targetSpeed=sprinting?CONFIG.sprintSpeed:CONFIG.walkSpeed;
+      if(sprinting)player.stamina=Math.max(0,player.stamina-25*dt); else player.stamina=Math.min(100,player.stamina+18*dt);
+
+      if(player.dodgeTimer<=0){
+        const targetVel=player.move.clone().multiplyScalar(player.attackType?targetSpeed*.35:targetSpeed);
+        player.velocity.x=damp(player.velocity.x,targetVel.x,player.hurtTime>0?2:12,dt); player.velocity.z=damp(player.velocity.z,targetVel.z,player.hurtTime>0?2:12,dt);
+      }
+      player.root.position.addScaledVector(player.velocity,dt);
+      const r=Math.hypot(player.root.position.x,player.root.position.z); if(r>CONFIG.arenaRadius-1){player.root.position.x*=((CONFIG.arenaRadius-1)/r);player.root.position.z*=((CONFIG.arenaRadius-1)/r);}
+      if(player.move.lengthSq()>.03&&!player.attackType)player.yaw=dampAngle(player.yaw,Math.atan2(player.move.x,player.move.z),14,dt);
+      player.root.rotation.y=player.yaw;
+
+      const dist=player.root.position.distanceTo(giraffe.root.position); if(dist<1.35){ const push=new THREE.Vector3().subVectors(player.root.position,giraffe.root.position).setY(0).normalize(); player.root.position.addScaledVector(push,(1.35-dist)*.5); }
+
+      if(player.attackType){
+        const duration=player.attackType==='heavy'?.76:.38; player.attackTime+=dt; const n=player.attackTime/duration;
+        if(!player.attackLanded&&n>(player.attackType==='heavy'?.58:.43)){player.attackLanded=true;hitGiraffe(player.attackType);}
+        if(n>=1){player.attackType=null;player.attackTime=0;}
+      }
+
+      const speed=player.velocity.length(); const gait=elapsed*(5+speed*1.7); const stride=clamp01(speed/CONFIG.walkSpeed);
+      player.hips.position.y=.82+Math.abs(Math.sin(gait*2))*.018*stride;
+      for(const leg of player.legs){ leg.hip.rotation.x=Math.sin(gait+(leg.side<0?0:Math.PI))*.52*stride; leg.knee.rotation.x=Math.max(0,-Math.sin(gait+(leg.side<0?0:Math.PI)))*.55*stride; }
+      for(const arm of player.arms){ arm.shoulder.rotation.x=-Math.sin(gait+(arm.side<0?0:Math.PI))*.38*stride; arm.shoulder.rotation.z=arm.side*.07; arm.elbow.rotation.x=-.22; }
+      if(player.attackType){
+        const duration=player.attackType==='heavy'?.76:.38, n=clamp01(player.attackTime/duration), punch=Math.sin(n*Math.PI);
+        const right=player.arms[1], left=player.arms[0];
+        if(player.attackType==='light'){right.shoulder.rotation.x=-1.25*punch;right.elbow.rotation.x=-.25-.8*(1-punch);player.torso.rotation.y=-.22*Math.sin(n*Math.PI*2);}
+        else {right.shoulder.rotation.x=-1.7*punch;right.shoulder.rotation.z=-.48*(1-punch);right.elbow.rotation.x=-1.0+.65*punch;left.shoulder.rotation.x=-.5*punch;player.torso.rotation.y=-.58*Math.sin(n*Math.PI);}
+      } else player.torso.rotation.y=damp(player.torso.rotation.y,0,12,dt);
+      if(player.dodgeTimer>0){player.hips.rotation.z=Math.sin((1-player.dodgeTimer/.34)*Math.PI)*.28;} else player.hips.rotation.z=damp(player.hips.rotation.z,0,14,dt);
+      if(player.hurtTime>0)player.hips.rotation.x=Math.sin(player.hurtTime*38)*.13; else player.hips.rotation.x=damp(player.hips.rotation.x,0,14,dt);
+      player.label.visible=player.root.position.distanceTo(camera.position)<35;
+    }
+
+    function updateGiraffe(dt){
+      if(giraffe.dead)return;
+      giraffe.stateTime+=dt; giraffe.attackCooldown=Math.max(0,giraffe.attackCooldown-dt); giraffe.lastHit+=dt;
+      if(giraffe.lastHit>4.5&&giraffe.hp<giraffe.maxHP){giraffe.hp=Math.min(giraffe.maxHP,giraffe.hp+2.2*dt);}
+      const hpRatio=giraffe.hp/giraffe.maxHP; giraffe.enrage=hpRatio<.25?3:hpRatio<.5?2:hpRatio<.75?1:0;
+      const toPlayer=new THREE.Vector3().subVectors(player.root.position,giraffe.root.position).setY(0); const dist=toPlayer.length();
+      if(toPlayer.lengthSq()>.001)giraffe.yaw=dampAngle(giraffe.yaw,Math.atan2(toPlayer.x,toPlayer.z),giraffe.state==='chase'?4.2:2.0,dt);
+      giraffe.root.rotation.y=giraffe.yaw;
+      giraffe.gaitStrength=damp(giraffe.gaitStrength,giraffe.state==='chase'&&dist>3.0?1:0,8,dt);
+
+      if(giraffe.state==='chase'){
+        if(dist>3.25){ const speed=CONFIG.giraffeSpeed+giraffe.enrage*.45; giraffe.root.position.addScaledVector(toPlayer.normalize(),speed*dt); giraffe.gait+=dt*speed*2.05; }
+        if(dist<4.25&&giraffe.attackCooldown<=0)chooseGiraffeAttack();
+      } else if(giraffe.state==='neck'){
+        const duration=1.30, hitAt=.70; telegraphMarker(4.25,hitAt,duration);
+        if(!giraffe.attackDone&&giraffe.stateTime>=hitAt){giraffe.attackDone=true;resolveGiraffeAttack('neck');tone('stomp',.7);cameraShake=Math.max(cameraShake,.35);}
+        if(giraffe.stateTime>=duration){setGiraffeState('recover');giraffe.attackCooldown=.55;}
+      } else if(giraffe.state==='stomp'){
+        const duration=1.13,hitAt=.62; telegraphMarker(2.5,hitAt,duration);
+        if(!giraffe.attackDone&&giraffe.stateTime>=hitAt){giraffe.attackDone=true;resolveGiraffeAttack('stomp');tone('stomp',.95);cameraShake=Math.max(cameraShake,.55);spawnParticle(giraffe.root.position.clone().add(new THREE.Vector3(.5,.1,.7)),0xb89d62,22,4,.09);}
+        if(giraffe.stateTime>=duration){setGiraffeState('recover');giraffe.attackCooldown=.62;}
+      } else if(giraffe.state==='kick'){
+        const duration=.96,hitAt=.48; telegraphMarker(2.9,hitAt,duration);
+        if(!giraffe.attackDone&&giraffe.stateTime>=hitAt){giraffe.attackDone=true;resolveGiraffeAttack('kick');tone('stomp',.8);cameraShake=Math.max(cameraShake,.42);}
+        if(giraffe.stateTime>=duration){setGiraffeState('recover');giraffe.attackCooldown=.52;}
+      } else if(giraffe.state==='recover'){
+        giraffe.attackMarker.material.opacity=0; if(giraffe.stateTime>.46-Math.min(.18,giraffe.enrage*.05))setGiraffeState('chase');
+      } else if(giraffe.state==='stunned'){
+        giraffe.attackMarker.material.opacity=0; if(giraffe.stateTime>1.65)setGiraffeState('chase');
+      }
+
+      const ar=Math.hypot(giraffe.root.position.x,giraffe.root.position.z); if(ar>CONFIG.arenaRadius-2){giraffe.root.position.x*=((CONFIG.arenaRadius-2)/ar);giraffe.root.position.z*=((CONFIG.arenaRadius-2)/ar);}
+      animateGiraffeRig(dt);
+    }
+
+    function telegraphMarker(radius,hitAt,duration){
+      giraffe.attackMarker.position.x=giraffe.root.position.x; giraffe.attackMarker.position.z=giraffe.root.position.z; giraffe.attackMarker.scale.setScalar(radius);
+      const before=clamp01(giraffe.stateTime/hitAt), after=clamp01((giraffe.stateTime-hitAt)/(duration-hitAt));
+      giraffe.attackMarker.material.opacity=giraffe.stateTime<hitAt?.16+.24*before:.36*(1-after);
+    }
+
+    function animateGiraffeRig(dt){
+      const g=giraffe.gait, strength=giraffe.gaitStrength;
+      giraffe.pelvis.position.y=2.85+Math.abs(Math.sin(g*2))*.045*strength;
+      for(const leg of giraffe.legs){
+        const s=Math.sin(g+leg.phase); leg.upper.rotation.x=s*.43*strength; leg.lower.rotation.x=Math.max(0,-s)*.55*strength; leg.hoofBone.rotation.x=-Math.max(0,s)*.25*strength;
+      }
+      let bend=.018*Math.sin(elapsed*1.7), side=.025*Math.sin(elapsed*1.3);
+      if(giraffe.state==='neck'){
+        const n=giraffe.stateTime/1.3; bend=n<.45?-smoothstep(0,.45,n)*.23:THREE.MathUtils.lerp(-.23,.72,smoothstep(.45,.72,n)); if(n>.72)bend=THREE.MathUtils.lerp(.72,0,smoothstep(.72,1,n));
+      }
+      if(giraffe.state==='stunned'){bend=-.32+Math.sin(elapsed*8)*.04;side=Math.sin(elapsed*11)*.08;giraffe.pelvis.rotation.z=Math.sin(elapsed*13)*.025;}
+      else giraffe.pelvis.rotation.z=damp(giraffe.pelvis.rotation.z,0,8,dt);
+      giraffe.neck.bones.forEach((bone,i)=>{ const f=i/(giraffe.neck.bones.length-1); bone.rotation.x=bend*(.12+.28*f)+Math.sin(elapsed*1.8+i*.8)*.008; bone.rotation.z=side*(.08+.18*f); });
+      giraffe.head.rotation.y=Math.sin(elapsed*.85)*.08; giraffe.head.rotation.z=Math.sin(elapsed*1.2)*.025;
+      giraffe.tailBones.forEach((b,i)=>{b.rotation.y=Math.sin(elapsed*3.2+i*.55)*(.18+i*.055);b.rotation.x=.05+Math.sin(elapsed*2.1+i)*.04;});
+      if(giraffe.state==='stomp'){
+        const n=giraffe.stateTime/1.13, lift=n<.55?Math.sin(n/.55*Math.PI*.5):Math.max(0,1-(n-.55)/.12);
+        giraffe.legs[1].upper.rotation.x=-1.05*lift; giraffe.legs[1].lower.rotation.x=.52*lift;
+      }
+      if(giraffe.state==='kick'){
+        const n=giraffe.stateTime/.96, k=Math.sin(clamp01(n)*Math.PI); giraffe.legs[2].upper.rotation.x=.95*k; giraffe.legs[2].lower.rotation.x=-.75*k; giraffe.legs[3].upper.rotation.x=.76*k; giraffe.legs[3].lower.rotation.x=-.60*k;
+      }
+    }
+
+    function updateCamera(dt){
+      const distance=7.6, cp=Math.cos(cameraPitch), target=player.root.position.clone().add(new THREE.Vector3(0,1.25,0));
+      const desired=target.clone().add(new THREE.Vector3(Math.sin(cameraYaw)*distance*cp,2.1+Math.sin(cameraPitch)*distance,Math.cos(cameraYaw)*distance*cp));
+      const shake=new THREE.Vector3(randRange(-1,1),randRange(-1,1),randRange(-1,1)).multiplyScalar(cameraShake);
+      desired.add(shake); camera.position.lerp(desired,1-Math.exp(-10*dt)); camera.lookAt(target); cameraShake=damp(cameraShake,0,8,dt);
+    }
+
+    function updateUI(){
+      ui.playerFill.style.transform=`scaleX(${clamp01(player.hp/CONFIG.playerMaxHP)})`; ui.playerValue.textContent=`${Math.ceil(player.hp)} / ${CONFIG.playerMaxHP}`;
+      ui.staminaFill.style.transform=`scaleX(${clamp01(player.stamina/100)})`; ui.staminaValue.textContent=Math.ceil(player.stamina);
+      ui.focusFill.style.transform=`scaleX(${clamp01(player.focus/10)})`; ui.focusValue.textContent=`${player.focus}×`;
+      ui.giraffeFill.style.transform=`scaleX(${clamp01(giraffe.hp/giraffe.maxHP)})`; ui.giraffeValue.textContent=Math.ceil(giraffe.hp).toLocaleString();
+      const mins=Math.floor(elapsed/60).toString().padStart(2,'0'), secs=(elapsed%60).toFixed(1).padStart(4,'0'); ui.timer.textContent=`${mins}:${secs}`; ui.hits.textContent=`${hitCount.toLocaleString()} human-scale hit${hitCount===1?'':'s'}`;
+      ui.vignette.style.opacity=String(clamp01((1-player.hp/CONFIG.playerMaxHP)*.75 + (player.hurtTime>0?.22:0)));
+      const phase=giraffe.enrage?` · rage ${giraffe.enrage}`:''; ui.bossTag.textContent=`Adult giraffe · 5.6 m tall · ${Math.ceil(giraffe.hp).toLocaleString()} HP${phase} · deeply unreasonable`;
+    }
+
+    function winGame(){
+      if(gameOver)return; gameOver=true; giraffe.dead=true; giraffe.state='dead'; giraffe.attackMarker.material.opacity=0; giraffe.helper.visible=false;
+      ui.endEyebrow.textContent='The implementation did not expect this'; ui.endTitle.textContent='YOU WON?'; ui.endCopy.textContent=`You defeated a 5.6 m giraffe in ${elapsed.toFixed(1)} seconds using ${hitCount.toLocaleString()} tiny acts of defiance. This result should be peer reviewed.`; ui.endOverlay.classList.add('show');
+      document.exitPointerLock?.(); tone('win',1); announce('Statistically offensive',3);
+      let t=0; const fall=()=>{t+=.018;giraffe.root.rotation.z=Math.min(Math.PI/2,t);giraffe.root.position.y=Math.sin(Math.min(1,t/(Math.PI/2))*Math.PI)*.15;renderer.render(scene,camera);if(t<Math.PI/2)requestAnimationFrame(fall);}; fall();
+    }
+
+    function loseGame(){
+      if(gameOver)return; gameOver=true; player.dead=true; ui.endEyebrow.textContent='Expected result'; ui.endTitle.textContent='GIRAFFED'; ui.endCopy.textContent=`You survived ${elapsed.toFixed(1)} seconds and landed ${hitCount.toLocaleString()} hits. The giraffe retains ${Math.ceil(giraffe.hp).toLocaleString()} HP and all of its confidence.`; ui.endOverlay.classList.add('show'); document.exitPointerLock?.();
+    }
+
+    function frame(){
+      requestAnimationFrame(frame); const dt=Math.min(.033,clock.getDelta());
+      if(started&&!paused&&!gameOver){elapsed+=dt;updatePlayer(dt);updateGiraffe(dt);}
+      updateCamera(dt);updateEffects(dt);updateUI();renderer.render(scene,camera);
+    }
+
+    ui.startButton.addEventListener('click',()=>{initAudio();started=true;paused=false;ui.startOverlay.classList.add('hidden');renderer.domElement.requestPointerLock?.();announce('Survive. Allegedly win.',1.8);});
+    ui.restart.addEventListener('click',()=>location.reload());
+    renderer.domElement.addEventListener('click',()=>{if(started&&paused&&!gameOver)renderer.domElement.requestPointerLock?.();});
+    document.addEventListener('pointerlockchange',()=>{
+      const locked=document.pointerLockElement===renderer.domElement;
+      if(started&&!gameOver&&!locked){paused=true;ui.startOverlay.classList.remove('hidden');ui.startOverlay.querySelector('.eyebrow').textContent='Paused before nature finishes the job';ui.startOverlay.querySelector('h1').innerHTML='MUKUND <span>VS.</span><br>THE GIRAFFE';ui.startButton.textContent='Resume the bad idea';}
+      if(locked){paused=false;ui.startOverlay.classList.add('hidden');}
+    });
+    document.addEventListener('mousemove',(e)=>{if(document.pointerLockElement!==renderer.domElement)return;cameraYaw-=e.movementX*.0022;cameraPitch=THREE.MathUtils.clamp(cameraPitch-e.movementY*.0018,-.05,.55);});
+    document.addEventListener('mousedown',(e)=>{if(document.pointerLockElement!==renderer.domElement)return;if(e.button===0)startAttack('light');if(e.button===2)startAttack('heavy');});
+    document.addEventListener('contextmenu',(e)=>e.preventDefault());
+    document.addEventListener('keydown',(e)=>{
+      keys.add(e.code); if(e.code==='Space'){e.preventDefault();tryDodge();}
+      if(e.code==='KeyR'&&!e.repeat){rigVisible=!rigVisible;giraffe.helper.visible=rigVisible;announce(rigVisible?'24-bone rig visible':'Rig hidden',1);}
+    });
+    document.addEventListener('keyup',(e)=>keys.delete(e.code));
+    addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,2));});
+
+    // Initial pose/render.
+    updateCamera(.016); updateUI(); frame();
+    window.__GAME_READY__=true; document.body.dataset.gameReady='true';
+  </script>
+</body>
+</html>
