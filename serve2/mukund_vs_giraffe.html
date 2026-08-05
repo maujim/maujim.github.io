@@ -80,7 +80,7 @@
       <div class="row"><div class="name">Mukund</div><div class="bar"><div id="player-fill" class="fill"></div></div><div id="player-value" class="value">100 / 100</div></div>
       <div class="row"><div class="name">Stamina</div><div class="bar"><div id="stamina-fill" class="fill"></div></div><div id="stamina-value" class="value">100</div></div>
       <div class="row"><div class="name">Focus</div><div class="bar"><div id="focus-fill" class="fill"></div></div><div id="focus-value" class="value">0×</div></div>
-      <div class="row"><div class="name">Giraffe</div><div class="bar"><div id="giraffe-fill" class="fill"></div></div><div id="giraffe-value" class="value">9,999</div></div>
+      <div class="row"><div class="name">Giraffe</div><div class="bar"><div id="giraffe-fill" class="fill"></div></div><div id="giraffe-value" class="value">5,000</div></div>
       <div id="meta"><span id="timer">00:00.0</span><span id="hits">0 human-scale hits</span><span>1 unit = 1 metre</span></div>
     </div>
     <div id="info" class="panel">
@@ -95,7 +95,7 @@
     <div id="damage-layer"></div>
     <div id="vignette"></div>
     <div id="flash"></div>
-    <div id="boss-tag">Adult giraffe · 5.6 m tall · 9,999 HP · deeply unreasonable</div>
+    <div id="boss-tag">Adult giraffe · 5.6 m tall · 5,000 HP · deeply unreasonable</div>
   </div>
 
   <div id="start-overlay" class="overlay">
@@ -142,7 +142,7 @@
       playerHeight: 1.68,
       giraffeHeight: 5.6,
       playerMaxHP: 100,
-      giraffeMaxHP: 9999,
+      giraffeMaxHP: 5000,
       arenaRadius: 31,
       walkSpeed: 5.1,
       sprintSpeed: 7.5,
@@ -599,7 +599,6 @@
     function updateGiraffe(dt){
       if(giraffe.dead)return;
       giraffe.stateTime+=dt; giraffe.attackCooldown=Math.max(0,giraffe.attackCooldown-dt); giraffe.lastHit+=dt;
-      if(giraffe.lastHit>4.5&&giraffe.hp<giraffe.maxHP){giraffe.hp=Math.min(giraffe.maxHP,giraffe.hp+2.2*dt);}
       const hpRatio=giraffe.hp/giraffe.maxHP; giraffe.enrage=hpRatio<.25?3:hpRatio<.5?2:hpRatio<.75?1:0;
       const toPlayer=new THREE.Vector3().subVectors(player.root.position,giraffe.root.position).setY(0); const dist=toPlayer.length();
       if(toPlayer.lengthSq()>.001)giraffe.yaw=dampAngle(giraffe.yaw,Math.atan2(toPlayer.x,toPlayer.z),giraffe.state==='chase'?4.2:2.0,dt);
