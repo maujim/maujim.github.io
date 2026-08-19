@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Guess a country from its export mix in five tries." />
+  <title>Tradle — Guess the country</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="./" aria-label="Tradle home"><span>TRAD</span>LE</a>
+    <div class="header-actions">
+      <button id="new-game-top" class="ghost-button" type="button">New country</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="intro">
+      <div><p class="eyebrow">THE EXPORT MIX IS THE CLUE</p><h1>Which country is this?</h1></div>
+      <p>Read the products, follow the proportions, and identify the economy. You have five guesses.</p>
+    </section>
+
+    <div class="game-workspace">
+    <section class="game-card" aria-labelledby="chart-title">
+      <div class="chart-heading">
+        <div>
+          <p class="mini-label">TOTAL EXPORTS</p>
+          <h2 id="total">Loading…</h2>
+        </div>
+        <span class="dataset-pill"><i></i> 217 economies · 2021 trade data</span>
+      </div>
+        <span id="chart-title" class="sr-only">Treemap of the mystery country's exports</span>
+        <span id="chart-summary" class="sr-only" aria-live="polite"></span>
+      <div id="treemap" class="treemap" role="img" aria-labelledby="chart-title chart-summary">
+        <div class="loading">Building the export map…</div>
+      </div>
+      <div class="legend-heading"><span>Filter by category</span><button id="clear-filter" class="is-hidden" type="button" aria-hidden="true" disabled>Show all</button></div>
+      <div id="legend" class="legend" aria-label="Filter export products by category"></div>
+    </section>
+
+    <section class="guess-panel">
+      <div class="progress-copy"><span id="guess-count">0 of 5 guesses</span></div>
+      <div class="guess-columns" aria-hidden="true"><span>Country</span><span>Distance</span><span>Direction</span><span>Closeness</span></div>
+      <div id="guess-rows" class="guess-rows" aria-live="polite"></div>
+      <form id="guess-form" autocomplete="off">
+        <label for="country-input">Your guess</label>
+        <div class="input-row">
+          <div class="input-wrap">
+            <input id="country-input" placeholder="Type a country…" autocomplete="off" aria-autocomplete="list" aria-controls="country-suggestions" aria-expanded="false" required />
+            <div id="country-suggestions" class="country-suggestions" role="listbox" hidden></div>
+          </div>
+          <button class="primary-button" type="submit">Submit guess <span>→</span></button>
+        </div>
+      </form>
+      <div id="result" class="result" role="status" aria-live="polite" tabindex="-1" hidden>
+        <p class="mini-label">THE COUNTRY WAS</p>
+        <h2 id="answer"></h2>
+        <button id="new-game" class="primary-button" type="button">Play another <span>→</span></button>
+      </div>
+      <div class="panel-info">
+        <section class="info-block" aria-labelledby="closeness-heading">
+          <p class="info-label" id="closeness-heading">How closeness works</p>
+          <p>100% is the same place. The score falls toward 0% over roughly 20,000 km.</p>
+        </section>
+        <section class="info-block about-data-inline" aria-labelledby="data-heading">
+          <p class="info-label" id="data-heading">About this data</p>
+          <p>2021 merchandise exports grouped by HS4 product—not GDP.</p>
+          <a href="data/manifest.json">Dataset details <span>↗</span></a>
+        </section>
+      </div>
+    </section>
+    </div>
+
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>

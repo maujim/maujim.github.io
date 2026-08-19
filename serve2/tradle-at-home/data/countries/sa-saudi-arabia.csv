@@ -1,0 +1,1147 @@
+Section ID,Section,HS2 ID,HS2,HS4 ID,HS4,Year,Trade Value
+1,"Animal Products",101,"Live animals",10101,"Horses",2021,359205
+1,"Animal Products",101,"Live animals",10102,"Bovine",2021,6101274.999999999
+1,"Animal Products",101,"Live animals",10104,"Sheep and Goats",2021,14837129
+1,"Animal Products",101,"Live animals",10105,"Poultry",2021,23525766
+1,"Animal Products",101,"Live animals",10106,"Other Animals",2021,23235909.999999996
+1,"Animal Products",102,"Meat & edible offal",10201,"Bovine Meat",2021,1148931
+1,"Animal Products",102,"Meat & edible offal",10202,"Frozen Bovine Meat",2021,10595017
+1,"Animal Products",102,"Meat & edible offal",10203,"Pig Meat",2021,25134
+1,"Animal Products",102,"Meat & edible offal",10204,"Sheep and Goat Meat",2021,1474318
+1,"Animal Products",102,"Meat & edible offal",10206,"Edible Offal",2021,591627
+1,"Animal Products",102,"Meat & edible offal",10207,"Poultry Meat",2021,138138053
+1,"Animal Products",102,"Meat & edible offal",10208,"Other Meat",2021,1333946
+1,"Animal Products",102,"Meat & edible offal",10210,"Preserved Meat",2021,87691
+1,"Animal Products",103,"Fish, Crustaceans & Molluscs",10301,"Live Fish",2021,419423
+1,"Animal Products",103,"Fish, Crustaceans & Molluscs",10302,"Non-fillet Fresh Fish",2021,13436242
+1,"Animal Products",103,"Fish, Crustaceans & Molluscs",10303,"Non-fillet Frozen Fish",2021,6519297
+1,"Animal Products",103,"Fish, Crustaceans & Molluscs",10304,"Fish Fillets",2021,1631654
+1,"Animal Products",103,"Fish, Crustaceans & Molluscs",10305,"Dried/Salted/Smoked/Brined Fish",2021,100878
+1,"Animal Products",103,"Fish, Crustaceans & Molluscs",10306,"Crustaceans",2021,117315840
+1,"Animal Products",103,"Fish, Crustaceans & Molluscs",10307,"Molluscs",2021,3385464.9999999995
+1,"Animal Products",104,"Edible products of animal origin, n.e.s.",10401,"Milk",2021,188895674
+1,"Animal Products",104,"Edible products of animal origin, n.e.s.",10402,"Concentrated Milk",2021,324819204
+1,"Animal Products",104,"Edible products of animal origin, n.e.s.",10403,"Fermented Milk Products",2021,183633636
+1,"Animal Products",104,"Edible products of animal origin, n.e.s.",10404,"Whey and other milk products",2021,428851
+1,"Animal Products",104,"Edible products of animal origin, n.e.s.",10405,"Butter",2021,36382273
+1,"Animal Products",104,"Edible products of animal origin, n.e.s.",10406,"Cheese",2021,318741328
+1,"Animal Products",104,"Edible products of animal origin, n.e.s.",10407,"Eggs",2021,22252303
+1,"Animal Products",104,"Edible products of animal origin, n.e.s.",10408,"Processed Egg Products",2021,586026
+1,"Animal Products",104,"Edible products of animal origin, n.e.s.",10409,"Honey",2021,28006498
+1,"Animal Products",104,"Edible products of animal origin, n.e.s.",10410,"Other Edible Animal Products",2021,6069.000000000001
+1,"Animal Products",105,"Animal originated products, n.e.s.",10504,"Animal Organs",2021,573406
+1,"Animal Products",105,"Animal originated products, n.e.s.",10505,"Bird Feathers and Skins",2021,1652
+1,"Animal Products",105,"Animal originated products, n.e.s.",10506,"Processed Bones",2021,2739
+1,"Animal Products",105,"Animal originated products, n.e.s.",10508,"Coral and Shells",2021,56032
+1,"Animal Products",105,"Animal originated products, n.e.s.",10510,"Pharmaceutical Animal Products",2021,3333
+1,"Animal Products",105,"Animal originated products, n.e.s.",10511,"Other Inedible Animal Products",2021,508516
+2,"Vegetable Products",206,"Live trees, plants, bulbs, cut flowers, & ornamental foliage",20601,"Bulbs and Roots",2021,1828
+2,"Vegetable Products",206,"Live trees, plants, bulbs, cut flowers, & ornamental foliage",20602,"Other live plants, cuttings and slips;
+mushroom spawn",2021,15737773
+2,"Vegetable Products",206,"Live trees, plants, bulbs, cut flowers, & ornamental foliage",20603,"Cut Flowers",2021,76780
+2,"Vegetable Products",206,"Live trees, plants, bulbs, cut flowers, & ornamental foliage",20604,"Plant foliage",2021,254261
+2,"Vegetable Products",207,"Edible vegetables, roots, & tubers",20701,"Potatoes",2021,102523
+2,"Vegetable Products",207,"Edible vegetables, roots, & tubers",20702,"Tomatoes",2021,1823979
+2,"Vegetable Products",207,"Edible vegetables, roots, & tubers",20703,"Onions",2021,1043768
+2,"Vegetable Products",207,"Edible vegetables, roots, & tubers",20704,"Cabbages",2021,4515409
+2,"Vegetable Products",207,"Edible vegetables, roots, & tubers",20705,"Lettuce",2021,2035107
+2,"Vegetable Products",207,"Edible vegetables, roots, & tubers",20706,"Root Vegetables",2021,2989938
+2,"Vegetable Products",207,"Edible vegetables, roots, & tubers",20707,"Cucumbers",2021,2374324
+2,"Vegetable Products",207,"Edible vegetables, roots, & tubers",20708,"Legumes",2021,8080886
+2,"Vegetable Products",207,"Edible vegetables, roots, & tubers",20709,"Other Vegetables",2021,16101008
+2,"Vegetable Products",207,"Edible vegetables, roots, & tubers",20710,"Frozen Vegetables",2021,4607590
+2,"Vegetable Products",207,"Edible vegetables, roots, & tubers",20711,"Preserved Vegetables",2021,233781
+2,"Vegetable Products",207,"Edible vegetables, roots, & tubers",20712,"Dried Vegetables",2021,150215
+2,"Vegetable Products",207,"Edible vegetables, roots, & tubers",20713,"Dried Legumes",2021,6831332
+2,"Vegetable Products",207,"Edible vegetables, roots, & tubers",20714,"Cassava",2021,487700.99999999994
+2,"Vegetable Products",208,"Edible fruits, nuts & fruit peels",20801,"Coconuts, Brazil Nuts, and Cashews",2021,381488
+2,"Vegetable Products",208,"Edible fruits, nuts & fruit peels",20802,"Other Nuts",2021,3071065
+2,"Vegetable Products",208,"Edible fruits, nuts & fruit peels",20803,"Bananas",2021,591843
+2,"Vegetable Products",208,"Edible fruits, nuts & fruit peels",20804,"Tropical Fruits",2021,341669709
+2,"Vegetable Products",208,"Edible fruits, nuts & fruit peels",20805,"Citrus",2021,9816505
+2,"Vegetable Products",208,"Edible fruits, nuts & fruit peels",20806,"Grapes",2021,1894743
+2,"Vegetable Products",208,"Edible fruits, nuts & fruit peels",20807,"Melons",2021,419314
+2,"Vegetable Products",208,"Edible fruits, nuts & fruit peels",20808,"Apples and Pears",2021,2679067
+2,"Vegetable Products",208,"Edible fruits, nuts & fruit peels",20809,"Pitted Fruits",2021,1378145
+2,"Vegetable Products",208,"Edible fruits, nuts & fruit peels",20810,"Other Fruits",2021,3271025
+2,"Vegetable Products",208,"Edible fruits, nuts & fruit peels",20811,"Frozen Fruits and Nuts",2021,294297
+2,"Vegetable Products",208,"Edible fruits, nuts & fruit peels",20812,"Preserved Fruits and Nuts",2021,117199
+2,"Vegetable Products",208,"Edible fruits, nuts & fruit peels",20813,"Dried Fruits",2021,1742030
+2,"Vegetable Products",209,"Coffee, tea, mate & spices",20901,"Coffee",2021,14304170
+2,"Vegetable Products",209,"Coffee, tea, mate & spices",20902,"Tea",2021,16739106
+2,"Vegetable Products",209,"Coffee, tea, mate & spices",20903,"Mate",2021,5517
+2,"Vegetable Products",209,"Coffee, tea, mate & spices",20904,"Pepper",2021,1033991
+2,"Vegetable Products",209,"Coffee, tea, mate & spices",20905,"Vanilla",2021,1411964
+2,"Vegetable Products",209,"Coffee, tea, mate & spices",20906,"Cinnamon",2021,496862
+2,"Vegetable Products",209,"Coffee, tea, mate & spices",20907,"Cloves",2021,391755
+2,"Vegetable Products",209,"Coffee, tea, mate & spices",20908,"Nutmeg, mace and cardamons",2021,10970957
+2,"Vegetable Products",209,"Coffee, tea, mate & spices",20909,"Spice Seeds",2021,1040299
+2,"Vegetable Products",209,"Coffee, tea, mate & spices",20910,"Spices",2021,4166043
+2,"Vegetable Products",210,"Cereals",21001,"Wheat",2021,397193.99999999994
+2,"Vegetable Products",210,"Cereals",21003,"Barley",2021,25838.999999999996
+2,"Vegetable Products",210,"Cereals",21004,"Oats",2021,21750
+2,"Vegetable Products",210,"Cereals",21005,"Corn",2021,53833
+2,"Vegetable Products",210,"Cereals",21006,"Rice",2021,8072153
+2,"Vegetable Products",210,"Cereals",21007,"Sorghum",2021,2450
+2,"Vegetable Products",210,"Cereals",21008,"Buckwheat",2021,58114
+2,"Vegetable Products",211,"Products of the milling industry",21101,"Wheat Flours",2021,2784521
+2,"Vegetable Products",211,"Products of the milling industry",21102,"Cereal Flours",2021,355270
+2,"Vegetable Products",211,"Products of the milling industry",21103,"Cereal Meal and Pellets",2021,682596
+2,"Vegetable Products",211,"Products of the milling industry",21104,"Processed Cereals",2021,1016218
+2,"Vegetable Products",211,"Products of the milling industry",21105,"Potato Flours",2021,1061930
+2,"Vegetable Products",211,"Products of the milling industry",21106,"Legume Flours",2021,1927444
+2,"Vegetable Products",211,"Products of the milling industry",21107,"Malt",2021,14214
+2,"Vegetable Products",211,"Products of the milling industry",21108,"Starches",2021,8465139
+2,"Vegetable Products",211,"Products of the milling industry",21109,"Wheat Gluten",2021,276957.99999999994
+2,"Vegetable Products",212,"Oils seeds, oleaginous fruits, grains, straw & fodder",21201,"Soybeans",2021,18629
+2,"Vegetable Products",212,"Oils seeds, oleaginous fruits, grains, straw & fodder",21202,"Ground Nuts",2021,110455
+2,"Vegetable Products",212,"Oils seeds, oleaginous fruits, grains, straw & fodder",21203,"Copra",2021,15979
+2,"Vegetable Products",212,"Oils seeds, oleaginous fruits, grains, straw & fodder",21204,"Linseed",2021,1062
+2,"Vegetable Products",212,"Oils seeds, oleaginous fruits, grains, straw & fodder",21206,"Sunflower Seeds",2021,575455
+2,"Vegetable Products",212,"Oils seeds, oleaginous fruits, grains, straw & fodder",21207,"Other Oily Seeds",2021,1551636
+2,"Vegetable Products",212,"Oils seeds, oleaginous fruits, grains, straw & fodder",21208,"Oil Seed Flower",2021,8835
+2,"Vegetable Products",212,"Oils seeds, oleaginous fruits, grains, straw & fodder",21209,"Sowing Seeds",2021,789312
+2,"Vegetable Products",212,"Oils seeds, oleaginous fruits, grains, straw & fodder",21210,"Hops",2021,50
+2,"Vegetable Products",212,"Oils seeds, oleaginous fruits, grains, straw & fodder",21211,"Perfume Plants",2021,2324509
+2,"Vegetable Products",212,"Oils seeds, oleaginous fruits, grains, straw & fodder",21212,"Locust beans, seaweed, sugar beet, cane, for food",2021,1121073
+2,"Vegetable Products",212,"Oils seeds, oleaginous fruits, grains, straw & fodder",21213,"Cereal Straws",2021,162659
+2,"Vegetable Products",212,"Oils seeds, oleaginous fruits, grains, straw & fodder",21214,"Forage Crops",2021,346056.99999999994
+2,"Vegetable Products",213,"Natural gums, resins & other vegetable extracts",21301,"Insect Resins",2021,789665
+2,"Vegetable Products",213,"Natural gums, resins & other vegetable extracts",21302,"Vegetable Saps",2021,5491974
+2,"Vegetable Products",214,"Vegetable plaiting materials & products, n.e.s.",21401,"Vegetable Plaiting Materials",2021,39274
+2,"Vegetable Products",214,"Vegetable plaiting materials & products, n.e.s.",21404,"Other Vegetable Products",2021,155666
+3,"Animal and Vegetable Bi-Products",315,"Animal or vegetable fats, oils, & waxes",31501,"Pig and Poultry Fat",2021,2041951
+3,"Animal and Vegetable Bi-Products",315,"Animal or vegetable fats, oils, & waxes",31502,"Bovine, Sheep, and Goat Fat",2021,1877906
+3,"Animal and Vegetable Bi-Products",315,"Animal or vegetable fats, oils, & waxes",31504,"Fish Oil",2021,100.99999999999999
+3,"Animal and Vegetable Bi-Products",315,"Animal or vegetable fats, oils, & waxes",31505,"Wool Grease",2021,424890
+3,"Animal and Vegetable Bi-Products",315,"Animal or vegetable fats, oils, & waxes",31506,"Other Animal Fats",2021,47881
+3,"Animal and Vegetable Bi-Products",315,"Animal or vegetable fats, oils, & waxes",31507,"Soybean Oil",2021,83640645
+3,"Animal and Vegetable Bi-Products",315,"Animal or vegetable fats, oils, & waxes",31508,"Ground Nut Oil",2021,305
+3,"Animal and Vegetable Bi-Products",315,"Animal or vegetable fats, oils, & waxes",31509,"Pure Olive Oil",2021,2295546
+3,"Animal and Vegetable Bi-Products",315,"Animal or vegetable fats, oils, & waxes",31510,"Olive Oil",2021,19730
+3,"Animal and Vegetable Bi-Products",315,"Animal or vegetable fats, oils, & waxes",31511,"Palm Oil",2021,75619746
+3,"Animal and Vegetable Bi-Products",315,"Animal or vegetable fats, oils, & waxes",31512,"Seed Oils",2021,58619632
+3,"Animal and Vegetable Bi-Products",315,"Animal or vegetable fats, oils, & waxes",31513,"Coconut Oil",2021,17196955
+3,"Animal and Vegetable Bi-Products",315,"Animal or vegetable fats, oils, & waxes",31514,"Rapeseed Oil",2021,3433145
+3,"Animal and Vegetable Bi-Products",315,"Animal or vegetable fats, oils, & waxes",31515,"Other Pure Vegetable Oils",2021,57349829
+3,"Animal and Vegetable Bi-Products",315,"Animal or vegetable fats, oils, & waxes",31516,"Other Vegetable Oils",2021,19608905
+3,"Animal and Vegetable Bi-Products",315,"Animal or vegetable fats, oils, & waxes",31517,"Margarine",2021,5025824
+3,"Animal and Vegetable Bi-Products",315,"Animal or vegetable fats, oils, & waxes",31518,"Inedible Fats and Oils",2021,84580415
+3,"Animal and Vegetable Bi-Products",315,"Animal or vegetable fats, oils, & waxes",31519,"Stearic Acid",2021,36466537
+3,"Animal and Vegetable Bi-Products",315,"Animal or vegetable fats, oils, & waxes",31520,"Glycerol",2021,789568
+3,"Animal and Vegetable Bi-Products",315,"Animal or vegetable fats, oils, & waxes",31521,"Vegetable waxes and beeswax",2021,296336
+3,"Animal and Vegetable Bi-Products",315,"Animal or vegetable fats, oils, & waxes",31522,"Fat and Oil Residues",2021,252202
+4,"Foodstuffs",416,"Preparations of fish, crustacenas, & molluscs",41601,"Sausages",2021,6370003
+4,"Foodstuffs",416,"Preparations of fish, crustacenas, & molluscs",41602,"Other Prepared Meat",2021,71423484
+4,"Foodstuffs",416,"Preparations of fish, crustacenas, & molluscs",41604,"Processed Fish",2021,2587419
+4,"Foodstuffs",416,"Preparations of fish, crustacenas, & molluscs",41605,"Processed Crustaceans",2021,10283452
+4,"Foodstuffs",417,"Sugars & confectioneries",41701,"Raw Sugar",2021,259831742
+4,"Foodstuffs",417,"Sugars & confectioneries",41702,"Other Sugars",2021,24620869
+4,"Foodstuffs",417,"Sugars & confectioneries",41703,"Molasses",2021,1803808
+4,"Foodstuffs",417,"Sugars & confectioneries",41704,"Confectionery Sugar",2021,54900973
+4,"Foodstuffs",418,"Cocoa & cocoa preparations",41801,"Cocoa Beans",2021,41276
+4,"Foodstuffs",418,"Cocoa & cocoa preparations",41803,"Cocoa Paste",2021,142438
+4,"Foodstuffs",418,"Cocoa & cocoa preparations",41804,"Cocoa Butter",2021,188142
+4,"Foodstuffs",418,"Cocoa & cocoa preparations",41805,"Cocoa Powder",2021,1102871
+4,"Foodstuffs",418,"Cocoa & cocoa preparations",41806,"Chocolate",2021,49395006
+4,"Foodstuffs",419,"Preparations of cereals, flour, starch or milk",41901,"Malt Extract",2021,39251092
+4,"Foodstuffs",419,"Preparations of cereals, flour, starch or milk",41902,"Pasta",2021,248431836
+4,"Foodstuffs",419,"Preparations of cereals, flour, starch or milk",41903,"Tapioca",2021,54329
+4,"Foodstuffs",419,"Preparations of cereals, flour, starch or milk",41904,"Prepared Cereals",2021,2612445
+4,"Foodstuffs",419,"Preparations of cereals, flour, starch or milk",41905,"Baked Goods",2021,338081713
+4,"Foodstuffs",420,"Preparations of vegetables, fruit, nuts or other plant parts",42001,"Pickled Foods",2021,2414808
+4,"Foodstuffs",420,"Preparations of vegetables, fruit, nuts or other plant parts",42002,"Processed Tomatoes",2021,13525036
+4,"Foodstuffs",420,"Preparations of vegetables, fruit, nuts or other plant parts",42003,"Processed Mushrooms",2021,42775
+4,"Foodstuffs",420,"Preparations of vegetables, fruit, nuts or other plant parts",42004,"Other Frozen Vegetables",2021,9593484
+4,"Foodstuffs",420,"Preparations of vegetables, fruit, nuts or other plant parts",42005,"Other Processed Vegetables",2021,24033588
+4,"Foodstuffs",420,"Preparations of vegetables, fruit, nuts or other plant parts",42006,"Sugar Preserved Foods",2021,7397
+4,"Foodstuffs",420,"Preparations of vegetables, fruit, nuts or other plant parts",42007,"Jams",2021,4828033
+4,"Foodstuffs",420,"Preparations of vegetables, fruit, nuts or other plant parts",42008,"Other Processed Fruits and Nuts",2021,5251212
+4,"Foodstuffs",420,"Preparations of vegetables, fruit, nuts or other plant parts",42009,"Fruit Juice",2021,279060480
+4,"Foodstuffs",421,"Miscellaneous edible preparations",42101,"Coffee and Tea Extracts",2021,3521141
+4,"Foodstuffs",421,"Miscellaneous edible preparations",42102,"Yeast",2021,2341836
+4,"Foodstuffs",421,"Miscellaneous edible preparations",42103,"Sauces and Seasonings",2021,35930752
+4,"Foodstuffs",421,"Miscellaneous edible preparations",42104,"Soups and Broths",2021,7151371
+4,"Foodstuffs",421,"Miscellaneous edible preparations",42105,"Ice Cream",2021,2883204
+4,"Foodstuffs",421,"Miscellaneous edible preparations",42106,"Other Edible Preparations",2021,51634386
+4,"Foodstuffs",422,"Beverages, spirits, & vinegar",42201,"Water",2021,6950868
+4,"Foodstuffs",422,"Beverages, spirits, & vinegar",42202,"Flavored Water",2021,198825913
+4,"Foodstuffs",422,"Beverages, spirits, & vinegar",42203,"Beer",2021,352399.00000000006
+4,"Foodstuffs",422,"Beverages, spirits, & vinegar",42204,"Wine",2021,149960
+4,"Foodstuffs",422,"Beverages, spirits, & vinegar",42205,"Vermouth",2021,340
+4,"Foodstuffs",422,"Beverages, spirits, & vinegar",42207,"Alcohol > 80% ABV",2021,526887
+4,"Foodstuffs",422,"Beverages, spirits, & vinegar",42208,"Hard Liquor",2021,252949
+4,"Foodstuffs",422,"Beverages, spirits, & vinegar",42209,"Vinegar",2021,1506670
+4,"Foodstuffs",423,"Food residues & wastes; animal fodder",42301,"Animal Meal and Pellets",2021,20866655
+4,"Foodstuffs",423,"Food residues & wastes; animal fodder",42302,"Bran",2021,51027
+4,"Foodstuffs",423,"Food residues & wastes; animal fodder",42303,"Starch Residue",2021,100316
+4,"Foodstuffs",423,"Food residues & wastes; animal fodder",42304,"Soybean Meal",2021,137586
+4,"Foodstuffs",423,"Food residues & wastes; animal fodder",42306,"Other Vegetable Residues",2021,5446
+4,"Foodstuffs",423,"Food residues & wastes; animal fodder",42308,"Other Vegetable Residues and Waste",2021,11710
+4,"Foodstuffs",423,"Food residues & wastes; animal fodder",42309,"Animal Food",2021,46229670
+4,"Foodstuffs",424,"Tobacco & substitutes",42401,"Raw Tobacco",2021,1012482
+4,"Foodstuffs",424,"Tobacco & substitutes",42402,"Rolled Tobacco",2021,4589708
+4,"Foodstuffs",424,"Tobacco & substitutes",42403,"Processed Tobacco",2021,2302182
+5,"Mineral Products",525,"Salt, sulphur, cement, lime, stone, & plaster",52501,"Salt",2021,20191038
+5,"Mineral Products",525,"Salt, sulphur, cement, lime, stone, & plaster",52502,"Iron Pyrites",2021,9371
+5,"Mineral Products",525,"Salt, sulphur, cement, lime, stone, & plaster",52503,"Sulphur",2021,605003120
+5,"Mineral Products",525,"Salt, sulphur, cement, lime, stone, & plaster",52504,"Graphite",2021,4688
+5,"Mineral Products",525,"Salt, sulphur, cement, lime, stone, & plaster",52505,"Sand",2021,57984924
+5,"Mineral Products",525,"Salt, sulphur, cement, lime, stone, & plaster",52506,"Quartz",2021,471783
+5,"Mineral Products",525,"Salt, sulphur, cement, lime, stone, & plaster",52507,"Kaolin",2021,9769
+5,"Mineral Products",525,"Salt, sulphur, cement, lime, stone, & plaster",52508,"Clays",2021,1150452
+5,"Mineral Products",525,"Salt, sulphur, cement, lime, stone, & plaster",52509,"Chalk",2021,574981
+5,"Mineral Products",525,"Salt, sulphur, cement, lime, stone, & plaster",52510,"Calcium Phosphates",2021,24225.000000000004
+5,"Mineral Products",525,"Salt, sulphur, cement, lime, stone, & plaster",52511,"Barium Sulphate",2021,2350187
+5,"Mineral Products",525,"Salt, sulphur, cement, lime, stone, & plaster",52512,"Siliceous Fossil Meals",2021,27476
+5,"Mineral Products",525,"Salt, sulphur, cement, lime, stone, & plaster",52513,"Pumice",2021,996905
+5,"Mineral Products",525,"Salt, sulphur, cement, lime, stone, & plaster",52514,"Slate",2021,185
+5,"Mineral Products",525,"Salt, sulphur, cement, lime, stone, & plaster",52515,"Marble, Travertine and Alabaster",2021,3995929
+5,"Mineral Products",525,"Salt, sulphur, cement, lime, stone, & plaster",52516,"Granite",2021,4474617
+5,"Mineral Products",525,"Salt, sulphur, cement, lime, stone, & plaster",52517,"Gravel and Crushed Stone",2021,426874
+5,"Mineral Products",525,"Salt, sulphur, cement, lime, stone, & plaster",52518,"Dolomite",2021,2881517.0000000005
+5,"Mineral Products",525,"Salt, sulphur, cement, lime, stone, & plaster",52519,"Magnesium Carbonate",2021,19530670
+5,"Mineral Products",525,"Salt, sulphur, cement, lime, stone, & plaster",52520,"Gypsum",2021,8732057
+5,"Mineral Products",525,"Salt, sulphur, cement, lime, stone, & plaster",52521,"Limestone",2021,2248
+5,"Mineral Products",525,"Salt, sulphur, cement, lime, stone, & plaster",52522,"Quicklime",2021,12437949
+5,"Mineral Products",525,"Salt, sulphur, cement, lime, stone, & plaster",52523,"Cement",2021,375822274
+5,"Mineral Products",525,"Salt, sulphur, cement, lime, stone, & plaster",52525,"Mica",2021,8505
+5,"Mineral Products",525,"Salt, sulphur, cement, lime, stone, & plaster",52526,"Soapstone",2021,261345
+5,"Mineral Products",525,"Salt, sulphur, cement, lime, stone, & plaster",52528,"Borax",2021,17997.000000000004
+5,"Mineral Products",525,"Salt, sulphur, cement, lime, stone, & plaster",52529,"Feldspar",2021,362639
+5,"Mineral Products",525,"Salt, sulphur, cement, lime, stone, & plaster",52530,"Other Mineral",2021,414066
+5,"Mineral Products",526,"Ores, slag and ash",52601,"Iron Ore",2021,19918857
+5,"Mineral Products",526,"Ores, slag and ash",52602,"Manganese Ore",2021,1434
+5,"Mineral Products",526,"Ores, slag and ash",52603,"Copper Ore",2021,758374730
+5,"Mineral Products",526,"Ores, slag and ash",52604,"Nickel Ore",2021,86323
+5,"Mineral Products",526,"Ores, slag and ash",52606,"Aluminium Ore",2021,118573.99999999999
+5,"Mineral Products",526,"Ores, slag and ash",52607,"Lead Ore",2021,462120
+5,"Mineral Products",526,"Ores, slag and ash",52608,"Zinc Ore",2021,61798042
+5,"Mineral Products",526,"Ores, slag and ash",52610,"Chromium Ore",2021,18050
+5,"Mineral Products",526,"Ores, slag and ash",52611,"Tungsten Ore",2021,998733.9999999999
+5,"Mineral Products",526,"Ores, slag and ash",52613,"Molybdenum Ore",2021,479426.99999999994
+5,"Mineral Products",526,"Ores, slag and ash",52614,"Titanium Ore",2021,781
+5,"Mineral Products",526,"Ores, slag and ash",52615,"Niobium, Tantalum, Vanadium and Zirconium Ore",2021,110054
+5,"Mineral Products",526,"Ores, slag and ash",52616,"Precious Metal Ore",2021,7569450
+5,"Mineral Products",526,"Ores, slag and ash",52617,"Other Ores",2021,206
+5,"Mineral Products",526,"Ores, slag and ash",52618,"Granulated Slag",2021,36556
+5,"Mineral Products",526,"Ores, slag and ash",52619,"Slag Dross",2021,15556
+5,"Mineral Products",526,"Ores, slag and ash",52620,"Non-Iron and Steel Slag, Ash and Residues",2021,139927745
+5,"Mineral Products",526,"Ores, slag and ash",52621,"Other Slag and Ash",2021,45257
+5,"Mineral Products",527,"Mineral fuels, mineral oils and products of their distillation",52701,"Coal Briquettes",2021,290017
+5,"Mineral Products",527,"Mineral fuels, mineral oils and products of their distillation",52702,"Lignite",2021,21163
+5,"Mineral Products",527,"Mineral fuels, mineral oils and products of their distillation",52703,"Peat",2021,77328
+5,"Mineral Products",527,"Mineral fuels, mineral oils and products of their distillation",52704,"Coke",2021,148822
+5,"Mineral Products",527,"Mineral fuels, mineral oils and products of their distillation",52707,"Coal Tar Oil",2021,567243871
+5,"Mineral Products",527,"Mineral fuels, mineral oils and products of their distillation",52709,"Crude Petroleum",2021,157570489410
+5,"Mineral Products",527,"Mineral fuels, mineral oils and products of their distillation",52710,"Refined Petroleum",2021,33357779792
+5,"Mineral Products",527,"Mineral fuels, mineral oils and products of their distillation",52711,"Petroleum Gas",2021,4656876849
+5,"Mineral Products",527,"Mineral fuels, mineral oils and products of their distillation",52712,"Petroleum Jelly",2021,353306148
+5,"Mineral Products",527,"Mineral fuels, mineral oils and products of their distillation",52713,"Petroleum Coke",2021,735115103
+5,"Mineral Products",527,"Mineral fuels, mineral oils and products of their distillation",52714,"Bitumen and asphalt",2021,650674
+5,"Mineral Products",527,"Mineral fuels, mineral oils and products of their distillation",52715,"Asphalt Mixtures",2021,6589
+6,"Chemical Products",628,"Inorganic chemicals",62801,"Halogens",2021,748167
+6,"Chemical Products",628,"Inorganic chemicals",62802,"Sulfur",2021,8165046
+6,"Chemical Products",628,"Inorganic chemicals",62803,"Carbon",2021,29357232
+6,"Chemical Products",628,"Inorganic chemicals",62804,"Hydrogen",2021,8819033
+6,"Chemical Products",628,"Inorganic chemicals",62805,"Alkali, alkaline-earth, rare-earth metals, scandium, yttrium, and mercury",2021,517042.99999999994
+6,"Chemical Products",628,"Inorganic chemicals",62806,"Hydrochloric Acid",2021,9467025
+6,"Chemical Products",628,"Inorganic chemicals",62807,"Sulfuric Acid",2021,1599937
+6,"Chemical Products",628,"Inorganic chemicals",62808,"Nitric Acids",2021,168887
+6,"Chemical Products",628,"Inorganic chemicals",62809,"Phosphoric Acid",2021,204375
+6,"Chemical Products",628,"Inorganic chemicals",62810,"Boron",2021,23735
+6,"Chemical Products",628,"Inorganic chemicals",62811,"Other Inorganic Acids",2021,3828290
+6,"Chemical Products",628,"Inorganic chemicals",62812,"Halides",2021,14454
+6,"Chemical Products",628,"Inorganic chemicals",62814,"Ammonia",2021,1398123102
+6,"Chemical Products",628,"Inorganic chemicals",62815,"Sodium or Potassium Peroxides",2021,139939706
+6,"Chemical Products",628,"Inorganic chemicals",62816,"Magnesium Hydroxide and Peroxide",2021,1780
+6,"Chemical Products",628,"Inorganic chemicals",62817,"Zinc Oxide and Peroxide",2021,28330802
+6,"Chemical Products",628,"Inorganic chemicals",62818,"Aluminium Oxide",2021,123331653
+6,"Chemical Products",628,"Inorganic chemicals",62819,"Chromium Oxides and Hydroxides",2021,10016
+6,"Chemical Products",628,"Inorganic chemicals",62821,"Iron Oxides and Hydroxides",2021,245027
+6,"Chemical Products",628,"Inorganic chemicals",62822,"Cobalt Oxides and Hydroxides",2021,2903
+6,"Chemical Products",628,"Inorganic chemicals",62823,"Titanium Oxides",2021,16667146.999999998
+6,"Chemical Products",628,"Inorganic chemicals",62824,"Lead Oxides",2021,44.00000000000001
+6,"Chemical Products",628,"Inorganic chemicals",62825,"Inorganic Salts",2021,4088290
+6,"Chemical Products",628,"Inorganic chemicals",62826,"Fluorides",2021,155254
+6,"Chemical Products",628,"Inorganic chemicals",62827,"Chlorides",2021,1225541
+6,"Chemical Products",628,"Inorganic chemicals",62828,"Hypochlorites",2021,1267939
+6,"Chemical Products",628,"Inorganic chemicals",62829,"Chlorates and Perchlorates",2021,52723.99999999999
+6,"Chemical Products",628,"Inorganic chemicals",62830,"Sulfides",2021,9193
+6,"Chemical Products",628,"Inorganic chemicals",62831,"Dithionites and Sulfoxylates",2021,218138
+6,"Chemical Products",628,"Inorganic chemicals",62832,"Sulfites",2021,1751930
+6,"Chemical Products",628,"Inorganic chemicals",62833,"Sulfates",2021,52611403
+6,"Chemical Products",628,"Inorganic chemicals",62834,"Nitrites and Nitrates",2021,1726967
+6,"Chemical Products",628,"Inorganic chemicals",62835,"Phosphinates (hypophosphites) and phosphonates (phosphites)",2021,1300812
+6,"Chemical Products",628,"Inorganic chemicals",62836,"Carbonates",2021,14034032
+6,"Chemical Products",628,"Inorganic chemicals",62839,"Silicates",2021,7154203
+6,"Chemical Products",628,"Inorganic chemicals",62840,"Borates",2021,64942
+6,"Chemical Products",628,"Inorganic chemicals",62841,"Oxometallic or Peroxometallic Acid Salts",2021,1578348
+6,"Chemical Products",628,"Inorganic chemicals",62842,"Other Inorganic Acids Salts",2021,45017844
+6,"Chemical Products",628,"Inorganic chemicals",62843,"Precious Metal Compounds",2021,2826551
+6,"Chemical Products",628,"Inorganic chemicals",62844,"Radioactive Chemicals",2021,286896
+6,"Chemical Products",628,"Inorganic chemicals",62846,"Rare-Earth Metal Compounds",2021,55
+6,"Chemical Products",628,"Inorganic chemicals",62847,"Hydrogen peroxide",2021,203997
+6,"Chemical Products",628,"Inorganic chemicals",62849,"Carbides",2021,265388
+6,"Chemical Products",628,"Inorganic chemicals",62851,"Inorganic Compounds",2021,84489
+6,"Chemical Products",629,"Organic chemicals",62901,"Acyclic Hydrocarbons",2021,530169115
+6,"Chemical Products",629,"Organic chemicals",62902,"Cyclic Hydrocarbons",2021,3283849692
+6,"Chemical Products",629,"Organic chemicals",62903,"Halogenated Hydrocarbons",2021,389686498
+6,"Chemical Products",629,"Organic chemicals",62904,"Sulfonated, Nitrated or Nitrosated Hydrocarbons",2021,4499504
+6,"Chemical Products",629,"Organic chemicals",62905,"Acyclic alcohol derivatives (halogenated, sulphonated, nitrated)",2021,6910676000
+6,"Chemical Products",629,"Organic chemicals",62906,"Cyclic Alcohols",2021,126635692
+6,"Chemical Products",629,"Organic chemicals",62907,"Phenols",2021,358443727
+6,"Chemical Products",629,"Organic chemicals",62909,"Ethers",2021,1664500480
+6,"Chemical Products",629,"Organic chemicals",62910,"Epoxides",2021,440950785
+6,"Chemical Products",629,"Organic chemicals",62911,"Acetals and Hemiacetals",2021,62729
+6,"Chemical Products",629,"Organic chemicals",62912,"Aldehydes, cyclic polymers, and paraformaldehyde",2021,44047588
+6,"Chemical Products",629,"Organic chemicals",62913,"Halogenated aldehyde derivatives (heading 2912)",2021,12
+6,"Chemical Products",629,"Organic chemicals",62914,"Ketones and Quinones",2021,251285577.00000003
+6,"Chemical Products",629,"Organic chemicals",62915,"Saturated Acyclic Monocarboxylic Acids",2021,577796454
+6,"Chemical Products",629,"Organic chemicals",62916,"Unsaturated Acyclic Monocarboxylic Acids",2021,856269357
+6,"Chemical Products",629,"Organic chemicals",62917,"Polycarboxylic Acids",2021,5281522
+6,"Chemical Products",629,"Organic chemicals",62918,"Carboxylic Acids",2021,2899682
+6,"Chemical Products",629,"Organic chemicals",62919,"Phosphoric Esters and Salts",2021,13934
+6,"Chemical Products",629,"Organic chemicals",62920,"Other Esters",2021,101347
+6,"Chemical Products",629,"Organic chemicals",62921,"Amine Compounds",2021,164018830
+6,"Chemical Products",629,"Organic chemicals",62922,"Oxygen Amino Compounds",2021,269720698
+6,"Chemical Products",629,"Organic chemicals",62923,"Quaternary Ammonium Salts and Hydroxides",2021,1608454
+6,"Chemical Products",629,"Organic chemicals",62924,"Carboxyamide Compounds",2021,43905185
+6,"Chemical Products",629,"Organic chemicals",62925,"Carboxyimide Compounds",2021,25799
+6,"Chemical Products",629,"Organic chemicals",62926,"Nitrile Compounds",2021,16416
+6,"Chemical Products",629,"Organic chemicals",62927,"Diazo, Azo or Aoxy Compounds",2021,122046
+6,"Chemical Products",629,"Organic chemicals",62928,"Hydrazine or Hydroxylamine Derivatives",2021,80975
+6,"Chemical Products",629,"Organic chemicals",62929,"Other Nitrogen Compounds",2021,180182024
+6,"Chemical Products",629,"Organic chemicals",62930,"Organo-Sulfur Compounds",2021,642432
+6,"Chemical Products",629,"Organic chemicals",62931,"Other Organo-Inorganic Compounds",2021,47752884.00000001
+6,"Chemical Products",629,"Organic chemicals",62932,"Oxygen Heterocyclic Compounds",2021,73383827
+6,"Chemical Products",629,"Organic chemicals",62933,"Nitrogen Heterocyclic Compounds",2021,15678963
+6,"Chemical Products",629,"Organic chemicals",62934,"Nucleic Acids",2021,838488
+6,"Chemical Products",629,"Organic chemicals",62935,"Sulfonamides",2021,21566
+6,"Chemical Products",629,"Organic chemicals",62936,"Vitamins",2021,9276786
+6,"Chemical Products",629,"Organic chemicals",62937,"Hormones",2021,38409
+6,"Chemical Products",629,"Organic chemicals",62938,"Glycosides",2021,59183
+6,"Chemical Products",629,"Organic chemicals",62939,"Vegetable Alkaloids",2021,101032
+6,"Chemical Products",629,"Organic chemicals",62941,"Antibiotics",2021,197149
+6,"Chemical Products",629,"Organic chemicals",62942,"Other Organic Compounds",2021,674348
+6,"Chemical Products",630,"Pharmaceutical products",63001,"Glands and Other Organs",2021,51479
+6,"Chemical Products",630,"Pharmaceutical products",63002,"Vaccines, blood, antisera, toxins and cultures",2021,9414678
+6,"Chemical Products",630,"Pharmaceutical products",63003,"Unpackaged Medicaments",2021,44461135
+6,"Chemical Products",630,"Pharmaceutical products",63004,"Packaged Medicaments",2021,347197931
+6,"Chemical Products",630,"Pharmaceutical products",63005,"Bandages",2021,2885038
+6,"Chemical Products",630,"Pharmaceutical products",63006,"Special Pharmaceuticals",2021,1309650
+6,"Chemical Products",631,"Fertilizers",63101,"Animal or Vegetable Fertilizers",2021,1218120
+6,"Chemical Products",631,"Fertilizers",63102,"Nitrogenous Fertilizers",2021,1830589541
+6,"Chemical Products",631,"Fertilizers",63103,"Phosphatic Fertilizers",2021,1761823
+6,"Chemical Products",631,"Fertilizers",63104,"Potassic Fertilizers",2021,27214884
+6,"Chemical Products",631,"Fertilizers",63105,"Mixed Mineral or Chemical Fertilizers",2021,2859561972
+6,"Chemical Products",632,"Paints, dyes, & varnishes",63201,"Vegetable Tanning Extracts",2021,129488
+6,"Chemical Products",632,"Paints, dyes, & varnishes",63202,"Synthetic Tanning Extracts",2021,81848
+6,"Chemical Products",632,"Paints, dyes, & varnishes",63203,"Vegetable or Animal Dyes",2021,298566
+6,"Chemical Products",632,"Paints, dyes, & varnishes",63204,"Synthetic Coloring Matter",2021,6964526
+6,"Chemical Products",632,"Paints, dyes, & varnishes",63205,"Lake Pigments",2021,428314
+6,"Chemical Products",632,"Paints, dyes, & varnishes",63206,"Other Coloring Matter",2021,258739114
+6,"Chemical Products",632,"Paints, dyes, & varnishes",63207,"Prepared Pigments",2021,26195374
+6,"Chemical Products",632,"Paints, dyes, & varnishes",63208,"Nonaqueous Paints",2021,28046957
+6,"Chemical Products",632,"Paints, dyes, & varnishes",63209,"Aqueous Paints",2021,39391896
+6,"Chemical Products",632,"Paints, dyes, & varnishes",63210,"Other Paints",2021,792073
+6,"Chemical Products",632,"Paints, dyes, & varnishes",63211,"Prepared Paint Driers",2021,53779
+6,"Chemical Products",632,"Paints, dyes, & varnishes",63212,"Nonaqueous Pigments",2021,7210603
+6,"Chemical Products",632,"Paints, dyes, & varnishes",63213,"Artistry Paints",2021,855836
+6,"Chemical Products",632,"Paints, dyes, & varnishes",63214,"Glaziers Putty",2021,14248699
+6,"Chemical Products",632,"Paints, dyes, & varnishes",63215,"Ink",2021,10949460
+6,"Chemical Products",633,"Perfumery & cosmetics",63301,"Essential Oils",2021,3586722
+6,"Chemical Products",633,"Perfumery & cosmetics",63302,"Scented Mixtures",2021,1573470
+6,"Chemical Products",633,"Perfumery & cosmetics",63303,"Perfumes",2021,42305179
+6,"Chemical Products",633,"Perfumery & cosmetics",63304,"Beauty Products",2021,13946791
+6,"Chemical Products",633,"Perfumery & cosmetics",63305,"Hair Products",2021,123342705
+6,"Chemical Products",633,"Perfumery & cosmetics",63306,"Dental Products",2021,15803688
+6,"Chemical Products",633,"Perfumery & cosmetics",63307,"Shaving Products",2021,18031675
+6,"Chemical Products",634,"Soap, cleaners, candles, dental, modelling pastes",63401,"Soap",2021,58048973
+6,"Chemical Products",634,"Soap, cleaners, candles, dental, modelling pastes",63402,"Cleaning Products",2021,550461492
+6,"Chemical Products",634,"Soap, cleaners, candles, dental, modelling pastes",63403,"Lubricating Products",2021,4331417
+6,"Chemical Products",634,"Soap, cleaners, candles, dental, modelling pastes",63404,"Waxes",2021,17073522
+6,"Chemical Products",634,"Soap, cleaners, candles, dental, modelling pastes",63405,"Polishes and Creams",2021,2730702
+6,"Chemical Products",634,"Soap, cleaners, candles, dental, modelling pastes",63406,"Candles",2021,246600
+6,"Chemical Products",634,"Soap, cleaners, candles, dental, modelling pastes",63407,"Pastes and Waxes",2021,67288
+6,"Chemical Products",635,"Glues, starches, & albuminoid products",63501,"Casein",2021,74724
+6,"Chemical Products",635,"Glues, starches, & albuminoid products",63502,"Water Soluble Proteins",2021,4465
+6,"Chemical Products",635,"Glues, starches, & albuminoid products",63503,"Gelatin",2021,340005
+6,"Chemical Products",635,"Glues, starches, & albuminoid products",63504,"Peptones",2021,21182
+6,"Chemical Products",635,"Glues, starches, & albuminoid products",63505,"Dextrins",2021,22701903
+6,"Chemical Products",635,"Glues, starches, & albuminoid products",63506,"Glues",2021,25667430
+6,"Chemical Products",635,"Glues, starches, & albuminoid products",63507,"Enzymes",2021,722905
+6,"Chemical Products",636,"Explosives, matches, & fireworks",63602,"Prepared Explosives",2021,4054080
+6,"Chemical Products",636,"Explosives, matches, & fireworks",63603,"Detonating Fuses",2021,3223786
+6,"Chemical Products",636,"Explosives, matches, & fireworks",63604,"Fireworks",2021,19
+6,"Chemical Products",636,"Explosives, matches, & fireworks",63605,"Matches",2021,27350
+6,"Chemical Products",636,"Explosives, matches, & fireworks",63606,"Pyrophoric Alloys",2021,8063
+6,"Chemical Products",637,"Photo & movie goods",63701,"Photographic Plates",2021,186893
+6,"Chemical Products",637,"Photo & movie goods",63702,"Photographic Film",2021,953144
+6,"Chemical Products",637,"Photo & movie goods",63703,"Photographic Paper",2021,18233
+6,"Chemical Products",637,"Photo & movie goods",63704,"Undeveloped Exposed Photographic Material",2021,1254
+6,"Chemical Products",637,"Photo & movie goods",63705,"Developed Exposed Photographic Material",2021,175
+6,"Chemical Products",637,"Photo & movie goods",63707,"Photographic Chemicals",2021,2196743
+6,"Chemical Products",638,"Chemical products n.e.s.",63801,"Artificial Graphite",2021,596052
+6,"Chemical Products",638,"Chemical products n.e.s.",63802,"Activated Carbon",2021,68018
+6,"Chemical Products",638,"Chemical products n.e.s.",63804,"Wood Pulp Lyes",2021,271205
+6,"Chemical Products",638,"Chemical products n.e.s.",63805,"Turpentine",2021,290789
+6,"Chemical Products",638,"Chemical products n.e.s.",63806,"Rosin",2021,67581
+6,"Chemical Products",638,"Chemical products n.e.s.",63807,"Wood Tar, Oils and Pitch",2021,1006
+6,"Chemical Products",638,"Chemical products n.e.s.",63808,"Pesticides",2021,16847632
+6,"Chemical Products",638,"Chemical products n.e.s.",63809,"Dyeing Finishing Agents",2021,74563748
+6,"Chemical Products",638,"Chemical products n.e.s.",63810,"Metal Pickling Preparations",2021,3160557
+6,"Chemical Products",638,"Chemical products n.e.s.",63811,"Antiknock",2021,4430370
+6,"Chemical Products",638,"Chemical products n.e.s.",63812,"Prepared Rubber Accelerators",2021,20372032
+6,"Chemical Products",638,"Chemical products n.e.s.",63813,"Fire Extinguishers Preparations",2021,525571
+6,"Chemical Products",638,"Chemical products n.e.s.",63814,"Organic Composite Solvents",2021,12058408
+6,"Chemical Products",638,"Chemical products n.e.s.",63815,"Reaction and Catalytic Products",2021,57200490
+6,"Chemical Products",638,"Chemical products n.e.s.",63816,"Refractory Cements",2021,5178013
+6,"Chemical Products",638,"Chemical products n.e.s.",63817,"Alkylbenzenes and Alkylnaphthalenes",2021,533414232
+6,"Chemical Products",638,"Chemical products n.e.s.",63818,"Disc Chemicals for Electronics",2021,91812
+6,"Chemical Products",638,"Chemical products n.e.s.",63819,"Hydraulic Brake Fluid",2021,1152686
+6,"Chemical Products",638,"Chemical products n.e.s.",63820,"Antifreeze",2021,1109865
+6,"Chemical Products",638,"Chemical products n.e.s.",63821,"Micro-Organism Culture Preparations",2021,25996
+6,"Chemical Products",638,"Chemical products n.e.s.",63822,"Laboratory Reagents",2021,1292321
+6,"Chemical Products",638,"Chemical products n.e.s.",63823,"Industrial Fatty Acids, Oils and Alcohols",2021,79453777
+7,"Plastics and Rubbers",739,"Plastics & articles thereof",73901,"Ethylene Polymers",2021,13673728431
+7,"Plastics and Rubbers",739,"Plastics & articles thereof",73902,"Propylene Polymers",2021,7329900534
+7,"Plastics and Rubbers",739,"Plastics & articles thereof",73903,"Styrene Polymers",2021,372952518
+7,"Plastics and Rubbers",739,"Plastics & articles thereof",73904,"Vinyl Chloride Polymers",2021,297313170
+7,"Plastics and Rubbers",739,"Plastics & articles thereof",73905,"Other Vinyl Polymers",2021,19639487
+7,"Plastics and Rubbers",739,"Plastics & articles thereof",73906,"Acrylic Polymers",2021,279170931
+7,"Plastics and Rubbers",739,"Plastics & articles thereof",73907,"Polyacetals",2021,2142331668
+7,"Plastics and Rubbers",739,"Plastics & articles thereof",73908,"Polyamides",2021,26279171
+7,"Plastics and Rubbers",739,"Plastics & articles thereof",73909,"Amino-resins",2021,702204958
+7,"Plastics and Rubbers",739,"Plastics & articles thereof",73910,"Silicone",2021,1370048
+7,"Plastics and Rubbers",739,"Plastics & articles thereof",73911,"Petroleum Resins",2021,396028
+7,"Plastics and Rubbers",739,"Plastics & articles thereof",73912,"Cellulose",2021,6843718
+7,"Plastics and Rubbers",739,"Plastics & articles thereof",73913,"Natural Polymers",2021,516532
+7,"Plastics and Rubbers",739,"Plastics & articles thereof",73914,"Polymer Ion-Exchangers",2021,133689
+7,"Plastics and Rubbers",739,"Plastics & articles thereof",73915,"Scrap Plastic",2021,20892055
+7,"Plastics and Rubbers",739,"Plastics & articles thereof",73916,"Monofilament",2021,1906702
+7,"Plastics and Rubbers",739,"Plastics & articles thereof",73917,"Plastic Pipes",2021,133906318
+7,"Plastics and Rubbers",739,"Plastics & articles thereof",73918,"Plastic Floor Coverings",2021,3465510
+7,"Plastics and Rubbers",739,"Plastics & articles thereof",73919,"Self-adhesive Plastics",2021,28352616
+7,"Plastics and Rubbers",739,"Plastics & articles thereof",73920,"Raw Plastic Sheeting",2021,600044359
+7,"Plastics and Rubbers",739,"Plastics & articles thereof",73921,"Other Plastic Sheetings",2021,170410571
+7,"Plastics and Rubbers",739,"Plastics & articles thereof",73922,"Plastic Wash Basins",2021,1300402
+7,"Plastics and Rubbers",739,"Plastics & articles thereof",73923,"Plastic Lids",2021,288580013
+7,"Plastics and Rubbers",739,"Plastics & articles thereof",73924,"Plastic Housewares",2021,57214067
+7,"Plastics and Rubbers",739,"Plastics & articles thereof",73925,"Plastic Building Materials",2021,7073541
+7,"Plastics and Rubbers",739,"Plastics & articles thereof",73926,"Other Plastic Products",2021,13735727
+7,"Plastics and Rubbers",740,"Rubber & articles thereof",74001,"Rubber",2021,3216002
+7,"Plastics and Rubbers",740,"Rubber & articles thereof",74002,"Synthetic Rubber",2021,694371577
+7,"Plastics and Rubbers",740,"Rubber & articles thereof",74003,"Reclaimed Rubber",2021,1464082
+7,"Plastics and Rubbers",740,"Rubber & articles thereof",74004,"Scrap Rubber",2021,3515321
+7,"Plastics and Rubbers",740,"Rubber & articles thereof",74005,"Compounded Unvulcanised Rubber",2021,407550
+7,"Plastics and Rubbers",740,"Rubber & articles thereof",74006,"Unvulcanised Rubber Products",2021,689960
+7,"Plastics and Rubbers",740,"Rubber & articles thereof",74007,"Rubber Thread",2021,88404
+7,"Plastics and Rubbers",740,"Rubber & articles thereof",74008,"Rubber Sheets",2021,5321690
+7,"Plastics and Rubbers",740,"Rubber & articles thereof",74009,"Rubber Pipes",2021,1613874
+7,"Plastics and Rubbers",740,"Rubber & articles thereof",74010,"Rubber Belting",2021,600591
+7,"Plastics and Rubbers",740,"Rubber & articles thereof",74011,"Rubber Tires",2021,12746276
+7,"Plastics and Rubbers",740,"Rubber & articles thereof",74012,"Used Rubber Tires",2021,712513
+7,"Plastics and Rubbers",740,"Rubber & articles thereof",74013,"Rubber Inner Tubes",2021,210883
+7,"Plastics and Rubbers",740,"Rubber & articles thereof",74014,"Pharmaceutical Rubber Products",2021,743953
+7,"Plastics and Rubbers",740,"Rubber & articles thereof",74015,"Rubber Apparel",2021,4645804
+7,"Plastics and Rubbers",740,"Rubber & articles thereof",74016,"Other Rubber Products",2021,6245216
+7,"Plastics and Rubbers",740,"Rubber & articles thereof",74017,"Hard Rubber",2021,2538789
+8,"Animal Hides",841,"Raw hides & skin (non-fur)",84101,"Equine and Bovine Hides",2021,4474066
+8,"Animal Hides",841,"Raw hides & skin (non-fur)",84102,"Sheep Hides",2021,13398111
+8,"Animal Hides",841,"Raw hides & skin (non-fur)",84103,"Other Hides and Skins",2021,834051
+8,"Animal Hides",841,"Raw hides & skin (non-fur)",84104,"Tanned Equine and Bovine Hides",2021,3776464.0000000005
+8,"Animal Hides",841,"Raw hides & skin (non-fur)",84105,"Tanned Sheep Hides",2021,25756901
+8,"Animal Hides",841,"Raw hides & skin (non-fur)",84106,"Tanned Goat Hides",2021,5335788
+8,"Animal Hides",841,"Raw hides & skin (non-fur)",84107,"Leather of Other Animals",2021,48963
+8,"Animal Hides",841,"Raw hides & skin (non-fur)",84109,"Patent Leather",2021,2366
+8,"Animal Hides",841,"Raw hides & skin (non-fur)",84111,"Leather Sheets",2021,166.99999999999997
+8,"Animal Hides",842,"Leather articles",84201,"Saddlery",2021,19084
+8,"Animal Hides",842,"Leather articles",84202,"Trunks and Cases",2021,9392061
+8,"Animal Hides",842,"Leather articles",84203,"Leather Apparel",2021,550881
+8,"Animal Hides",842,"Leather articles",84205,"Other Leather Articles",2021,1472320.9999999998
+8,"Animal Hides",843,"Furskins, articifial fur, & articles",84301,"Raw Furskins",2021,65
+8,"Animal Hides",843,"Furskins, articifial fur, & articles",84302,"Tanned Furskins",2021,7669.000000000001
+8,"Animal Hides",843,"Furskins, articifial fur, & articles",84303,"Furskin Apparel",2021,32518
+8,"Animal Hides",843,"Furskins, articifial fur, & articles",84304,"Artificial Fur",2021,16200
+9,"Wood Products",944,"Wood, wood articles, & charcoal",94401,"Fuel Wood",2021,155863
+9,"Wood Products",944,"Wood, wood articles, & charcoal",94402,"Wood Charcoal",2021,364662
+9,"Wood Products",944,"Wood, wood articles, & charcoal",94403,"Rough Wood",2021,86875
+9,"Wood Products",944,"Wood, wood articles, & charcoal",94404,"Wood Stakes",2021,515723.00000000006
+9,"Wood Products",944,"Wood, wood articles, & charcoal",94405,"Wood Wool",2021,74977
+9,"Wood Products",944,"Wood, wood articles, & charcoal",94407,"Sawn Wood",2021,43840429
+9,"Wood Products",944,"Wood, wood articles, & charcoal",94408,"Veneer Sheets",2021,290647
+9,"Wood Products",944,"Wood, wood articles, & charcoal",94409,"Shaped Wood",2021,1534119.0000000002
+9,"Wood Products",944,"Wood, wood articles, & charcoal",94410,"Particle Board",2021,4780099
+9,"Wood Products",944,"Wood, wood articles, & charcoal",94411,"Wood Fiberboard",2021,4705507
+9,"Wood Products",944,"Wood, wood articles, & charcoal",94412,"Plywood",2021,7467844
+9,"Wood Products",944,"Wood, wood articles, & charcoal",94413,"Densified Wood",2021,2811280
+9,"Wood Products",944,"Wood, wood articles, & charcoal",94414,"Wood Frames",2021,2271013
+9,"Wood Products",944,"Wood, wood articles, & charcoal",94415,"Wood Crates",2021,2930513
+9,"Wood Products",944,"Wood, wood articles, & charcoal",94416,"Wood Barrels",2021,1544149.0000000002
+9,"Wood Products",944,"Wood, wood articles, & charcoal",94417,"Wooden Tool Handles",2021,118661
+9,"Wood Products",944,"Wood, wood articles, & charcoal",94418,"Wood Carpentry",2021,1780200
+9,"Wood Products",944,"Wood, wood articles, & charcoal",94419,"Wood Kitchenware",2021,667279
+9,"Wood Products",944,"Wood, wood articles, & charcoal",94420,"Wood Ornaments",2021,427939
+9,"Wood Products",944,"Wood, wood articles, & charcoal",94421,"Other Wood Articles",2021,263559
+9,"Wood Products",945,"Cork & cork articles",94501,"Raw Cork",2021,3958
+9,"Wood Products",945,"Cork & cork articles",94502,"Debacked Cork",2021,552537
+9,"Wood Products",945,"Cork & cork articles",94503,"Natural Cork Articles",2021,846417
+9,"Wood Products",945,"Cork & cork articles",94504,"Agglomerated Cork",2021,33745807
+9,"Wood Products",946,"Straw & esparto manufactures",94601,"Plaiting Products",2021,408606
+9,"Wood Products",946,"Straw & esparto manufactures",94602,"Basketwork",2021,725475
+10,"Paper Goods",1047,"Wood pulp & paper scrap",104703,"Sulfate Chemical Woodpulp",2021,17959
+10,"Paper Goods",1047,"Wood pulp & paper scrap",104705,"Semi chemical Woodpulp",2021,110698
+10,"Paper Goods",1047,"Wood pulp & paper scrap",104706,"Recovered Paper Pulp",2021,46852
+10,"Paper Goods",1047,"Wood pulp & paper scrap",104707,"Recovered Paper",2021,25838192
+10,"Paper Goods",1048,"Paper articles",104801,"Newsprint",2021,14750100
+10,"Paper Goods",1048,"Paper articles",104802,"Uncoated Paper",2021,2519983
+10,"Paper Goods",1048,"Paper articles",104803,"Tissue",2021,7082330
+10,"Paper Goods",1048,"Paper articles",104804,"Kraft Paper",2021,30005060
+10,"Paper Goods",1048,"Paper articles",104805,"Other Uncoated Paper",2021,167174818
+10,"Paper Goods",1048,"Paper articles",104806,"Vegetable Parchment",2021,240401
+10,"Paper Goods",1048,"Paper articles",104807,"Composite Paper",2021,18359215
+10,"Paper Goods",1048,"Paper articles",104808,"Corrugated Paper",2021,32422482
+10,"Paper Goods",1048,"Paper articles",104809,"Carbon Paper",2021,46298
+10,"Paper Goods",1048,"Paper articles",104810,"Kaolin Coated Paper",2021,19545799
+10,"Paper Goods",1048,"Paper articles",104811,"Cellulose Fibers Paper",2021,50123252
+10,"Paper Goods",1048,"Paper articles",104812,"Paper Pulp Filter Blocks",2021,75338
+10,"Paper Goods",1048,"Paper articles",104813,"Cigarette Paper",2021,2263547
+10,"Paper Goods",1048,"Paper articles",104814,"Wallpaper",2021,175566
+10,"Paper Goods",1048,"Paper articles",104816,"Other Carbon Paper",2021,272289
+10,"Paper Goods",1048,"Paper articles",104817,"Letter Stock",2021,8253688
+10,"Paper Goods",1048,"Paper articles",104818,"Toilet Paper",2021,387900222
+10,"Paper Goods",1048,"Paper articles",104819,"Paper Containers",2021,211542313
+10,"Paper Goods",1048,"Paper articles",104820,"Paper Notebooks",2021,5190327
+10,"Paper Goods",1048,"Paper articles",104821,"Paper Labels",2021,1682084
+10,"Paper Goods",1048,"Paper articles",104822,"Paper Spools",2021,4433640
+10,"Paper Goods",1048,"Paper articles",104823,"Shaped Paper",2021,69415828
+10,"Paper Goods",1049,"Books, newspapers, & other prints",104901,"Brochures",2021,11213321
+10,"Paper Goods",1049,"Books, newspapers, & other prints",104902,"Newspapers",2021,570524
+10,"Paper Goods",1049,"Books, newspapers, & other prints",104903,"Children's Picture Books",2021,55710
+10,"Paper Goods",1049,"Books, newspapers, & other prints",104904,"Sheet Music",2021,27.999999999999996
+10,"Paper Goods",1049,"Books, newspapers, & other prints",104905,"Maps",2021,791932
+10,"Paper Goods",1049,"Books, newspapers, & other prints",104906,"Architectural Plans",2021,112054
+10,"Paper Goods",1049,"Books, newspapers, & other prints",104907,"Documents of title (bonds etc) and unused stamps",2021,30323
+10,"Paper Goods",1049,"Books, newspapers, & other prints",104908,"Decals",2021,33688
+10,"Paper Goods",1049,"Books, newspapers, & other prints",104909,"Postcards",2021,726
+10,"Paper Goods",1049,"Books, newspapers, & other prints",104910,"Calendars",2021,26557
+10,"Paper Goods",1049,"Books, newspapers, & other prints",104911,"Other Printed Material",2021,1075161
+11,"Textiles",1150,"Silk",115004,"Non-Retail Silk Yarn",2021,1
+11,"Textiles",1150,"Silk",115007,"Silk Fabrics",2021,35586
+11,"Textiles",1151,"Wool & animal hair",115101,"Wool",2021,3155058
+11,"Textiles",1151,"Wool & animal hair",115104,"Garnetted Wool or Animal Hair",2021,187
+11,"Textiles",1151,"Wool & animal hair",115105,"Prepared Wool or Animal Hair",2021,13339
+11,"Textiles",1151,"Wool & animal hair",115107,"Non-Retail Combed Wool Yarn",2021,167
+11,"Textiles",1151,"Wool & animal hair",115108,"Non-Retail Animal Hair Yarn",2021,534.9999999999999
+11,"Textiles",1151,"Wool & animal hair",115109,"Retail Wool or Animal Hair Yarn",2021,315579
+11,"Textiles",1151,"Wool & animal hair",115111,"Carded Wool or Animal Hair Fabric",2021,5111
+11,"Textiles",1151,"Wool & animal hair",115112,"Combed Wool or Animal Hair Fabric",2021,34881
+11,"Textiles",1151,"Wool & animal hair",115113,"Horsehair Fabric",2021,55432
+11,"Textiles",1152,"Cotton",115201,"Raw Cotton",2021,706
+11,"Textiles",1152,"Cotton",115202,"Cotton Waste",2021,130340
+11,"Textiles",1152,"Cotton",115203,"Prepared Cotton",2021,120
+11,"Textiles",1152,"Cotton",115204,"Cotton Sewing Thread",2021,66330
+11,"Textiles",1152,"Cotton",115205,"Non-Retail Pure Cotton Yarn",2021,1536
+11,"Textiles",1152,"Cotton",115207,"Retail Cotton Yarn",2021,3775
+11,"Textiles",1152,"Cotton",115208,"Light Pure Woven Cotton",2021,605202
+11,"Textiles",1152,"Cotton",115209,"Heavy Pure Woven Cotton",2021,296494
+11,"Textiles",1152,"Cotton",115210,"Light Mixed Woven Cotton",2021,53829
+11,"Textiles",1152,"Cotton",115211,"Heavy Mixed Woven Cotton",2021,3841
+11,"Textiles",1152,"Cotton",115212,"Other Cotton Fabrics",2021,31446
+11,"Textiles",1153,"Vegetable textile fibers, paper yarn & fabrics",115303,"Jute and Other Textile Fibers",2021,19420
+11,"Textiles",1153,"Vegetable textile fibers, paper yarn & fabrics",115305,"Coconut and Other Vegetable Fibers",2021,37867
+11,"Textiles",1153,"Vegetable textile fibers, paper yarn & fabrics",115306,"Flax Yarn",2021,13580
+11,"Textiles",1153,"Vegetable textile fibers, paper yarn & fabrics",115309,"Flax Woven Fabric",2021,6867.999999999999
+11,"Textiles",1153,"Vegetable textile fibers, paper yarn & fabrics",115310,"Jute Woven Fabric",2021,64482.99999999999
+11,"Textiles",1153,"Vegetable textile fibers, paper yarn & fabrics",115311,"Other Vegetable Fibers Fabric",2021,1606
+11,"Textiles",1154,"Man-made filaments",115401,"Artificial Filament Sewing Thread",2021,241722
+11,"Textiles",1154,"Man-made filaments",115402,"Non-Retail Synthetic Filament Yarn",2021,28012210
+11,"Textiles",1154,"Man-made filaments",115403,"Non-Retail Artificial Filament Yarn",2021,170036.99999999997
+11,"Textiles",1154,"Man-made filaments",115404,"Synthetic Monofilament",2021,47879161
+11,"Textiles",1154,"Man-made filaments",115405,"Artificial Monofilament",2021,290968
+11,"Textiles",1154,"Man-made filaments",115406,"Retail Artificial Filament Yarn",2021,307331
+11,"Textiles",1154,"Man-made filaments",115407,"Synthetic Filament Yarn Woven Fabric",2021,134976852
+11,"Textiles",1154,"Man-made filaments",115408,"Artificial Filament Yarn Woven Fabric",2021,49627.00000000001
+11,"Textiles",1155,"Man-made staple fibres",115501,"Synthetic Filament Tow",2021,1424556
+11,"Textiles",1155,"Man-made staple fibres",115502,"Artificial Filament Tow",2021,314308
+11,"Textiles",1155,"Man-made staple fibres",115503,"Unprocessed Synthetic Staple Fibers",2021,58010286
+11,"Textiles",1155,"Man-made staple fibres",115504,"Unprocessed Artificial Staple Fibers",2021,31785.999999999996
+11,"Textiles",1155,"Man-made staple fibres",115505,"Artificial Fibers Waste",2021,828972
+11,"Textiles",1155,"Man-made staple fibres",115506,"Processed Synthetic Staple Fibers",2021,636454
+11,"Textiles",1155,"Man-made staple fibres",115507,"Processed Artificial Staple Fibers",2021,1193414
+11,"Textiles",1155,"Man-made staple fibres",115508,"Non-Retail Artificial Staple Fibers Sewing Thread",2021,636871.0000000001
+11,"Textiles",1155,"Man-made staple fibres",115509,"Non-Retail Synthetic Staple Fibers Yarn",2021,21046
+11,"Textiles",1155,"Man-made staple fibres",115510,"Non-Retail Artificial Staple Fibers Yarn",2021,6540588
+11,"Textiles",1155,"Man-made staple fibres",115511,"Retail Artificial Staple Fibers Yarn",2021,18.000000000000004
+11,"Textiles",1155,"Man-made staple fibres",115512,"Synthetic Fabrics",2021,2106834
+11,"Textiles",1155,"Man-made staple fibres",115513,"Light Synthetic Cotton Fabrics",2021,1580573
+11,"Textiles",1155,"Man-made staple fibres",115514,"Heavy Synthetic Cotton Fabrics",2021,168492
+11,"Textiles",1155,"Man-made staple fibres",115515,"Other Synthetic Fabrics",2021,1746714
+11,"Textiles",1155,"Man-made staple fibres",115516,"Woven Fabric of Synthetic Staple Fibers",2021,265772
+11,"Textiles",1156,"Wadding, felt, nonwovens, twin, ropes, & articles thereof",115601,"Wadding",2021,3928671.9999999995
+11,"Textiles",1156,"Wadding, felt, nonwovens, twin, ropes, & articles thereof",115602,"Felt",2021,3128954
+11,"Textiles",1156,"Wadding, felt, nonwovens, twin, ropes, & articles thereof",115603,"Non-woven Textiles",2021,210595397
+11,"Textiles",1156,"Wadding, felt, nonwovens, twin, ropes, & articles thereof",115604,"Rubber Textiles",2021,1587850
+11,"Textiles",1156,"Wadding, felt, nonwovens, twin, ropes, & articles thereof",115606,"Gimp Yarn",2021,640
+11,"Textiles",1156,"Wadding, felt, nonwovens, twin, ropes, & articles thereof",115607,"Twine and Rope",2021,4155480
+11,"Textiles",1156,"Wadding, felt, nonwovens, twin, ropes, & articles thereof",115608,"Twine, cordage or rope; knotted netting, made up fishing nets and other made up nets, of textile materials",2021,544460
+11,"Textiles",1156,"Wadding, felt, nonwovens, twin, ropes, & articles thereof",115609,"Other Articles of Twine and Rope",2021,2411708.0000000005
+11,"Textiles",1157,"Carpets & textile floor covers",115701,"Knotted Carpets",2021,650709
+11,"Textiles",1157,"Carpets & textile floor covers",115702,"Hand-Woven Rugs",2021,25820071
+11,"Textiles",1157,"Carpets & textile floor covers",115703,"Tufted Carpets",2021,35643044
+11,"Textiles",1157,"Carpets & textile floor covers",115704,"Felt Carpets",2021,721171
+11,"Textiles",1157,"Carpets & textile floor covers",115705,"Other Carpets",2021,3238978
+11,"Textiles",1158,"Special woven fabrics and tapestries",115801,"Woven Fabrics",2021,613876
+11,"Textiles",1158,"Special woven fabrics and tapestries",115802,"Terry Fabric",2021,25766
+11,"Textiles",1158,"Special woven fabrics and tapestries",115803,"Gauze",2021,724366
+11,"Textiles",1158,"Special woven fabrics and tapestries",115804,"Tulles and Net Fabric",2021,333149
+11,"Textiles",1158,"Special woven fabrics and tapestries",115805,"Hand-Woven Tapestries",2021,434
+11,"Textiles",1158,"Special woven fabrics and tapestries",115806,"Narrow Woven Fabric",2021,75049
+11,"Textiles",1158,"Special woven fabrics and tapestries",115807,"Labels",2021,8115
+11,"Textiles",1158,"Special woven fabrics and tapestries",115808,"Ornamental Trimmings",2021,24077
+11,"Textiles",1158,"Special woven fabrics and tapestries",115809,"Metallic Fabric",2021,51411.00000000001
+11,"Textiles",1158,"Special woven fabrics and tapestries",115810,"Embroidery",2021,596155
+11,"Textiles",1158,"Special woven fabrics and tapestries",115811,"Quilted Textiles",2021,148.00000000000003
+11,"Textiles",1159,"Coated, covered, & laminated fabrics for industrial use",115901,"Gum Coated Textile Fabric",2021,25878
+11,"Textiles",1159,"Coated, covered, & laminated fabrics for industrial use",115902,"Polyamide Fabric",2021,194734
+11,"Textiles",1159,"Coated, covered, & laminated fabrics for industrial use",115903,"Plastic Coated Textile Fabric",2021,4209954
+11,"Textiles",1159,"Coated, covered, & laminated fabrics for industrial use",115904,"Linoleum",2021,270843.00000000006
+11,"Textiles",1159,"Coated, covered, & laminated fabrics for industrial use",115905,"Textile Wall Coverings",2021,982
+11,"Textiles",1159,"Coated, covered, & laminated fabrics for industrial use",115906,"Rubber Textile Fabric",2021,1052450
+11,"Textiles",1159,"Coated, covered, & laminated fabrics for industrial use",115907,"Coated Textile Fabric",2021,308006
+11,"Textiles",1159,"Coated, covered, & laminated fabrics for industrial use",115908,"Textile Wicks",2021,652
+11,"Textiles",1159,"Coated, covered, & laminated fabrics for industrial use",115909,"Hose Piping Textiles",2021,182115
+11,"Textiles",1159,"Coated, covered, & laminated fabrics for industrial use",115910,"Conveyor Belt Textiles",2021,7327.000000000001
+11,"Textiles",1159,"Coated, covered, & laminated fabrics for industrial use",115911,"Textiles for technical uses",2021,288884
+11,"Textiles",1160,"Knitted fabrics",116001,"Pile Fabric",2021,3240759
+11,"Textiles",1160,"Knitted fabrics",116002,"Light Rubberized Knitted Fabric",2021,260518
+11,"Textiles",1161,"Knitted clothing accesories",116101,"Knit Men's Coats",2021,130216
+11,"Textiles",1161,"Knitted clothing accesories",116102,"Knit Women's Coats",2021,621523
+11,"Textiles",1161,"Knitted clothing accesories",116103,"Knit Men's Suits",2021,1352996
+11,"Textiles",1161,"Knitted clothing accesories",116104,"Knit Women's Suits",2021,9917740
+11,"Textiles",1161,"Knitted clothing accesories",116105,"Knit Men's Shirts",2021,774035
+11,"Textiles",1161,"Knitted clothing accesories",116106,"Knit Women's Shirts",2021,574550
+11,"Textiles",1161,"Knitted clothing accesories",116107,"Knit Men's Undergarments",2021,1827401
+11,"Textiles",1161,"Knitted clothing accesories",116108,"Knit Women's Undergarments",2021,3347984
+11,"Textiles",1161,"Knitted clothing accesories",116109,"Knit T-shirts",2021,1214901
+11,"Textiles",1161,"Knitted clothing accesories",116110,"Knit Sweaters",2021,952084
+11,"Textiles",1161,"Knitted clothing accesories",116111,"Knit Babies' Garments",2021,831235
+11,"Textiles",1161,"Knitted clothing accesories",116112,"Knit Active Wear",2021,315513
+11,"Textiles",1161,"Knitted clothing accesories",116113,"Garments of Impregnated Fabric",2021,749854
+11,"Textiles",1161,"Knitted clothing accesories",116114,"Other Knit Garments",2021,13365352
+11,"Textiles",1161,"Knitted clothing accesories",116115,"Knit Socks and Hosiery",2021,268560
+11,"Textiles",1161,"Knitted clothing accesories",116116,"Knit Gloves",2021,31097
+11,"Textiles",1161,"Knitted clothing accesories",116117,"Other Knit Clothing Accessories",2021,521662
+11,"Textiles",1162,"Non-knitted clothing accesories",116201,"Non-Knit Men's Coats",2021,1402121
+11,"Textiles",1162,"Non-knitted clothing accesories",116202,"Non-Knit Women's Coats",2021,1807468
+11,"Textiles",1162,"Non-knitted clothing accesories",116203,"Non-Knit Men's Suits",2021,3629143
+11,"Textiles",1162,"Non-knitted clothing accesories",116204,"Non-Knit Women's Suits",2021,4825716
+11,"Textiles",1162,"Non-knitted clothing accesories",116205,"Non-Knit Men's Shirts",2021,2981331
+11,"Textiles",1162,"Non-knitted clothing accesories",116206,"Non-Knit Women's Shirts",2021,1180382
+11,"Textiles",1162,"Non-knitted clothing accesories",116207,"Non-Knit Men's Undergarments",2021,2351105
+11,"Textiles",1162,"Non-knitted clothing accesories",116208,"Non-Knit Women's Undergarments",2021,2081231
+11,"Textiles",1162,"Non-knitted clothing accesories",116209,"Non-Knit Babies' Garments",2021,469400
+11,"Textiles",1162,"Non-knitted clothing accesories",116210,"Felt or Coated Fabric Garments",2021,16881358
+11,"Textiles",1162,"Non-knitted clothing accesories",116211,"Non-Knit Active Wear",2021,10255505
+11,"Textiles",1162,"Non-knitted clothing accesories",116212,"Other Women's Undergarments",2021,373800
+11,"Textiles",1162,"Non-knitted clothing accesories",116213,"Handkerchiefs",2021,13634
+11,"Textiles",1162,"Non-knitted clothing accesories",116214,"Scarves",2021,3121461
+11,"Textiles",1162,"Non-knitted clothing accesories",116215,"Neck Ties",2021,39829
+11,"Textiles",1162,"Non-knitted clothing accesories",116216,"Non-Knit Gloves",2021,71372
+11,"Textiles",1162,"Non-knitted clothing accesories",116217,"Other Non-Knit Clothing Accessories",2021,446095
+11,"Textiles",1163,"Used clothes & textile articles",116301,"Blankets",2021,5497913
+11,"Textiles",1163,"Used clothes & textile articles",116302,"House Linens",2021,1609002
+11,"Textiles",1163,"Used clothes & textile articles",116303,"Window Dressings",2021,635271
+11,"Textiles",1163,"Used clothes & textile articles",116304,"Bedspreads",2021,836225
+11,"Textiles",1163,"Used clothes & textile articles",116305,"Packing Bags",2021,21359373
+11,"Textiles",1163,"Used clothes & textile articles",116306,"Awnings, Tents, and Sails",2021,9474322
+11,"Textiles",1163,"Used clothes & textile articles",116307,"Other Cloth Articles",2021,25789217
+11,"Textiles",1163,"Used clothes & textile articles",116308,"Packaged Sewing Sets",2021,14448
+11,"Textiles",1163,"Used clothes & textile articles",116309,"Used Clothing",2021,3017342
+11,"Textiles",1163,"Used clothes & textile articles",116310,"Textile Scraps",2021,11959266
+12,"Footwear and Headwear",1264,"Footwear",126401,"Waterproof Footwear",2021,385246
+12,"Footwear and Headwear",1264,"Footwear",126402,"Rubber Footwear",2021,4141641
+12,"Footwear and Headwear",1264,"Footwear",126403,"Leather Footwear",2021,4300582
+12,"Footwear and Headwear",1264,"Footwear",126404,"Textile Footwear",2021,2884364
+12,"Footwear and Headwear",1264,"Footwear",126405,"Other Footwear",2021,1829357.0000000002
+12,"Footwear and Headwear",1264,"Footwear",126406,"Footwear Parts",2021,232339
+12,"Footwear and Headwear",1265,"Headgear",126501,"Hat Forms",2021,2733
+12,"Footwear and Headwear",1265,"Headgear",126502,"Hat Shapes",2021,40.99999999999999
+12,"Footwear and Headwear",1265,"Headgear",126504,"Hats",2021,59949
+12,"Footwear and Headwear",1265,"Headgear",126505,"Knitted Hats",2021,757316
+12,"Footwear and Headwear",1265,"Headgear",126506,"Other Headwear",2021,959559
+12,"Footwear and Headwear",1265,"Headgear",126507,"Headbands and Linings",2021,2701
+12,"Footwear and Headwear",1266,"Umbrellas, walking sticks, & whips",126601,"Umbrellas",2021,544252
+12,"Footwear and Headwear",1266,"Umbrellas, walking sticks, & whips",126602,"Walking Sticks",2021,15578
+12,"Footwear and Headwear",1266,"Umbrellas, walking sticks, & whips",126603,"Umbrella and Walking Stick Accessories",2021,10131
+12,"Footwear and Headwear",1267,"Feather articles, feathers, artificial flowers, & articles of human hair",126701,"Bird Skins and Feathers",2021,2297
+12,"Footwear and Headwear",1267,"Feather articles, feathers, artificial flowers, & articles of human hair",126702,"Artificial Vegetation",2021,846636
+12,"Footwear and Headwear",1267,"Feather articles, feathers, artificial flowers, & articles of human hair",126703,"Processed Hair",2021,2089
+12,"Footwear and Headwear",1267,"Feather articles, feathers, artificial flowers, & articles of human hair",126704,"Fake Hair",2021,12030
+13,"Stone And Glass",1368,"Stone, plaster, cement, asbestos, mica.",136801,"Curbstones",2021,6851787
+13,"Stone And Glass",1368,"Stone, plaster, cement, asbestos, mica.",136802,"Building Stone",2021,6147744
+13,"Stone And Glass",1368,"Stone, plaster, cement, asbestos, mica.",136803,"Worked Slate",2021,4227
+13,"Stone And Glass",1368,"Stone, plaster, cement, asbestos, mica.",136804,"Milling Stones",2021,2248890
+13,"Stone And Glass",1368,"Stone, plaster, cement, asbestos, mica.",136805,"Abrasive Powder",2021,1571189
+13,"Stone And Glass",1368,"Stone, plaster, cement, asbestos, mica.",136806,"Rock Wool",2021,25824698
+13,"Stone And Glass",1368,"Stone, plaster, cement, asbestos, mica.",136807,"Asphalt",2021,67062559
+13,"Stone And Glass",1368,"Stone, plaster, cement, asbestos, mica.",136808,"Vegetable Fiber",2021,1899380
+13,"Stone And Glass",1368,"Stone, plaster, cement, asbestos, mica.",136809,"Plaster Articles",2021,58877299
+13,"Stone And Glass",1368,"Stone, plaster, cement, asbestos, mica.",136810,"Cement Articles",2021,22719360
+13,"Stone And Glass",1368,"Stone, plaster, cement, asbestos, mica.",136811,"Asbestos Cement Articles",2021,2865815
+13,"Stone And Glass",1368,"Stone, plaster, cement, asbestos, mica.",136812,"Asbestos Fibres",2021,11349886
+13,"Stone And Glass",1368,"Stone, plaster, cement, asbestos, mica.",136813,"Friction Material",2021,28481
+13,"Stone And Glass",1368,"Stone, plaster, cement, asbestos, mica.",136814,"Processed Mica",2021,94077
+13,"Stone And Glass",1368,"Stone, plaster, cement, asbestos, mica.",136815,"Other Stone Articles",2021,1594949
+13,"Stone And Glass",1369,"Ceramic products",136901,"Bricks",2021,548203
+13,"Stone And Glass",1369,"Ceramic products",136902,"Refractory Bricks",2021,144940
+13,"Stone And Glass",1369,"Ceramic products",136903,"Refractory Ceramics",2021,466119.00000000006
+13,"Stone And Glass",1369,"Ceramic products",136904,"Ceramic Bricks",2021,1748931
+13,"Stone And Glass",1369,"Ceramic products",136905,"Roofing Tiles",2021,2480727
+13,"Stone And Glass",1369,"Ceramic products",136906,"Ceramic Pipes",2021,559729
+13,"Stone And Glass",1369,"Ceramic products",136907,"Unglazed Ceramics",2021,21091412
+13,"Stone And Glass",1369,"Ceramic products",136908,"Glazed Ceramics",2021,44616.00000000001
+13,"Stone And Glass",1369,"Ceramic products",136909,"Laboratory Ceramic Ware",2021,1065118
+13,"Stone And Glass",1369,"Ceramic products",136910,"Bathroom Ceramics",2021,2267385
+13,"Stone And Glass",1369,"Ceramic products",136911,"Porcelain Tableware",2021,851746
+13,"Stone And Glass",1369,"Ceramic products",136912,"Ceramic Tableware",2021,3997554
+13,"Stone And Glass",1369,"Ceramic products",136913,"Ornamental Ceramics",2021,210990
+13,"Stone And Glass",1369,"Ceramic products",136914,"Other Ceramic Articles",2021,856649
+13,"Stone And Glass",1370,"Glass & glassware",137001,"Glass Scraps",2021,246477
+13,"Stone And Glass",1370,"Glass & glassware",137002,"Glass Balls",2021,103252
+13,"Stone And Glass",1370,"Glass & glassware",137003,"Cast or Rolled Glass",2021,16094287
+13,"Stone And Glass",1370,"Glass & glassware",137004,"Blown Glass",2021,15630774
+13,"Stone And Glass",1370,"Glass & glassware",137005,"Float Glass",2021,119031134
+13,"Stone And Glass",1370,"Glass & glassware",137006,"Glass with Edge Workings",2021,1256990
+13,"Stone And Glass",1370,"Glass & glassware",137007,"Safety Glass",2021,14444787
+13,"Stone And Glass",1370,"Glass & glassware",137008,"Insulating Glass",2021,6155004
+13,"Stone And Glass",1370,"Glass & glassware",137009,"Glass Mirrors",2021,16529981
+13,"Stone And Glass",1370,"Glass & glassware",137010,"Glass Bottles",2021,92068726
+13,"Stone And Glass",1370,"Glass & glassware",137011,"Glass Bulbs",2021,182823
+13,"Stone And Glass",1370,"Glass & glassware",137013,"Interior Decorative Glassware",2021,30599778
+13,"Stone And Glass",1370,"Glass & glassware",137015,"Eyewear and Clock Glass",2021,2563
+13,"Stone And Glass",1370,"Glass & glassware",137016,"Glass Bricks",2021,657300
+13,"Stone And Glass",1370,"Glass & glassware",137017,"Laboratory Glassware",2021,78089
+13,"Stone And Glass",1370,"Glass & glassware",137018,"Glass Beads",2021,488710
+13,"Stone And Glass",1370,"Glass & glassware",137019,"Glass Fibers",2021,42776377
+13,"Stone And Glass",1370,"Glass & glassware",137020,"Other Glass Articles",2021,592887
+14,"Precious Metals",1471,"Precious stones, metals, & pearls",147101,"Pearls",2021,100
+14,"Precious Metals",1471,"Precious stones, metals, & pearls",147102,"Diamonds",2021,22178957
+14,"Precious Metals",1471,"Precious stones, metals, & pearls",147103,"Precious Stones",2021,432121
+14,"Precious Metals",1471,"Precious stones, metals, & pearls",147104,"Synthetic Reconstructed Jewellery Stones",2021,1974
+14,"Precious Metals",1471,"Precious stones, metals, & pearls",147105,"Precious Stone Dust",2021,11408
+14,"Precious Metals",1471,"Precious stones, metals, & pearls",147106,"Silver",2021,3581688
+14,"Precious Metals",1471,"Precious stones, metals, & pearls",147108,"Gold",2021,1131666467
+14,"Precious Metals",1471,"Precious stones, metals, & pearls",147109,"Gold Clad Metals",2021,516
+14,"Precious Metals",1471,"Precious stones, metals, & pearls",147110,"Platinum",2021,18873284
+14,"Precious Metals",1471,"Precious stones, metals, & pearls",147112,"Precious Metal Scraps",2021,105449760
+14,"Precious Metals",1471,"Precious stones, metals, & pearls",147113,"Jewellery",2021,315854657
+14,"Precious Metals",1471,"Precious stones, metals, & pearls",147114,"Metal-Clad Products",2021,1562573
+14,"Precious Metals",1471,"Precious stones, metals, & pearls",147115,"Other Precious Metal Products",2021,23188967
+14,"Precious Metals",1471,"Precious stones, metals, & pearls",147116,"Pearl Products",2021,348265
+14,"Precious Metals",1471,"Precious stones, metals, & pearls",147117,"Imitation Jewellery",2021,51630259
+14,"Precious Metals",1471,"Precious stones, metals, & pearls",147118,"Coin",2021,3412.9999999999995
+15,"Metals",1572,"Iron & steel",157201,"Pig Iron",2021,63988974
+15,"Metals",1572,"Iron & steel",157202,"Ferroalloys",2021,55885468
+15,"Metals",1572,"Iron & steel",157203,"Iron Reductions",2021,24929
+15,"Metals",1572,"Iron & steel",157204,"Scrap Iron",2021,74147656
+15,"Metals",1572,"Iron & steel",157205,"Iron Powder",2021,971476
+15,"Metals",1572,"Iron & steel",157206,"Iron Ingots",2021,439379
+15,"Metals",1572,"Iron & steel",157207,"Semi-Finished Iron",2021,249721606
+15,"Metals",1572,"Iron & steel",157208,"Hot-Rolled Iron",2021,502803166
+15,"Metals",1572,"Iron & steel",157209,"Cold-Rolled Iron",2021,7476787
+15,"Metals",1572,"Iron & steel",157210,"Coated Flat-Rolled Iron",2021,99687405
+15,"Metals",1572,"Iron & steel",157211,"Large Flat-Rolled Iron",2021,2554659
+15,"Metals",1572,"Iron & steel",157212,"Large Coated Flat-Rolled Iron",2021,1620872
+15,"Metals",1572,"Iron & steel",157213,"Hot-Rolled Iron Bars",2021,133768725
+15,"Metals",1572,"Iron & steel",157214,"Raw Iron Bars",2021,152704468
+15,"Metals",1572,"Iron & steel",157215,"Other Iron Bars",2021,117502
+15,"Metals",1572,"Iron & steel",157216,"Iron Blocks",2021,63389113
+15,"Metals",1572,"Iron & steel",157217,"Iron Wire",2021,19120113
+15,"Metals",1572,"Iron & steel",157218,"Stainless Steel Ingots",2021,992163
+15,"Metals",1572,"Iron & steel",157219,"Large Flat-Rolled Stainless Steel",2021,2519805
+15,"Metals",1572,"Iron & steel",157220,"Flat-Rolled Stainless Steel",2021,149004
+15,"Metals",1572,"Iron & steel",157221,"Hot-Rolled Stainless Steel Bars",2021,141721
+15,"Metals",1572,"Iron & steel",157222,"Other Stainless Steel Bars",2021,46975123
+15,"Metals",1572,"Iron & steel",157223,"Stainless Steel Wire",2021,17167949
+15,"Metals",1572,"Iron & steel",157224,"Steel Ingots",2021,128127
+15,"Metals",1572,"Iron & steel",157225,"Flat Flat-Rolled Steel",2021,14536000
+15,"Metals",1572,"Iron & steel",157226,"Flat-Rolled Iron",2021,399539
+15,"Metals",1572,"Iron & steel",157227,"Steel Bars",2021,2105411
+15,"Metals",1572,"Iron & steel",157228,"Other Steel Bars",2021,1136633
+15,"Metals",1572,"Iron & steel",157229,"Steel Wire",2021,11480620
+15,"Metals",1573,"Iron/Steel Articles",157301,"Iron Sheet Piling",2021,5605249
+15,"Metals",1573,"Iron/Steel Articles",157302,"Iron Railway Products",2021,14937326
+15,"Metals",1573,"Iron/Steel Articles",157303,"Cast Iron Pipes",2021,54792999
+15,"Metals",1573,"Iron/Steel Articles",157304,"Iron Pipes",2021,155974125
+15,"Metals",1573,"Iron/Steel Articles",157305,"Other Large Iron Pipes",2021,25524318
+15,"Metals",1573,"Iron/Steel Articles",157306,"Other Small Iron Pipes",2021,40155621
+15,"Metals",1573,"Iron/Steel Articles",157307,"Iron Pipe Fittings",2021,19032984
+15,"Metals",1573,"Iron/Steel Articles",157308,"Iron Structures",2021,189800323
+15,"Metals",1573,"Iron/Steel Articles",157309,"Large Iron Containers",2021,5078770
+15,"Metals",1573,"Iron/Steel Articles",157310,"Small Iron Containers",2021,41215919
+15,"Metals",1573,"Iron/Steel Articles",157311,"Iron Gas Containers",2021,2945339
+15,"Metals",1573,"Iron/Steel Articles",157312,"Stranded Iron Wire",2021,12911435
+15,"Metals",1573,"Iron/Steel Articles",157313,"Barbed Wire",2021,653928
+15,"Metals",1573,"Iron/Steel Articles",157314,"Iron Cloth",2021,8982365
+15,"Metals",1573,"Iron/Steel Articles",157315,"Iron Chains",2021,958803
+15,"Metals",1573,"Iron/Steel Articles",157316,"Iron Anchors",2021,805871.0000000001
+15,"Metals",1573,"Iron/Steel Articles",157317,"Iron Nails",2021,16880996
+15,"Metals",1573,"Iron/Steel Articles",157318,"Iron Fasteners",2021,12649137
+15,"Metals",1573,"Iron/Steel Articles",157319,"Iron Sewing Needles",2021,165632
+15,"Metals",1573,"Iron/Steel Articles",157320,"Iron Springs",2021,711640
+15,"Metals",1573,"Iron/Steel Articles",157321,"Iron Stovetops",2021,1655579
+15,"Metals",1573,"Iron/Steel Articles",157322,"Iron Radiators",2021,788616
+15,"Metals",1573,"Iron/Steel Articles",157323,"Iron Housewares",2021,1790218
+15,"Metals",1573,"Iron/Steel Articles",157324,"Iron Toiletry",2021,1169080
+15,"Metals",1573,"Iron/Steel Articles",157325,"Other Cast Iron Products",2021,866346
+15,"Metals",1573,"Iron/Steel Articles",157326,"Other Iron Products",2021,33261304
+15,"Metals",1574,"Copper articles",157402,"Raw Copper",2021,2406240
+15,"Metals",1574,"Copper articles",157403,"Refined Copper",2021,7889741
+15,"Metals",1574,"Copper articles",157404,"Scrap Copper",2021,1103500276
+15,"Metals",1574,"Copper articles",157406,"Copper Powder",2021,321
+15,"Metals",1574,"Copper articles",157407,"Copper Bars",2021,6965208
+15,"Metals",1574,"Copper articles",157408,"Copper Wire",2021,16187134
+15,"Metals",1574,"Copper articles",157409,"Copper Plating",2021,993749
+15,"Metals",1574,"Copper articles",157410,"Copper Foil",2021,8157.999999999999
+15,"Metals",1574,"Copper articles",157411,"Copper Pipes",2021,2928449
+15,"Metals",1574,"Copper articles",157412,"Copper Pipe Fittings",2021,5986265
+15,"Metals",1574,"Copper articles",157413,"Stranded Copper Wire",2021,109895869
+15,"Metals",1574,"Copper articles",157415,"Copper Fasteners",2021,173894
+15,"Metals",1574,"Copper articles",157418,"Copper Housewares",2021,221073
+15,"Metals",1574,"Copper articles",157419,"Other Copper Products",2021,205589
+15,"Metals",1575,"Nickel articles",157503,"Scrap Nickel",2021,19862168
+15,"Metals",1575,"Nickel articles",157504,"Nickel Powder",2021,11477
+15,"Metals",1575,"Nickel articles",157505,"Nickel Bars",2021,71032
+15,"Metals",1575,"Nickel articles",157506,"Nickel Sheets",2021,427451
+15,"Metals",1575,"Nickel articles",157507,"Nickel Pipes",2021,559511
+15,"Metals",1575,"Nickel articles",157508,"Other Nickel Products",2021,2595737
+15,"Metals",1576,"Aluminum articles",157601,"Raw Aluminium",2021,1222582075
+15,"Metals",1576,"Aluminum articles",157602,"Scrap Aluminium",2021,462268084
+15,"Metals",1576,"Aluminum articles",157603,"Aluminium Powder",2021,70815
+15,"Metals",1576,"Aluminum articles",157604,"Aluminium Bars",2021,105335875
+15,"Metals",1576,"Aluminum articles",157605,"Aluminium Wire",2021,6779089
+15,"Metals",1576,"Aluminum articles",157606,"Aluminium Plating",2021,990847799
+15,"Metals",1576,"Aluminum articles",157607,"Aluminium Foil",2021,57985291
+15,"Metals",1576,"Aluminum articles",157608,"Aluminium Pipes",2021,16672802
+15,"Metals",1576,"Aluminum articles",157609,"Aluminium Pipe Fittings",2021,124847
+15,"Metals",1576,"Aluminum articles",157610,"Aluminium Structures",2021,40695383
+15,"Metals",1576,"Aluminum articles",157611,"Large Aluminium Containers",2021,897691
+15,"Metals",1576,"Aluminum articles",157612,"Aluminium Cans",2021,182688006
+15,"Metals",1576,"Aluminum articles",157613,"Aluminium Gas Containers",2021,140888
+15,"Metals",1576,"Aluminum articles",157614,"Stranded Aluminium Wire",2021,14390604
+15,"Metals",1576,"Aluminum articles",157615,"Aluminium Housewares",2021,5161252
+15,"Metals",1576,"Aluminum articles",157616,"Other Aluminium Products",2021,8267360
+15,"Metals",1578,"Lead articles",157801,"Raw Lead",2021,88782625
+15,"Metals",1578,"Lead articles",157802,"Scrap Lead",2021,2024154
+15,"Metals",1578,"Lead articles",157804,"Lead Sheets",2021,103285
+15,"Metals",1578,"Lead articles",157806,"Other Lead Products",2021,307086
+15,"Metals",1579,"Zinc articles",157901,"Raw Zinc",2021,4113834
+15,"Metals",1579,"Zinc articles",157902,"Scrap Waste",2021,15232106
+15,"Metals",1579,"Zinc articles",157903,"Zinc Powder",2021,13741511
+15,"Metals",1579,"Zinc articles",157904,"Zinc Bars",2021,1246351
+15,"Metals",1579,"Zinc articles",157905,"Zinc Sheets",2021,121153
+15,"Metals",1579,"Zinc articles",157907,"Other Zinc Products",2021,2559103
+15,"Metals",1580,"Tin articles",158001,"Raw Tin",2021,19132
+15,"Metals",1580,"Tin articles",158002,"Scrap Tin",2021,62160
+15,"Metals",1580,"Tin articles",158003,"Tin Bars",2021,13384
+15,"Metals",1580,"Tin articles",158007,"Other Tin Products",2021,8703657
+15,"Metals",1581,"Cermet articles",158101,"Tungsten",2021,924214
+15,"Metals",1581,"Cermet articles",158102,"Molybdenum",2021,460835
+15,"Metals",1581,"Cermet articles",158103,"Tantalum",2021,177438
+15,"Metals",1581,"Cermet articles",158104,"Magnesium",2021,467424
+15,"Metals",1581,"Cermet articles",158105,"Cobalt",2021,18811
+15,"Metals",1581,"Cermet articles",158108,"Titanium",2021,2953936
+15,"Metals",1581,"Cermet articles",158109,"Zirconium",2021,9771
+15,"Metals",1581,"Cermet articles",158112,"Other Metals",2021,138709
+15,"Metals",1581,"Cermet articles",158113,"Cermets",2021,10373
+15,"Metals",1582,"Tools & cutlery",158201,"Garden Tools",2021,111348
+15,"Metals",1582,"Tools & cutlery",158202,"Hand Saws",2021,507581.00000000006
+15,"Metals",1582,"Tools & cutlery",158203,"Hand Tools",2021,531415
+15,"Metals",1582,"Tools & cutlery",158204,"Wrenches",2021,273926
+15,"Metals",1582,"Tools & cutlery",158205,"Other Hand Tools",2021,8379537
+15,"Metals",1582,"Tools & cutlery",158206,"Tool Sets",2021,799255
+15,"Metals",1582,"Tools & cutlery",158207,"Interchangeable Tool Parts",2021,33792156
+15,"Metals",1582,"Tools & cutlery",158208,"Cutting Blades",2021,498332
+15,"Metals",1582,"Tools & cutlery",158209,"Tool Plates",2021,117736
+15,"Metals",1582,"Tools & cutlery",158210,"Cooking Hand Tools",2021,12669
+15,"Metals",1582,"Tools & cutlery",158211,"Knives",2021,204184
+15,"Metals",1582,"Tools & cutlery",158212,"Razor Blades",2021,1039205
+15,"Metals",1582,"Tools & cutlery",158213,"Scissors",2021,21108
+15,"Metals",1582,"Tools & cutlery",158214,"Other Cutlery",2021,93658
+15,"Metals",1582,"Tools & cutlery",158215,"Cutlery Sets",2021,299337
+15,"Metals",1583,"Miscellaneous metal products",158301,"Padlocks",2021,697996
+15,"Metals",1583,"Miscellaneous metal products",158302,"Metal Mountings",2021,6026116
+15,"Metals",1583,"Miscellaneous metal products",158303,"Safes",2021,99604
+15,"Metals",1583,"Miscellaneous metal products",158304,"Filing Cabinets",2021,112312
+15,"Metals",1583,"Miscellaneous metal products",158305,"Metal Office Supplies",2021,18306
+15,"Metals",1583,"Miscellaneous metal products",158306,"Bells and Other Metal Ornaments",2021,329422
+15,"Metals",1583,"Miscellaneous metal products",158307,"Flexible Metal Tubing",2021,795267
+15,"Metals",1583,"Miscellaneous metal products",158308,"Other Metal Fasteners",2021,455328
+15,"Metals",1583,"Miscellaneous metal products",158309,"Metal Stoppers",2021,143468175
+15,"Metals",1583,"Miscellaneous metal products",158310,"Metal Signs",2021,2086501
+15,"Metals",1583,"Miscellaneous metal products",158311,"Coated Metal Soldering Products",2021,1965632
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168401,"Nuclear Reactors",2021,16891
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168402,"Steam Boilers",2021,2365137
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168403,"Central Heating Boilers",2021,43575.00000000001
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168404,"Boiler Plants",2021,271209
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168405,"Water and Gas Generators",2021,585917
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168406,"Steam Turbines",2021,3280910
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168407,"Spark-Ignition Engines",2021,680262592
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168408,"Combustion Engines",2021,1546049
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168409,"Engine Parts",2021,54910979
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168410,"Hydraulic Turbines",2021,953357
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168411,"Gas Turbines",2021,278334847
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168412,"Other Engines",2021,15123399
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168413,"Liquid Pumps",2021,67461455
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168414,"Air Pumps",2021,23441918
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168415,"Air Conditioners",2021,72836884
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168416,"Liquid Fuel Furnaces",2021,623699
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168417,"Industrial Furnaces",2021,279447
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168418,"Refrigerators",2021,10235022
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168419,"Other Heating Machinery",2021,9921199
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168420,"Rolling Machines",2021,314857
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168421,"Centrifuges",2021,188305212
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168422,"Washing and Bottling Machines",2021,15562505
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168423,"Scales",2021,450722
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168424,"Liquid Dispersing Machines",2021,58795434
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168425,"Pulley Systems",2021,5157746
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168426,"Cranes",2021,29564119
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168427,"Fork-Lifts",2021,7989180
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168428,"Lifting Machinery",2021,46070799
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168429,"Large Construction Vehicles",2021,37079538
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168430,"Other Construction Vehicles",2021,41838291
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168431,"Excavation Machinery",2021,37360521
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168432,"Soil Preparation Machinery",2021,5861262
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168433,"Harvesting Machinery",2021,1594399
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168434,"Dairy Machinery",2021,705958
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168435,"Fruit Pressing Machinery",2021,8259
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168436,"Other Agricultural Machinery",2021,397013
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168437,"Mill Machinery",2021,253353
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168438,"Industrial Food Preperation Machinery",2021,3457454
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168439,"Papermaking Machines",2021,1551649
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168440,"Book-binding Machines",2021,165322
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168441,"Other Paper Machinery",2021,1721873
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168442,"Print Production Machinery",2021,1278863
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168443,"Industrial Printers",2021,1682404
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168444,"Artificial Textile Machinery",2021,97227
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168445,"Textile Fiber Machinery",2021,28759
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168446,"Looms",2021,557390
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168447,"Knitting Machines",2021,52051.00000000001
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168448,"Knitting Machine Accessories",2021,330815
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168449,"Felt Machinery",2021,938010
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168450,"Household Washing Machines",2021,1048560
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168451,"Textile Processing Machines",2021,2086213
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168452,"Sewing Machines",2021,125520
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168453,"Leather Machinery",2021,3020
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168454,"Casting Machines",2021,5606
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168455,"Metal-Rolling Mills",2021,1617237
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168456,"Non-Mechanical Removal Machinery",2021,457074
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168457,"Metalworking Transfer Machines",2021,1792994
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168458,"Metal Lathes",2021,393229
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168459,"Drilling Machines",2021,7125542
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168460,"Metal Finishing Machines",2021,758901
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168461,"Metalworking Machines",2021,975829
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168462,"Forging Machines",2021,1550278
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168463,"Other Non-Metal Removal Machinery",2021,1314872
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168464,"Stone Working Machines",2021,248793
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168465,"Woodworking machines",2021,992609
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168466,"Metalworking Machine Parts",2021,1768321
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168467,"Motor-working Tools",2021,5291134
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168468,"Soldering and Welding Machinery",2021,494260
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168470,"Calculators",2021,1213845
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168471,"Computers",2021,13519223
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168472,"Other Office Machines",2021,142715
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168473,"Office Machine Parts",2021,9857931
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168474,"Stone Processing Machines",2021,9758754
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168475,"Glass Working Machines",2021,3359991
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168476,"Vending Machines",2021,116232.00000000001
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168477,"Rubberworking Machinery",2021,6013250
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168478,"Tobacco Processing Machines",2021,2256
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168479,"Machinery Having Individual Functions",2021,21814510
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168480,"Metal Molds",2021,1519743
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168481,"Valves",2021,33267783.000000004
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168482,"Ball Bearings",2021,6700633
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168483,"Transmissions",2021,7451863
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168484,"Gaskets",2021,1326568
+16,"Machines",1684,"Machinery, mechanical appliances, & parts",168485,"Boat Propellers",2021,1946206
+16,"Machines",1685,"Electrical machinery and electronics",168501,"Electric Motors",2021,40471309
+16,"Machines",1685,"Electrical machinery and electronics",168502,"Electric Generating Sets",2021,13252095
+16,"Machines",1685,"Electrical machinery and electronics",168503,"Electric Motor Parts",2021,10504699
+16,"Machines",1685,"Electrical machinery and electronics",168504,"Electrical Transformers",2021,53065795
+16,"Machines",1685,"Electrical machinery and electronics",168505,"Electromagnets",2021,126037
+16,"Machines",1685,"Electrical machinery and electronics",168506,"Batteries",2021,8491518
+16,"Machines",1685,"Electrical machinery and electronics",168507,"Electric Batteries",2021,76366836
+16,"Machines",1685,"Electrical machinery and electronics",168508,"Vacuum Cleaners",2021,159952
+16,"Machines",1685,"Electrical machinery and electronics",168509,"Other Domestic Electric Housewares",2021,1274288
+16,"Machines",1685,"Electrical machinery and electronics",168510,"Hair Trimmers",2021,282835
+16,"Machines",1685,"Electrical machinery and electronics",168511,"Electrical Ignitions",2021,3908956
+16,"Machines",1685,"Electrical machinery and electronics",168512,"Electrical Lighting and Signalling Equipment",2021,204557
+16,"Machines",1685,"Electrical machinery and electronics",168513,"Portable Lighting",2021,111341
+16,"Machines",1685,"Electrical machinery and electronics",168514,"Electric Furnaces",2021,3988509
+16,"Machines",1685,"Electrical machinery and electronics",168515,"Electric Soldering Equipment",2021,5414427
+16,"Machines",1685,"Electrical machinery and electronics",168516,"Electric Heaters",2021,30969147
+16,"Machines",1685,"Electrical machinery and electronics",168517,"Telephones",2021,18462721
+16,"Machines",1685,"Electrical machinery and electronics",168518,"Microphones and Headphones",2021,5727052
+16,"Machines",1685,"Electrical machinery and electronics",168519,"Sound Recording Equipment",2021,31146
+16,"Machines",1685,"Electrical machinery and electronics",168520,"Dictation Machines",2021,8555
+16,"Machines",1685,"Electrical machinery and electronics",168521,"Video Recording Equipment",2021,6145173
+16,"Machines",1685,"Electrical machinery and electronics",168522,"Audio and Video Recording Accessories",2021,14091
+16,"Machines",1685,"Electrical machinery and electronics",168523,"Blank Audio Media",2021,2279531
+16,"Machines",1685,"Electrical machinery and electronics",168524,"Sound Recordings",2021,19405
+16,"Machines",1685,"Electrical machinery and electronics",168525,"Broadcasting Equipment",2021,69146095
+16,"Machines",1685,"Electrical machinery and electronics",168526,"Navigation Equipment",2021,3136363
+16,"Machines",1685,"Electrical machinery and electronics",168527,"Radio Receivers",2021,240033
+16,"Machines",1685,"Electrical machinery and electronics",168528,"Video Displays",2021,2930562
+16,"Machines",1685,"Electrical machinery and electronics",168529,"Broadcasting Accessories",2021,4091279
+16,"Machines",1685,"Electrical machinery and electronics",168530,"Traffic Signals",2021,475871
+16,"Machines",1685,"Electrical machinery and electronics",168531,"Audio Alarms",2021,1817267
+16,"Machines",1685,"Electrical machinery and electronics",168532,"Electrical Capacitors",2021,271721
+16,"Machines",1685,"Electrical machinery and electronics",168533,"Electrical Resistors",2021,1694614
+16,"Machines",1685,"Electrical machinery and electronics",168534,"Printed Circuit Boards",2021,1952020
+16,"Machines",1685,"Electrical machinery and electronics",168535,"High-voltage Protection Equipment",2021,10840336
+16,"Machines",1685,"Electrical machinery and electronics",168536,"Low-voltage Protection Equipment",2021,17919225
+16,"Machines",1685,"Electrical machinery and electronics",168537,"Electrical Control Boards",2021,34193125
+16,"Machines",1685,"Electrical machinery and electronics",168538,"Electrical Power Accessories",2021,20166517
+16,"Machines",1685,"Electrical machinery and electronics",168539,"Electric Filament",2021,1987153
+16,"Machines",1685,"Electrical machinery and electronics",168540,"Cathode Tubes",2021,104438
+16,"Machines",1685,"Electrical machinery and electronics",168541,"Semiconductor Devices",2021,2063829
+16,"Machines",1685,"Electrical machinery and electronics",168542,"Integrated Circuits",2021,13921849
+16,"Machines",1685,"Electrical machinery and electronics",168543,"Other Electrical Machinery",2021,3447271
+16,"Machines",1685,"Electrical machinery and electronics",168544,"Insulated Wire",2021,498782241
+16,"Machines",1685,"Electrical machinery and electronics",168545,"Carbon-based Electronics",2021,2110537
+16,"Machines",1685,"Electrical machinery and electronics",168546,"Electrical Insulators",2021,673359
+16,"Machines",1685,"Electrical machinery and electronics",168547,"Metal Insulating Fittings",2021,1511391
+16,"Machines",1685,"Electrical machinery and electronics",168548,"Electrical Parts",2021,96788
+17,"Transportation",1786,"Railway and trams",178601,"Electric Locomotives",2021,20141
+17,"Transportation",1786,"Railway and trams",178602,"Other Locomotives",2021,137550
+17,"Transportation",1786,"Railway and trams",178603,"Self-Propelled Rail Transport",2021,141234
+17,"Transportation",1786,"Railway and trams",178604,"Railway Maintenance Vehicles",2021,1406515
+17,"Transportation",1786,"Railway and trams",178605,"Railway Passenger Cars",2021,7492
+17,"Transportation",1786,"Railway and trams",178606,"Railway Freight Cars",2021,1765687
+17,"Transportation",1786,"Railway and trams",178607,"Locomotive Parts",2021,5294394
+17,"Transportation",1786,"Railway and trams",178608,"Railway Track Fixtures",2021,128437
+17,"Transportation",1786,"Railway and trams",178609,"Railway Cargo Containers",2021,2452556
+17,"Transportation",1787,"Cars, tractors, trucks & parts thereof.",178701,"Tractors",2021,31706684.000000004
+17,"Transportation",1787,"Cars, tractors, trucks & parts thereof.",178702,"Buses",2021,9491679
+17,"Transportation",1787,"Cars, tractors, trucks & parts thereof.",178703,"Cars",2021,1025798008
+17,"Transportation",1787,"Cars, tractors, trucks & parts thereof.",178704,"Delivery Trucks",2021,173436195
+17,"Transportation",1787,"Cars, tractors, trucks & parts thereof.",178705,"Special purpose motor vehicles",2021,8050014
+17,"Transportation",1787,"Cars, tractors, trucks & parts thereof.",178706,"Motor vehicle (8701 to 8705) chassis fitted with engine",2021,872238
+17,"Transportation",1787,"Cars, tractors, trucks & parts thereof.",178707,"Vehicle Bodies (including cabs) for the motor vehicles (8701 to 8705)",2021,6957990
+17,"Transportation",1787,"Cars, tractors, trucks & parts thereof.",178708,"Motor vehicles; parts and accessories (8701 to 8705)",2021,44027960
+17,"Transportation",1787,"Cars, tractors, trucks & parts thereof.",178709,"Work Trucks",2021,47067925
+17,"Transportation",1787,"Cars, tractors, trucks & parts thereof.",178710,"Tanks and Armored vehicles",2021,6885601
+17,"Transportation",1787,"Cars, tractors, trucks & parts thereof.",178711,"Motorcycles and cycles",2021,12534562
+17,"Transportation",1787,"Cars, tractors, trucks & parts thereof.",178712,"Bicycles, delivery tricycles, other cycles",2021,482400
+17,"Transportation",1787,"Cars, tractors, trucks & parts thereof.",178713,"Wheelchairs",2021,28449
+17,"Transportation",1787,"Cars, tractors, trucks & parts thereof.",178714,"Bi-Wheel Vehicle Parts",2021,640666
+17,"Transportation",1787,"Cars, tractors, trucks & parts thereof.",178715,"Baby Carriages",2021,300619
+17,"Transportation",1787,"Cars, tractors, trucks & parts thereof.",178716,"Trailers and semi-trailers, not mechanically propelled vehicles",2021,33344566
+17,"Transportation",1788,"Aircraft and Spacecraft",178801,"Non-powered Aircraft",2021,568
+17,"Transportation",1788,"Aircraft and Spacecraft",178802,"Planes, Helicopters, and/or Spacecraft",2021,40886397
+17,"Transportation",1788,"Aircraft and Spacecraft",178803,"Aircraft parts (gliders, balloons, and powered aircraft)",2021,205936291
+17,"Transportation",1788,"Aircraft and Spacecraft",178804,"Parachutes",2021,122570
+17,"Transportation",1788,"Aircraft and Spacecraft",178805,"Aircraft Launch Gear",2021,102938360
+17,"Transportation",1789,"Ships, boats, & floating structures",178901,"Passenger and Cargo Ships",2021,584985484
+17,"Transportation",1789,"Ships, boats, & floating structures",178902,"Fishing Ships",2021,20610
+17,"Transportation",1789,"Ships, boats, & floating structures",178903,"Recreational Boats",2021,1660728
+17,"Transportation",1789,"Ships, boats, & floating structures",178904,"Tug Boats",2021,919651863.0000001
+17,"Transportation",1789,"Ships, boats, & floating structures",178905,"Special Purpose Ships",2021,1561946083
+17,"Transportation",1789,"Ships, boats, & floating structures",178906,"Other Sea Vessels",2021,901181166
+17,"Transportation",1789,"Ships, boats, & floating structures",178907,"Other Floating Structures",2021,905014
+17,"Transportation",1789,"Ships, boats, & floating structures",178908,"Scrap Vessels",2021,931136.0000000001
+18,"Instruments",1890,"Optical, photo, & film equipment; medical instruments",189001,"Optical Fibers and optical fibre bundles",2021,813583
+18,"Instruments",1890,"Optical, photo, & film equipment; medical instruments",189002,"Mirrors and Lenses",2021,1866084
+18,"Instruments",1890,"Optical, photo, & film equipment; medical instruments",189003,"Eyewear Frames",2021,729476
+18,"Instruments",1890,"Optical, photo, & film equipment; medical instruments",189004,"Eyewear",2021,1134871
+18,"Instruments",1890,"Optical, photo, & film equipment; medical instruments",189005,"Binoculars and Telescopes",2021,1323464
+18,"Instruments",1890,"Optical, photo, & film equipment; medical instruments",189006,"Cameras",2021,534015
+18,"Instruments",1890,"Optical, photo, & film equipment; medical instruments",189007,"Video Cameras",2021,6599022
+18,"Instruments",1890,"Optical, photo, & film equipment; medical instruments",189008,"Image Projectors",2021,300610
+18,"Instruments",1890,"Optical, photo, & film equipment; medical instruments",189009,"Photocopiers",2021,263157
+18,"Instruments",1890,"Optical, photo, & film equipment; medical instruments",189010,"Photo Lab Equipment",2021,1542036
+18,"Instruments",1890,"Optical, photo, & film equipment; medical instruments",189011,"Microscopes",2021,612716
+18,"Instruments",1890,"Optical, photo, & film equipment; medical instruments",189012,"Non-optical Microscopes",2021,181778
+18,"Instruments",1890,"Optical, photo, & film equipment; medical instruments",189013,"LCDs",2021,3610860
+18,"Instruments",1890,"Optical, photo, & film equipment; medical instruments",189014,"Compasses",2021,11323425
+18,"Instruments",1890,"Optical, photo, & film equipment; medical instruments",189015,"Surveying Equipment",2021,26143854
+18,"Instruments",1890,"Optical, photo, & film equipment; medical instruments",189016,"Balances",2021,70146
+18,"Instruments",1890,"Optical, photo, & film equipment; medical instruments",189017,"Drafting Tools",2021,216521
+18,"Instruments",1890,"Optical, photo, & film equipment; medical instruments",189018,"Medical Instruments",2021,15878564
+18,"Instruments",1890,"Optical, photo, & film equipment; medical instruments",189019,"Therapeutic Appliances",2021,6072606
+18,"Instruments",1890,"Optical, photo, & film equipment; medical instruments",189020,"Breathing Appliances",2021,1062664
+18,"Instruments",1890,"Optical, photo, & film equipment; medical instruments",189021,"Orthopedic Appliances",2021,8410231
+18,"Instruments",1890,"Optical, photo, & film equipment; medical instruments",189022,"X-Ray Equipment",2021,10663218
+18,"Instruments",1890,"Optical, photo, & film equipment; medical instruments",189023,"Instructional Models",2021,2910313
+18,"Instruments",1890,"Optical, photo, & film equipment; medical instruments",189024,"Tensile Testing Machines",2021,847668
+18,"Instruments",1890,"Optical, photo, & film equipment; medical instruments",189025,"Hydrometers",2021,1477166
+18,"Instruments",1890,"Optical, photo, & film equipment; medical instruments",189026,"Gas and Liquid Flow Measuring Instruments",2021,7368885
+18,"Instruments",1890,"Optical, photo, & film equipment; medical instruments",189027,"Chemical Analysis Instruments",2021,6758754
+18,"Instruments",1890,"Optical, photo, & film equipment; medical instruments",189028,"Utility Meters",2021,1028365
+18,"Instruments",1890,"Optical, photo, & film equipment; medical instruments",189029,"Revolution Counters",2021,644610
+18,"Instruments",1890,"Optical, photo, & film equipment; medical instruments",189030,"Oscilloscopes",2021,13674027.999999998
+18,"Instruments",1890,"Optical, photo, & film equipment; medical instruments",189031,"Other Measuring Instruments",2021,15517558
+18,"Instruments",1890,"Optical, photo, & film equipment; medical instruments",189032,"Thermostats",2021,3576931
+18,"Instruments",1890,"Optical, photo, & film equipment; medical instruments",189033,"Opto-Electric Instrument Parts",2021,615007
+18,"Instruments",1891,"Clocks, watches, & parts",189101,"Precious Metal Watches",2021,104175753
+18,"Instruments",1891,"Clocks, watches, & parts",189102,"Base Metal Watches",2021,30358907.999999996
+18,"Instruments",1891,"Clocks, watches, & parts",189103,"Clocks with Watch Movements",2021,3052230
+18,"Instruments",1891,"Clocks, watches, & parts",189104,"Dashboard Clocks",2021,6963.999999999999
+18,"Instruments",1891,"Clocks, watches, & parts",189105,"Other Clocks",2021,622162
+18,"Instruments",1891,"Clocks, watches, & parts",189106,"Time Recording Instruments",2021,8740
+18,"Instruments",1891,"Clocks, watches, & parts",189107,"Time Switches",2021,200738
+18,"Instruments",1891,"Clocks, watches, & parts",189108,"Watch Movements",2021,1110593
+18,"Instruments",1891,"Clocks, watches, & parts",189109,"Clock Movements",2021,52914
+18,"Instruments",1891,"Clocks, watches, & parts",189110,"Incomplete Movement Sets",2021,2695
+18,"Instruments",1891,"Clocks, watches, & parts",189111,"Watch Cases and Parts",2021,5045
+18,"Instruments",1891,"Clocks, watches, & parts",189112,"Clock Cases and Parts",2021,11571
+18,"Instruments",1891,"Clocks, watches, & parts",189113,"Watch Straps",2021,66215
+18,"Instruments",1891,"Clocks, watches, & parts",189114,"Other Clocks and Watches",2021,287551
+18,"Instruments",1892,"Musical instruments",189201,"Pianos",2021,4440
+18,"Instruments",1892,"Musical instruments",189202,"String Instruments",2021,15473
+18,"Instruments",1892,"Musical instruments",189205,"Wind Instruments",2021,142397
+18,"Instruments",1892,"Musical instruments",189206,"Percussion",2021,108524.99999999999
+18,"Instruments",1892,"Musical instruments",189207,"Electric Musical Instruments",2021,7413
+18,"Instruments",1892,"Musical instruments",189208,"Other Musical Instruments",2021,9449
+18,"Instruments",1892,"Musical instruments",189209,"Musical Instrument Parts",2021,16919
+19,"Weapons",1993,"Weapons",199303,"Other Firearms",2021,4330
+19,"Weapons",1993,"Weapons",199305,"Weapons Parts and Accessories",2021,3646
+19,"Weapons",1993,"Weapons",199306,"Explosive Ammunition",2021,6459
+19,"Weapons",1993,"Weapons",199307,"Bladed Weapons and Accessories",2021,2044
+20,"Miscellaneous",2094,"Furniture, bedding, lamps, & prefab buildings",209401,"Seats",2021,17294428
+20,"Miscellaneous",2094,"Furniture, bedding, lamps, & prefab buildings",209402,"Medical Furniture",2021,1033014
+20,"Miscellaneous",2094,"Furniture, bedding, lamps, & prefab buildings",209403,"Other Furniture",2021,24794414
+20,"Miscellaneous",2094,"Furniture, bedding, lamps, & prefab buildings",209404,"Mattresses",2021,11855659
+20,"Miscellaneous",2094,"Furniture, bedding, lamps, & prefab buildings",209405,"Light Fixtures",2021,9458561
+20,"Miscellaneous",2094,"Furniture, bedding, lamps, & prefab buildings",209406,"Prefabricated Buildings",2021,22887979
+20,"Miscellaneous",2095,"Toys, games, & sports",209503,"Other toys",2021,2187080
+20,"Miscellaneous",2095,"Toys, games, & sports",209504,"Video and Card Games",2021,3022816
+20,"Miscellaneous",2095,"Toys, games, & sports",209505,"Party Decorations",2021,6969169.999999999
+20,"Miscellaneous",2095,"Toys, games, & sports",209506,"Sports Equipment",2021,617296
+20,"Miscellaneous",2095,"Toys, games, & sports",209507,"Fishing and Hunting Equipment",2021,7913
+20,"Miscellaneous",2095,"Toys, games, & sports",209508,"Fairground Amusements",2021,185305273
+20,"Miscellaneous",2096,"Misc. manufactures",209601,"Worked Ivory and Bone",2021,1086
+20,"Miscellaneous",2096,"Misc. manufactures",209602,"Vegetable and Mineral Carvings",2021,52744
+20,"Miscellaneous",2096,"Misc. manufactures",209603,"Brooms",2021,1889464
+20,"Miscellaneous",2096,"Misc. manufactures",209604,"Hand Sifters",2021,21239
+20,"Miscellaneous",2096,"Misc. manufactures",209605,"Travel Kits",2021,1275732
+20,"Miscellaneous",2096,"Misc. manufactures",209606,"Buttons",2021,45900
+20,"Miscellaneous",2096,"Misc. manufactures",209607,"Zippers",2021,48311.00000000001
+20,"Miscellaneous",2096,"Misc. manufactures",209608,"Pens",2021,206729
+20,"Miscellaneous",2096,"Misc. manufactures",209609,"Pencils and Crayons",2021,289794.99999999994
+20,"Miscellaneous",2096,"Misc. manufactures",209610,"Chalkboards",2021,42526
+20,"Miscellaneous",2096,"Misc. manufactures",209611,"Rubber Stamps",2021,7900
+20,"Miscellaneous",2096,"Misc. manufactures",209612,"Ink Ribbons",2021,184431
+20,"Miscellaneous",2096,"Misc. manufactures",209613,"Lighters",2021,80011
+20,"Miscellaneous",2096,"Misc. manufactures",209614,"Smoking Pipes",2021,307986
+20,"Miscellaneous",2096,"Misc. manufactures",209615,"Combs",2021,300277
+20,"Miscellaneous",2096,"Misc. manufactures",209616,"Scent Sprays",2021,155242
+20,"Miscellaneous",2096,"Misc. manufactures",209617,"Vacuum Flask",2021,1467548
+20,"Miscellaneous",2096,"Misc. manufactures",209618,"Mannequins",2021,24572
+21,"Arts and Antiques",2197,"Art & antiques",219701,"Paintings",2021,2539877
+21,"Arts and Antiques",2197,"Art & antiques",219702,"Prints",2021,9597
+21,"Arts and Antiques",2197,"Art & antiques",219703,"Sculptures",2021,775546
+21,"Arts and Antiques",2197,"Art & antiques",219705,"Collector's Items",2021,161649
+21,"Arts and Antiques",2197,"Art & antiques",219706,"Antiques",2021,1525890
