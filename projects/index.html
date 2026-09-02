@@ -30,7 +30,8 @@
       }
 
       header,
-      main {
+      main,
+      footer {
         position: relative;
         z-index: 1;
       }
@@ -60,7 +61,6 @@
         margin: 0;
         padding: 0;
       }
-
 
       .item-link {
         display: grid;
@@ -105,6 +105,24 @@
         color: #777;
         white-space: nowrap;
       }
+
+      footer {
+        margin-top: 34px;
+        padding: 0 12px;
+      }
+
+      .back-link {
+        color: #777;
+        font-size: 15px;
+        font-weight: 500;
+        text-decoration-color: #aaa;
+        text-underline-offset: 3px;
+      }
+
+      .back-link:hover {
+        color: #2f2f2f;
+        text-decoration-color: currentColor;
+      }
     </style>
   </head>
   <body>
@@ -115,26 +133,80 @@
     </header>
 
     <main>
+      <h2 class="section-label">personal projects</h2>
       <ul class="list">
+
+
         <li class="item">
-          <a class="item-link" href="/projects/">
+          <a
+            class="item-link"
+            href="https://github.com/maujim/mac-notch-timer"
+          >
             <div class="item-main">
-              <h3 class="item-title">projects</h3>
-              <p class="item-subtitle">code you might care about</p>
+              <h3 class="item-title">Mac Notch Timer</h3>
+              <p class="item-subtitle">
+                macOS notch timer app
+              </p>
+            </div>
+          </a>
+        </li>
+        <li class="item">
+          <a class="item-link" href="/projects/lego-hand-grid.html">
+            <div class="item-main">
+              <h3 class="item-title">LEGO Hand Grid</h3>
+              <p class="item-subtitle">Hand-controlled brick grid</p>
             </div>
           </a>
         </li>
 
         <li class="item">
-          <a class="item-link" href="/writing/">
+          <a
+            class="item-link"
+            href="https://github.com/maujim/hf-search-extension"
+          >
             <div class="item-main">
-              <h3 class="item-title">writing</h3>
-              <p class="item-subtitle">musings, past and present</p>
+              <h3 class="item-title">HF Search Extension</h3>
+              <p class="item-subtitle">
+                Browser extension for Hugging Face search
+              </p>
+            </div>
+          </a>
+        </li>
+
+        <li class="item">
+          <a
+            class="item-link"
+            href="https://github.com/maujim/tinyworlds-viewer"
+          >
+            <div class="item-main">
+              <h3 class="item-title">Tinyworlds Viewer</h3>
+              <p class="item-subtitle">Viewer for TinyWorlds projects</p>
+            </div>
+          </a>
+        </li>
+
+        <li class="item">
+          <a class="item-link" href="/projects/clinical-trials-viewer.html">
+            <div class="item-main">
+              <h3 class="item-title">Clinical Trials Viewer</h3>
+              <p class="item-subtitle">Search and explore studies</p>
+            </div>
+          </a>
+        </li>
+
+        <li class="item">
+          <a class="item-link" href="/projects/torus.html">
+            <div class="item-main">
+              <h3 class="item-title">Torus</h3>
+              <p class="item-subtitle">Experimental graphics page</p>
             </div>
           </a>
         </li>
       </ul>
     </main>
+    <footer>
+      <a class="back-link" href="/">← back</a>
+    </footer>
     <script src="/javascript/boids-background.js" defer></script>
   </body>
 </html>
